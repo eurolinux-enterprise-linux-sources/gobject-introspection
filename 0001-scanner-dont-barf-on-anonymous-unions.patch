@@ -1,0 +1,31 @@
+# This patch is a hand edited backport from upstream since RPM is crap
+# and doesn't understand git.
+
+From 305e0bd34a11e06219d1e6a7b7078918d050a4d6 Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Wed, 30 Oct 2013 15:24:06 +0000
+Subject: [PATCH] scanner: Don't barf on anonymous unions
+
+I'd like to be able to use this inside GTK+.
+
+See: https://bugzilla.gnome.org/show_bug.cgi?id=711153
+
+https://bugzilla.gnome.org/show_bug.cgi?id=711157
+---
+ giscanner/maintransformer.py           |  1 +
+ tests/scanner/Regress-1.0-expected.gir | 20 ++++++++++++++++++++
+ tests/scanner/regress.h                | 12 ++++++++++++
+ 3 files changed, 33 insertions(+)
+
+--- giscanner/maintransformer.py~	2013-02-19 10:57:45.000000000 -0500
++++ giscanner/maintransformer.py	2013-10-31 11:18:05.720336577 -0400
+@@ -116,7 +116,8 @@
+         for field in node.fields:
+             if field is None:
+                 continue
+-            if (field.name.startswith('_')
++            if (field.name is not None
++                and field.name.startswith('_')
+                 and field.anonymous_node is not None
+                 and isinstance(field.anonymous_node, ast.Callback)):
+                 field.introspectable = False
