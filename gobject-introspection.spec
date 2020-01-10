@@ -1,6 +1,6 @@
 Name:           gobject-introspection
 Version:        1.36.0
-Release:        2%{?dist}
+Release:        4%{?dist}
 Summary:        Introspection system for GObject-based libraries
 
 Group:      Development/Libraries
@@ -96,6 +96,12 @@ find $RPM_BUILD_ROOT -type f -name "*.a" -exec rm -f {} ';'
 %{_datadir}/gtk-doc/html/gi/*
 
 %changelog
+* Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 1.36.0-4
+- Mass rebuild 2014-01-24
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 1.36.0-3
+- Mass rebuild 2013-12-27
+
 * Thu Oct 31 2013 Colin Walters <walters@redhat.com> - 1.36.0-2
 - Backport patch for anonymous unions
   Resolves: #1024947
