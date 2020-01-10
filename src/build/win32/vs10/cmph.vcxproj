@@ -78,7 +78,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -127,29 +127,29 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\girepository\cmph\bdz.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\bdz_ph.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\bmz8.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\bmz.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\brz.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\buffer_entry.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\buffer_manager.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\chd.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\chd_ph.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\chm.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\cmph.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\cmph_structs.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\compressed_rank.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\compressed_seq.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\fch_buckets.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\fch.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\graph.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\hash.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\jenkins_hash.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\miller_rabin.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\select.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\vqueue.c" />
-    <ClCompile Include="..\..\..\girepository\cmph\vstack.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\bdz.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\bdz_ph.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\bmz8.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\bmz.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\brz.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\buffer_entry.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\buffer_manager.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\chd.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\chd_ph.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\chm.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\cmph.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\cmph_structs.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\compressed_rank.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\compressed_seq.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\fch_buckets.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\fch.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\graph.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\hash.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\jenkins_hash.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\miller_rabin.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\select.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\vqueue.c" />
+   <ClCompile Include="..\..\..\girepository\cmph\vstack.c" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="gi-prebuild.vcxproj">

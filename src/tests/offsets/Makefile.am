@@ -25,7 +25,7 @@ Offsets_1_0_gir_INCLUDES = GObject-2.0
 Offsets_1_0_gir_LIBS = liboffsets.la
 Offsets_1_0_gir_PACKAGES = gobject-2.0
 Offsets_1_0_gir_FILES = $(srcdir)/offsets.h $(srcdir)/offsets.c
-Offsets_1_0_gir_SCANNERFLAGS = --warn-all --warn-error  -I$(top_srcdir)/tests
+Offsets_1_0_gir_SCANNERFLAGS = $(INTROSPECTION_SCANNER_ARGS) --warn-all --warn-error  -I$(top_srcdir)/tests
 INTROSPECTION_GIRS += Offsets-1.0.gir
 
 CLEANFILES += Offsets-1.0.gir Offsets-1.0.typelib liboffsets.la
@@ -47,7 +47,7 @@ CLEANFILES += gitestoffsets.c $(EXTRA_PROGRAMS)
 
 ############################################################
 
-# The trailing "echo" in TESTS_ENVIRONMENT is used to ignore automake passing
+# The trailing "echo" in LOG_COMPILER is used to ignore automake passing
 # gitestoffsets as we already run this in the same command line.
 TESTS = gitestoffsets
 LOG_COMPILER = env GI_TYPELIB_PATH=:$(top_builddir) ./gitestoffsets$(EXEEXT) offsets.compiled offsets.introspected && \

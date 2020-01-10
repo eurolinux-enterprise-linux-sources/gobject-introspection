@@ -43,6 +43,7 @@ pkgpyexec_PYTHON = 			\
 	giscanner/libtoolimporter.py	\
 	giscanner/maintransformer.py	\
 	giscanner/message.py		\
+	giscanner/msvccompiler.py	\
 	giscanner/shlibs.py		\
 	giscanner/scannermain.py	\
 	giscanner/sectionparser.py	\
@@ -113,7 +114,8 @@ _giscanner_la_CFLAGS = \
 _giscanner_la_LIBADD = libgiscanner.la $(GOBJECT_LIBS)
 
 _giscanner_la_LDFLAGS = \
-	-module -avoid-version -export-symbols-regex init_giscanner
+	-module -avoid-version \
+	-export-symbols-regex "init_giscanner|PyInit__giscanner"
 
 if OS_WIN32
 # Windows requires Python extension modules to be explicitly

@@ -15,28 +15,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\girepository\cmph\bdz.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\bdz_ph.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\bmz8.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\bmz.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\brz.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\buffer_entry.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\buffer_manager.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\chd.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\chd_ph.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\chm.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\cmph.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\cmph_structs.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\compressed_rank.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\compressed_seq.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\fch_buckets.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\fch.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\graph.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\hash.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\jenkins_hash.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\miller_rabin.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\select.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\vqueue.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\cmph\vstack.c"><Filter>Sources</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\bdz.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\bdz_ph.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\bmz8.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\bmz.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\brz.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\buffer_entry.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\buffer_manager.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\chd.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\chd_ph.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\chm.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\cmph.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\cmph_structs.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\compressed_rank.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\compressed_seq.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\fch_buckets.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\fch.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\graph.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\hash.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\jenkins_hash.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\miller_rabin.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\select.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\vqueue.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\cmph\vstack.c"><Filter>Source Files</Filter></ClCompile>
   </ItemGroup>
 </Project>

@@ -15,27 +15,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\girepository\gdump.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\giarginfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\gibaseinfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\gicallableinfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\giconstantinfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\gienuminfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\gifieldinfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\gifunctioninfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\ginvoke.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\giinterfaceinfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\giobjectinfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\gipropertyinfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\giregisteredtypeinfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\girepository.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\girffi.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\gisignalinfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\gistructinfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\gitypeinfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\gitypelib.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\giunioninfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\givfuncinfo.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\gthash.c"><Filter>Sources</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\gdump.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\giarginfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\gibaseinfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\gicallableinfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\giconstantinfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\gienuminfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\gifieldinfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\gifunctioninfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\ginvoke.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\giinterfaceinfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\giobjectinfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\gipropertyinfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\giregisteredtypeinfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\girepository.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\girffi.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\gisignalinfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\gistructinfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\gitypeinfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\gitypelib.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\giunioninfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\givfuncinfo.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\gthash.c"><Filter>Source Files</Filter></ClCompile>
   </ItemGroup>
 </Project>

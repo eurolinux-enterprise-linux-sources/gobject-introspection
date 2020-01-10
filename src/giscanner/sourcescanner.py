@@ -19,12 +19,18 @@
 #
 
 from __future__ import with_statement
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import os
 import subprocess
 import tempfile
 
 from .libtoolimporter import LibtoolImporter
 from .message import Position
+from .ccompiler import CCompiler
 
 with LibtoolImporter(None, None):
     if 'UNINSTALLED_INTROSPECTION_SRCDIR' in os.environ:
@@ -119,7 +125,7 @@ class SourceType(object):
         self._stype = stype
 
     def __repr__(self):
-        return '<%s type=%r name=%r>' % (
+        return "<%s type='%s' name='%s'>" % (
             self.__class__.__name__,
             ctype_name(self.type),
             self.name)
@@ -166,8 +172,8 @@ class SourceSymbol(object):
         if src:
             line = self.line
             if line:
-                src += ':%r' % (line, )
-        return '<%s type=%r ident=%r src=%r>' % (
+                src += ":'%s'" % (line, )
+        return "<%s type='%s' ident='%s' src='%s'>" % (
             self.__class__.__name__,
             symbol_type_name(self.type),
             self.ident,
@@ -236,7 +242,7 @@ class SourceScanner(object):
                              ('-U', undefines)]:
             for arg in (args or []):
                 opt = prefix + arg
-                if not opt in self._cpp_options:
+                if opt not in self._cpp_options:
                     self._cpp_options.append(opt)
 
     def parse_files(self, filenames):
@@ -269,9 +275,9 @@ class SourceScanner(object):
         return self._scanner.get_comments()
 
     def dump(self):
-        print '-' * 30
+        print('-' * 30)
         for symbol in self._scanner.get_symbols():
-            print symbol.ident, symbol.base_type.name, symbol.type
+            print(symbol.ident, symbol.base_type.name, symbol.type)
 
     # Private
 
@@ -281,49 +287,37 @@ class SourceScanner(object):
 
         defines = ['__GI_SCANNER__']
         undefs = []
-        cpp_args = os.environ.get('CC', 'cc').split()  # support CC="ccache gcc"
-        if 'cl' in cpp_args:
-            # The Microsoft compiler/preprocessor (cl) does not accept
-            # source input from stdin (the '-' flag), so we need
-            # some help from gcc from MinGW/Cygwin or so.
-            # Note that the generated dumper program is
-            # still built and linked by Visual C++.
-            cpp_args = ['gcc']
-        cpp_args += os.environ.get('CPPFLAGS', '').split()
-        cpp_args += os.environ.get('CFLAGS', '').split()
-        cpp_args += ['-E', '-C', '-I.', '-']
-        cpp_args += self._cpp_options
 
-        proc = subprocess.Popen(cpp_args,
-                                stdin=subprocess.PIPE,
-                                stdout=subprocess.PIPE)
+        cc = CCompiler()
 
-        for define in defines:
-            proc.stdin.write('#ifndef %s\n' % (define, ))
-            proc.stdin.write('# define %s\n' % (define, ))
-            proc.stdin.write('#endif\n')
-        for undef in undefs:
-            proc.stdin.write('#undef %s\n' % (undef, ))
-        for filename in filenames:
-            proc.stdin.write('#include <%s>\n' % (filename, ))
-        proc.stdin.close()
+        tmp_fd_cpp, tmp_name_cpp = tempfile.mkstemp(prefix='g-ir-cpp-', suffix='.c')
+        with os.fdopen(tmp_fd_cpp, 'wb') as fp_cpp:
+            self._write_preprocess_src(fp_cpp, defines, undefs, filenames)
 
-        tmp_fd, tmp_name = tempfile.mkstemp()
-        fp = os.fdopen(tmp_fd, 'w+b')
-        while True:
-            data = proc.stdout.read(4096)
-            if data is None:
-                break
-            fp.write(data)
-            if len(data) < 4096:
-                break
-        fp.seek(0, 0)
+        tmpfile_basename = os.path.basename(os.path.splitext(tmp_name_cpp)[0])
 
-        assert proc, 'Proc was none'
-        proc.wait()
-        if proc.returncode != 0:
-            raise SystemExit('Error while processing the source.')
+        # Output file name of the preprocessor, only really used on non-MSVC,
+        # so we want the name to match the output file name of the MSVC preprocessor
+        tmpfile_output = tmpfile_basename + '.i'
+
+        cc.preprocess(tmp_name_cpp,
+                      tmpfile_output,
+                      self._cpp_options)
+
+        os.unlink(tmp_name_cpp)
+        fp = open(tmpfile_output, 'r')
 
         self._scanner.parse_file(fp.fileno())
         fp.close()
-        os.unlink(tmp_name)
+        os.unlink(tmpfile_output)
+
+    def _write_preprocess_src(self, fp, defines, undefs, filenames):
+        # Write to the temp file for feeding into the preprocessor
+        for define in defines:
+            fp.write(('#ifndef %s\n' % (define, )).encode())
+            fp.write(('# define %s\n' % (define, )).encode())
+            fp.write('#endif\n'.encode())
+        for undef in undefs:
+            fp.write(('#undef %s\n' % (undef, )).encode())
+        for filename in filenames:
+            fp.write(('#include <%s>\n' % (filename, )).encode())

@@ -82,7 +82,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libffi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -157,19 +157,18 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\girepository\gthash.c" />
-    <ClCompile Include="..\..\..\girepository\girmodule.c" />
-    <ClCompile Include="..\..\..\girepository\girnode.c" />
-    <ClCompile Include="..\..\..\girepository\giroffsets.c" />
-    <ClCompile Include="..\..\..\girepository\girparser.c" />
-    <ClCompile Include="..\..\..\girepository\girwriter.c" />
+   <ClCompile Include="..\..\..\girepository\gthash.c" />
+   <ClCompile Include="..\..\..\girepository\girmodule.c" />
+   <ClCompile Include="..\..\..\girepository\girnode.c" />
+   <ClCompile Include="..\..\..\girepository\giroffsets.c" />
+   <ClCompile Include="..\..\..\girepository\girparser.c" />
+   <ClCompile Include="..\..\..\girepository\girwriter.c" />
     <ClCompile Include="..\..\..\tools\compiler.c" />
   </ItemGroup>
   <ItemGroup>

@@ -201,10 +201,10 @@ typedef enum {
  * @directory: Offset of the directory in the typelib.
  * @n_attributes: Number of attribute blocks
  * @attributes: Offset of the list of attributes in the typelib.
- * @dependencies: Offset of a single string, which is the list of dependencies,
- *   separated by the '|' character.  The dependencies are required in order
- *   to avoid having programs consuming a typelib check for an "Unresolved"
- *   type return from every API call.
+ * @dependencies: Offset of a single string, which is the list of immediate
+ *   dependencies, separated by the '|' character.  The dependencies are
+ *   required in order to avoid having programs consuming a typelib check for
+ *   an "Unresolved" type return from every API call.
  * @size: The size in bytes of the typelib.
  * @namespace: Offset of the namespace string in the typelib.
  * @nsversion: Offset of the namespace version string in the typelib.
@@ -467,6 +467,8 @@ typedef struct {
  *   be skipped.
  * @instance_transfer_ownership: When calling, the function assumes ownership of
  *   the instance parameter.
+ * @throws: Denotes the signature takes an additional #GError argument beyond
+ *   the annotated arguments.
  * @reserved: Reserved for future use.
  * @n_arguments: The number of arguments that this function expects, also the
  *   length of the array of ArgBlobs.
@@ -482,7 +484,8 @@ typedef struct {
   guint16        caller_owns_return_container : 1;
   guint16        skip_return                  : 1;
   guint16        instance_transfer_ownership  : 1;
-  guint16        reserved                     :11;
+  guint16        throws                       : 1;
+  guint16        reserved                     :10;
 
   guint16        n_arguments;
 
@@ -522,7 +525,7 @@ typedef struct {
  * @constructor: The function acts as a constructor for the object it is
  *   contained in.
  * @wraps_vfunc: The function is a simple wrapper for a virtual function.
- * @throws: TODO
+ * @throws: (deprecated): This is now additionally stored in the #SignatureBlob.
  * @index: Index of the property that this function is a setter or getter of
  *   in the array of properties of the containing interface, or index
  *   of the virtual function that this function wraps.
@@ -990,7 +993,7 @@ typedef struct {
  *   virtual function.
  * @class_closure: Set if this virtual function is the class closure of a
  *   signal.
- * @throws: TODO
+ * @throws: (deprecated): This is now additionally stored in the #SignatureBlob.
  * @reserved: Reserved for future use.
  * @signal: The index of the signal in the list of signals of the object or
  *   interface to which this virtual function belongs.
@@ -1048,7 +1051,8 @@ typedef struct {
  * @n_constants: The lengths of the arrays.Up to 16bits of padding may be
  *   inserted between the arrays to ensure that they start on a 32bit
  *   boundary.
- * @reserved2: Reserved for future use.
+ * @n_field_callbacks: The number of n_fields which are also callbacks.
+ *   This is used to calculate the fields section size in constant time.
  * @ref_func: String pointing to a function which can be called to increase
  *   the reference count for an instance of this object type.
  * @unref_func: String pointing to a function which can be called to decrease
@@ -1085,7 +1089,7 @@ typedef struct {
   guint16   n_signals;
   guint16   n_vfuncs;
   guint16   n_constants;
-  guint16   reserved2;
+  guint16   n_field_callbacks;
 
   guint32   ref_func;
   guint32   unref_func;

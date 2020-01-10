@@ -17,7 +17,12 @@
 # Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 #
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
+import errno
 import re
 import os
 import subprocess
@@ -79,9 +84,8 @@ _libtool_pat = re.compile("dlname='([A-z0-9\.\-\+]+)'\n")
 
 
 def _extract_dlname_field(la_file):
-    f = open(la_file)
-    data = f.read()
-    f.close()
+    with open(la_file) as f:
+        data = f.read()
     m = _libtool_pat.search(data)
     if m:
         return m.groups()[0]
@@ -93,9 +97,8 @@ _libtool_libdir_pat = re.compile("libdir='([^']+)'")
 
 
 def _extract_libdir_field(la_file):
-    f = open(la_file)
-    data = f.read()
-    f.close()
+    with open(la_file) as f:
+        data = f.read()
     m = _libtool_libdir_pat.search(data)
     if m:
         return m.groups()[0]
@@ -165,16 +168,13 @@ def get_libtool_command(options):
 
 
 def files_are_identical(path1, path2):
-    f1 = open(path1)
-    f2 = open(path2)
-    buf1 = f1.read(8192)
-    buf2 = f2.read(8192)
-    while buf1 == buf2 and buf1 != '':
+    with open(path1, 'rb') as f1, open(path2, 'rb') as f2:
         buf1 = f1.read(8192)
         buf2 = f2.read(8192)
-    f1.close()
-    f2.close()
-    return buf1 == buf2
+        while buf1 == buf2 and buf1 != b'':
+            buf1 = f1.read(8192)
+            buf2 = f2.read(8192)
+        return buf1 == buf2
 
 
 def cflag_real_include_path(cflag):
@@ -209,3 +209,81 @@ def which(program):
                 return exe_file + '.exe'
 
     return None
+
+
+def makedirs(name, mode=0o777, exist_ok=False):
+    """Super-mkdir; create a leaf directory and all intermediate ones.  Works like
+    mkdir, except that any intermediate path segment (not just the rightmost)
+    will be created if it does not exist. If the target directory already
+    exists, raise an OSError if exist_ok is False. Otherwise no exception is
+    raised.  This is recursive.
+
+    Note: This function has been imported from Python 3.4 sources and adapted to work
+    with Python 2.X because get_user_cache_dir() uses the exist_ok parameter. It can
+    be removed again when Python 2.X support is dropped.
+    """
+    head, tail = os.path.split(name)
+    if not tail:
+        head, tail = os.path.split(head)
+    if head and tail and not os.path.exists(head):
+        try:
+            makedirs(head, mode, exist_ok)
+        except OSError as e:
+            # be happy if someone already created the path
+            if e.errno != errno.EEXIST:
+                raise
+        if tail == cdir:           # xxx/newdir/. exists if xxx/newdir exists
+            return
+    try:
+        os.mkdir(name, mode)
+    except OSError as e:
+        if not exist_ok or e.errno != errno.EEXIST or not os.path.isdir(name):
+            raise
+
+
+def get_user_cache_dir(dir=None):
+    '''
+    This is a Python reimplemention of `g_get_user_cache_dir()` because we don't want to
+    rely on the python-xdg package and we can't depend on GLib via introspection.
+    If any changes are made to that function they'll need to be copied here.
+    '''
+
+    xdg_cache_home = os.environ.get('XDG_CACHE_HOME')
+    if xdg_cache_home is not None:
+        if dir is not None:
+            xdg_cache_home = os.path.join(xdg_cache_home, dir)
+        try:
+            makedirs(xdg_cache_home, mode=0o755, exist_ok=True)
+        except:
+            # Let's fall back to ~/.cache below
+            pass
+        else:
+            return xdg_cache_home
+
+    homedir = os.path.expanduser('~')
+    if homedir is not None:
+        cachedir = os.path.join(homedir, '.cache')
+        if dir is not None:
+            cachedir = os.path.join(cachedir, dir)
+        try:
+            makedirs(cachedir, mode=0o755, exist_ok=True)
+        except:
+            return None
+        else:
+            return cachedir
+
+    return None
+
+
+def get_system_data_dirs():
+    '''
+    This is a Python reimplemention of `g_get_system_data_dirs()` because we don't want to
+    rely on the python-xdg package and we can't depend on GLib via introspection.
+    If any changes are made to that function they'll need to be copied here.
+    '''
+    xdg_data_dirs = [x for x in os.environ.get('XDG_DATA_DIRS', '').split(os.pathsep)]
+    if not xdg_data_dirs and os.name != 'nt':
+        xdg_data_dirs.append('/usr/local/share')
+        xdg_data_dirs.append('/usr/share')
+
+    return xdg_data_dirs

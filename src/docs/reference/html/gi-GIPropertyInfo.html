@@ -2,13 +2,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>GObject Introspection Reference Manual: GIPropertyInfo</title>
-<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<title>GIPropertyInfo: GObject Introspection Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="index.html" title="GObject Introspection Reference Manual">
 <link rel="up" href="ch01.html" title="GIRepository">
 <link rel="prev" href="gi-GIFieldInfo.html" title="GIFieldInfo">
 <link rel="next" href="gi-GITypeInfo.html" title="GITypeInfo">
-<meta name="generator" content="GTK-Doc V1.21.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -33,7 +33,7 @@
 </tr></table></div>
 <div class="refsect1">
 <a name="gi-GIPropertyInfo.functions"></a><h2>Functions</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="functions_return">
 <col class="functions_name">
@@ -47,7 +47,7 @@
 </tr>
 <tr>
 <td class="function_type">
-<a href="http://library.gnome.org/devel/gobject/unstable/gobject-GParamSpec.html#GParamFlags"><span class="returnvalue">GParamFlags</span></a>
+<span class="returnvalue">GParamFlags</span>
 </td>
 <td class="function_name">
 <a class="link" href="gi-GIPropertyInfo.html#g-property-info-get-flags" title="g_property_info_get_flags ()">g_property_info_get_flags</a> <span class="c_punctuation">()</span>
@@ -74,7 +74,7 @@
 </div>
 <div class="refsect1">
 <a name="gi-GIPropertyInfo.other"></a><h2>Types and Values</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="name">
 <col class="description">
@@ -105,8 +105,8 @@ either a <a class="link" href="gi-GIObjectInfo.html#GIObjectInfo" title="GIObjec
 <p>Checks if <em class="parameter"><code>info</code></em>
  is a <a class="link" href="gi-GIPropertyInfo.html#GIPropertyInfo" title="GIPropertyInfo"><span class="type">GIPropertyInfo</span></a>.</p>
 <div class="refsect3">
-<a name="id-1.4.2.20.6.2.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="GI-IS-PROPERTY-INFO.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -123,13 +123,13 @@ either a <a class="link" href="gi-GIObjectInfo.html#GIObjectInfo" title="GIObjec
 <hr>
 <div class="refsect2">
 <a name="g-property-info-get-flags"></a><h3>g_property_info_get_flags ()</h3>
-<pre class="programlisting"><a href="http://library.gnome.org/devel/gobject/unstable/gobject-GParamSpec.html#GParamFlags"><span class="returnvalue">GParamFlags</span></a>
+<pre class="programlisting"><span class="returnvalue">GParamFlags</span>
 g_property_info_get_flags (<em class="parameter"><code><a class="link" href="gi-GIPropertyInfo.html#GIPropertyInfo" title="GIPropertyInfo"><span class="type">GIPropertyInfo</span></a> *info</code></em>);</pre>
-<p>Obtain the flags for this property info. See <a href="http://library.gnome.org/devel/gobject/unstable/gobject-GParamSpec.html#GParamFlags"><span class="type">GParamFlags</span></a> for
+<p>Obtain the flags for this property info. See <span class="type">GParamFlags</span> for
 more information about possible flag values.</p>
 <div class="refsect3">
-<a name="id-1.4.2.20.6.3.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-property-info-get-flags.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -143,9 +143,8 @@ more information about possible flag values.</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.20.6.3.6"></a><h4>Returns</h4>
+<a name="g-property-info-get-flags.returns"></a><h4>Returns</h4>
 <p> the flags</p>
-<p></p>
 </div>
 </div>
 <hr>
@@ -157,8 +156,8 @@ g_property_info_get_ownership_transfer
 <p>Obtain the ownership transfer for this property. See <a class="link" href="gi-GIArgInfo.html#GITransfer" title="enum GITransfer"><span class="type">GITransfer</span></a> for more
 information about transfer values.</p>
 <div class="refsect3">
-<a name="id-1.4.2.20.6.4.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-property-info-get-ownership-transfer.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -172,9 +171,8 @@ information about transfer values.</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.20.6.4.6"></a><h4>Returns</h4>
+<a name="g-property-info-get-ownership-transfer.returns"></a><h4>Returns</h4>
 <p> the transfer</p>
-<p></p>
 </div>
 </div>
 <hr>
@@ -185,8 +183,8 @@ g_property_info_get_type (<em class="parameter"><code><a class="link" href="gi-G
 <p>Obtain the type information for the property <em class="parameter"><code>info</code></em>
 .</p>
 <div class="refsect3">
-<a name="id-1.4.2.20.6.5.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-property-info-get-type.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -200,7 +198,7 @@ g_property_info_get_type (<em class="parameter"><code><a class="link" href="gi-G
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.20.6.5.6"></a><h4>Returns</h4>
+<a name="g-property-info-get-type.returns"></a><h4>Returns</h4>
 <p> the <a class="link" href="gi-GITypeInfo.html#GITypeInfo" title="GITypeInfo"><span class="type">GITypeInfo</span></a>, free it with
 <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
@@ -218,7 +216,6 @@ g_property_info_get_type (<em class="parameter"><code><a class="link" href="gi-G
 </div>
 </div>
 <div class="footer">
-<hr>
-          Generated by GTK-Doc V1.21.1</div>
+<hr>Generated by GTK-Doc V1.25.1</div>
 </body>
 </html>

@@ -18,8 +18,12 @@
 # Boston, MA 02111-1307, USA.
 #
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import errno
-import cPickle
 import glob
 import hashlib
 import os
@@ -27,60 +31,41 @@ import shutil
 import sys
 import tempfile
 
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
 import giscanner
+
+from . import utils
+
 
 _CACHE_VERSION_FILENAME = '.cache-version'
 
 
 def _get_versionhash():
     toplevel = os.path.dirname(giscanner.__file__)
-    # Use pyc instead of py to avoid extra IO
-    sources = glob.glob(os.path.join(toplevel, '*.pyc'))
+    sources = glob.glob(os.path.join(toplevel, '*.py'))
     sources.append(sys.argv[0])
     # Using mtimes is a bit (5x) faster than hashing the file contents
     mtimes = (str(os.stat(source).st_mtime) for source in sources)
-    return hashlib.sha1(''.join(mtimes)).hexdigest()
-
-
-def _get_cachedir():
-    if 'GI_SCANNER_DISABLE_CACHE' in os.environ:
-        return None
-    homedir = os.path.expanduser('~')
-    if homedir is None:
-        return None
-    if not os.path.exists(homedir):
-        return None
-
-    cachedir = os.path.join(homedir, '.cache')
-    if not os.path.exists(cachedir):
-        try:
-            os.mkdir(cachedir, 0o755)
-        except OSError:
-            return None
-
-    scannerdir = os.path.join(cachedir, 'g-ir-scanner')
-    if not os.path.exists(scannerdir):
-        try:
-            os.mkdir(scannerdir, 0o755)
-        except OSError:
-            return None
-    # If it exists and is a file, don't cache at all
-    elif not os.path.isdir(scannerdir):
-        return None
-    return scannerdir
+    # ASCII encoding is sufficient since we are only dealing with numbers.
+    return hashlib.sha1(''.join(mtimes).encode('ascii')).hexdigest()
 
 
 class CacheStore(object):
 
     def __init__(self):
-        try:
-            self._directory = _get_cachedir()
-        except OSError as e:
-            if e.errno != errno.EPERM:
-                raise
-            self._directory = None
-
+        self._directory = self._get_cachedir()
         self._check_cache_version()
+
+    def _get_cachedir(self):
+        if 'GI_SCANNER_DISABLE_CACHE' in os.environ:
+            return None
+        else:
+            cachedir = utils.get_user_cache_dir('g-ir-scanner')
+            return cachedir
 
     def _check_cache_version(self):
         if self._directory is None:
@@ -89,7 +74,8 @@ class CacheStore(object):
         current_hash = _get_versionhash()
         version = os.path.join(self._directory, _CACHE_VERSION_FILENAME)
         try:
-            cache_hash = open(version).read()
+            with open(version, 'r') as version_file:
+                cache_hash = version_file.read()
         except IOError as e:
             # File does not exist
             if e.errno == errno.ENOENT:
@@ -100,11 +86,16 @@ class CacheStore(object):
         if current_hash == cache_hash:
             return
 
-        versiontmp = version + '.tmp'
-
         self._clean()
+
+        tmp_fd, tmp_filename = tempfile.mkstemp(prefix='g-ir-scanner-cache-version-')
         try:
-            fp = open(versiontmp, 'w')
+            with os.fdopen(tmp_fd, 'w') as tmp_file:
+                tmp_file.write(current_hash)
+
+            # On Unix, this would just be os.rename() but Windows
+            # doesn't allow that.
+            shutil.move(tmp_filename, version)
         except IOError as e:
             # Permission denied
             if e.errno == errno.EACCES:
@@ -112,19 +103,15 @@ class CacheStore(object):
             else:
                 raise
 
-        fp.write(current_hash)
-        fp.close()
-        # On Unix, this would just be os.rename() but Windows
-        # doesn't allow that.
-        shutil.move(versiontmp, version)
-
     def _get_filename(self, filename):
         # If we couldn't create the directory we're probably
         # on a read only home directory where we just disable
         # the cache all together.
         if self._directory is None:
             return
-        hexdigest = hashlib.sha1(filename).hexdigest()
+        # Assume UTF-8 encoding for the filenames. This doesn't matter so much
+        # as long as the results of this method always produce the same hash.
+        hexdigest = hashlib.sha1(filename.encode('utf-8')).hexdigest()
         return os.path.join(self._directory, hexdigest)
 
     def _cache_is_valid(self, store_filename, filename):
@@ -163,7 +150,8 @@ class CacheStore(object):
 
         tmp_fd, tmp_filename = tempfile.mkstemp(prefix='g-ir-scanner-cache-')
         try:
-            cPickle.dump(data, os.fdopen(tmp_fd, 'w'))
+            with os.fdopen(tmp_fd, 'wb') as tmp_file:
+                pickle.dump(data, tmp_file)
         except IOError as e:
             # No space left on device
             if e.errno == errno.ENOSPC:
@@ -186,7 +174,7 @@ class CacheStore(object):
         if store_filename is None:
             return
         try:
-            fd = open(store_filename)
+            fd = open(store_filename, 'rb')
         except IOError as e:
             if e.errno == errno.ENOENT:
                 return None
@@ -195,8 +183,8 @@ class CacheStore(object):
         if not self._cache_is_valid(store_filename, filename):
             return None
         try:
-            data = cPickle.load(fd)
-        except (AttributeError, EOFError, ValueError, cPickle.BadPickleGet):
+            data = pickle.load(fd)
+        except (AttributeError, EOFError, ValueError, pickle.BadPickleGet):
             # Broken cache entry, remove it
             self._remove_filename(store_filename)
             data = None

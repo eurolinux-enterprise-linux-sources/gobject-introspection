@@ -20,8 +20,14 @@
 # 02110-1301, USA.
 #
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import os
 import sys
+import operator
 
 from . import utils
 
@@ -43,12 +49,34 @@ class Position(object):
         self.line = line
         self.column = column
 
-    def __cmp__(self, other):
-        return cmp((self.filename, self.line, self.column),
-                   (other.filename, other.line, other.column))
+    def _compare(self, other, op):
+        return op((self.filename, self.line, self.column),
+                  (other.filename, other.line, other.column))
+
+    def __lt__(self, other):
+        return self._compare(other, operator.lt)
+
+    def __gt__(self, other):
+        return self._compare(other, operator.gt)
+
+    def __ge__(self, other):
+        return self._compare(other, operator.ge)
+
+    def __le__(self, other):
+        return self._compare(other, operator.le)
+
+    def __eq__(self, other):
+        return self._compare(other, operator.eq)
+
+    def __ne__(self, other):
+        return self._compare(other, operator.ne)
+
+    def __hash__(self):
+        return hash((self.filename, self.line, self.column))
 
     def __repr__(self):
-        return '<Position %s:%d:%d>' % (os.path.basename(self.filename), self.line or -1,
+        return '<Position %s:%d:%d>' % (os.path.basename(self.filename),
+                                        self.line or -1,
                                         self.column or -1)
 
     def format(self, cwd):
@@ -69,7 +97,7 @@ class Position(object):
 class MessageLogger(object):
     _instance = None
 
-    def __init__(self, namespace, output=None):
+    def __init__(self, namespace=None, output=None):
         if output is None:
             output = sys.stderr
         self._cwd = os.getcwd()
@@ -94,7 +122,7 @@ class MessageLogger(object):
     def get_error_count(self):
         return self._error_count
 
-    def log(self, log_type, text, positions=None, prefix=None):
+    def log(self, log_type, text, positions=None, prefix=None, marker_pos=None, marker_line=None):
         """
         Log a warning, using optional file positioning information.
         If the warning is related to a ast.Node type, see log_node().
@@ -103,7 +131,7 @@ class MessageLogger(object):
 
         self._warning_count += 1
 
-        if not log_type in self._enable_warnings:
+        if log_type not in self._enable_warnings:
             return
 
         if type(positions) == set:
@@ -126,9 +154,16 @@ class MessageLogger(object):
         elif log_type == FATAL:
             error_type = "Fatal"
 
+        if marker_pos is not None and marker_line is not None:
+            text = '%s\n%s\n%s' % (text, marker_line, ' ' * marker_pos + '^')
+
         if prefix:
-            text = ('%s: %s: %s: %s: %s\n' % (last_position, error_type,
-                                              self._namespace.name, prefix, text))
+            if self._namespace:
+                text = ('%s: %s: %s: %s: %s\n' % (last_position, error_type,
+                                                  self._namespace.name, prefix, text))
+            else:
+                text = ('%s: %s: %s: %s\n' % (last_position, error_type,
+                                              prefix, text))
         else:
             if self._namespace:
                 text = ('%s: %s: %s: %s\n' % (last_position, error_type,
@@ -157,9 +192,7 @@ class MessageLogger(object):
         elif context and context.file_positions:
             positions = context.file_positions
         else:
-            positions = []
-            if not context:
-                text = "context=%r %s" % (node, text)
+            positions = set()
 
         if context:
             text = "%s: %s" % (getattr(context, 'symbol', context.name), text)
@@ -171,7 +204,7 @@ class MessageLogger(object):
     def log_symbol(self, log_type, symbol, text):
         """Log a warning in the context of the given symbol."""
         self.log(log_type, text, symbol.position,
-                 prefix="symbol=%r" % (symbol.ident, ))
+                 prefix="symbol='%s'" % (symbol.ident, ))
 
 
 def log_node(log_type, node, text, context=None, positions=None):
@@ -179,13 +212,17 @@ def log_node(log_type, node, text, context=None, positions=None):
     ml.log_node(log_type, node, text, context=context, positions=positions)
 
 
-def warn(text, positions=None, prefix=None):
+def warn(text, positions=None, prefix=None, marker_pos=None, marker_line=None):
     ml = MessageLogger.get()
-    ml.log(WARNING, text, positions, prefix)
+    ml.log(WARNING, text, positions, prefix, marker_pos, marker_line)
 
 
 def warn_node(node, text, context=None, positions=None):
     log_node(WARNING, node, text, context=context, positions=positions)
+
+
+def error_node(node, text, context=None, positions=None):
+    log_node(ERROR, node, text, context=context, positions=positions)
 
 
 def warn_symbol(symbol, text):
@@ -193,11 +230,11 @@ def warn_symbol(symbol, text):
     ml.log_symbol(WARNING, symbol, text)
 
 
-def error(text, positions=None, prefix=None):
+def error(text, positions=None, prefix=None, marker_pos=None, marker_line=None):
     ml = MessageLogger.get()
-    ml.log(ERROR, text, positions, prefix)
+    ml.log(ERROR, text, positions, prefix, marker_pos, marker_line)
 
 
-def fatal(text, positions=None, prefix=None):
+def fatal(text, positions=None, prefix=None, marker_pos=None, marker_line=None):
     ml = MessageLogger.get()
-    ml.log(FATAL, text, positions, prefix)
+    ml.log(FATAL, text, positions, prefix, marker_pos, marker_line)

@@ -204,6 +204,7 @@ dump_signals (GType type, GOutputStream *out)
 	}
       goutput_write (out, "    </signal>\n");
     }
+  g_free (sig_ids);
 }
 
 static void
@@ -249,6 +250,8 @@ dump_object_type (GType type, const char *symbol, GOutputStream *out)
       escaped_printf (out, "    <implements name=\"%s\"/>\n",
 		      g_type_name (itype));
     }
+  g_free (interfaces);
+
   dump_properties (type, out);
   dump_signals (type, out);
   goutput_write (out, "  </class>\n");
@@ -280,6 +283,8 @@ dump_interface_type (GType type, const char *symbol, GOutputStream *out)
       escaped_printf (out, "    <prerequisite name=\"%s\"/>\n",
 		      g_type_name (itype));
     }
+  g_free (interfaces);
+
   dump_properties (type, out);
   dump_signals (type, out);
   goutput_write (out, "  </interface>\n");
@@ -379,6 +384,7 @@ dump_fundamental_type (GType type, const char *symbol, GOutputStream *out)
       escaped_printf (out, "    <implements name=\"%s\"/>\n",
 		      g_type_name (itype));
     }
+  g_free (interfaces);
   goutput_write (out, "  </fundamental>\n");
 }
 
@@ -471,11 +477,20 @@ g_irepository_dump (const char *arg, GError **error)
   input_file = g_file_new_for_path (args[0]);
   output_file = g_file_new_for_path (args[1]);
 
+  g_strfreev (args);
+
   input = g_file_read (input_file, NULL, error);
+  g_object_unref (input_file);
+
   if (input == NULL)
-    return FALSE;
+    {
+      g_object_unref (output_file);
+      return FALSE;
+    }
 
   output = g_file_replace (output_file, NULL, FALSE, 0, NULL, error);
+  g_object_unref (output_file);
+
   if (output == NULL)
     {
       g_input_stream_close (G_INPUT_STREAM (input), NULL, NULL);

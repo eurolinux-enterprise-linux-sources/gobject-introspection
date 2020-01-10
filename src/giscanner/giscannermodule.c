@@ -39,32 +39,38 @@
 
 #include <glib-object.h>
 
-DL_EXPORT(void) init_giscanner(void);
+#ifndef Py_TYPE
+    #define Py_TYPE(ob) (((PyObject*)(ob))->ob_type)
+#endif
+
+#if PY_MAJOR_VERSION >= 3
+    #define MOD_INIT(name) PyMODINIT_FUNC PyInit_##name(void)
+    #define MOD_ERROR_RETURN NULL
+    #define PyInt_FromLong PyLong_FromLong
+#else
+    #define MOD_INIT(name) DL_EXPORT(void) init##name(void)
+    #define MOD_ERROR_RETURN
+#endif
+
+/* forward declaration */
+MOD_INIT(_giscanner);
 
 #define NEW_CLASS(ctype, name, cname, num_methods)	      \
 static const PyMethodDef _Py##cname##_methods[num_methods];    \
 PyTypeObject Py##cname##_Type = {             \
-    PyObject_HEAD_INIT(NULL)                  \
-    0,			                      \
+    PyVarObject_HEAD_INIT(NULL, 0)            \
     "scanner." name,                          \
-    sizeof(ctype),     	              \
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	      \
-    0, 0, 0, 0,	0, 0,			      \
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, \
-    NULL, 0, 0, 0,	                      \
-    0,	      \
-    0, 0,                                     \
-    0,                                        \
-    0, 0, NULL, NULL, 0, 0,	              \
-    0             \
+    sizeof(ctype),                            \
+    0                                         \
 }
 
 #define REGISTER_TYPE(d, name, type)	      \
-    type.ob_type = &PyType_Type;              \
+    Py_TYPE(&type) = &PyType_Type;             \
     type.tp_alloc = PyType_GenericAlloc;      \
     type.tp_new = PyType_GenericNew;          \
+    type.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE; \
     if (PyType_Ready (&type))                 \
-	return;                               \
+        return MOD_ERROR_RETURN;              \
     PyDict_SetItemString (d, name, (PyObject *)&type); \
     Py_INCREF (&type);
 
@@ -141,7 +147,7 @@ symbol_get_ident (PyGISourceSymbol *self,
       return Py_None;
     }
 
-  return PyString_FromString (self->symbol->ident);
+  return PyUnicode_FromString (self->symbol->ident);
 }
 
 static PyObject *
@@ -189,7 +195,7 @@ symbol_get_const_string (PyGISourceSymbol *self,
       return Py_None;
     }
 
-  return PyString_FromString (self->symbol->const_string);
+  return PyUnicode_FromString (self->symbol->const_string);
 }
 
 static PyObject *
@@ -215,7 +221,7 @@ symbol_get_source_filename (PyGISourceSymbol *self,
       return Py_None;
     }
 
-  return PyString_FromString (self->symbol->source_filename);
+  return PyUnicode_FromString (self->symbol->source_filename);
 }
 
 static const PyGetSetDef _PyGISourceSymbol_getsets[] = {
@@ -296,7 +302,7 @@ type_get_name (PyGISourceType *self,
       return Py_None;
     }
 
-  return PyString_FromString (self->type->name);
+  return PyUnicode_FromString (self->type->name);
 }
 
 static PyObject *
@@ -402,16 +408,34 @@ pygi_source_scanner_parse_macros (PyGISourceScanner *self,
   for (i = 0; i < PyList_Size (list); ++i)
     {
       PyObject *obj;
-      char *filename;
+      char *filename = NULL;
 
       obj = PyList_GetItem (list, i);
-      filename = PyString_AsString (obj);
+      if (PyUnicode_Check (obj))
+        {
+          PyObject *s = PyUnicode_AsUTF8String (obj);
+          filename = g_strdup (PyBytes_AsString (s));
+          Py_DECREF (s);
+        }
+      else if (PyBytes_Check (obj))
+        {
+          filename = g_strdup (PyBytes_AsString (obj));
+        }
+
+      if (filename == NULL)
+        {
+          PyErr_Format (PyExc_RuntimeError,
+                        "Expected string but got %s",
+                        (Py_TYPE(obj))->tp_name);
+          g_list_free_full (filenames, g_free);
+          return NULL;
+        }
 
       filenames = g_list_append (filenames, filename);
     }
 
   gi_source_scanner_parse_macros (self->scanner, filenames);
-  g_list_free (filenames);
+  g_list_free_full (filenames, g_free);
 
   Py_INCREF (Py_None);
   return Py_None;
@@ -430,7 +454,9 @@ pygi_source_scanner_parse_file (PyGISourceScanner *self,
 #ifdef _WIN32
   /* The file descriptor passed to us is from the C library Python
    * uses. That is msvcr71.dll for Python 2.5 and msvcr90.dll for
-   * Python 2.6, 2.7, 3.2 etc; and msvcr100.dll for Python 3.3 and later.
+   * Python 2.6, 2.7, 3.2 etc; and msvcr100.dll for Python 3.3 and 3.4.
+   * Python 3.5 and later is built with Visual Studio 2015, which uses
+   * the universal CRT, so we need to deal with urtbase.dll here instead.
    * This code, at least if compiled with mingw, uses
    * msvcrt.dll, so we cannot use the file descriptor directly. So
    * perform appropriate magic.
@@ -441,7 +467,12 @@ pygi_source_scanner_parse_file (PyGISourceScanner *self,
    * (Not if a build using WDK is used):
    * Python 2.6.x/2.7.x with Visual C++ 2008
    * Python 3.1.x/3.2.x with Visual C++ 2008
-   * Python 3.3+ with Visual C++ 2010
+   * Python 3.3.x/3.4.x with Visual C++ 2010
+   */
+
+  /* XXX: Somehow we cannot use the FD directly on Python 3.5+ even when
+   *      using Visual Studio 2015, so we currently need to use _get_osfhandle() when
+   *      in all cases on Python 3.5+
    */
 
 #if (defined(_MSC_VER) && !defined(USE_WIN_DDK))
@@ -449,23 +480,23 @@ pygi_source_scanner_parse_file (PyGISourceScanner *self,
 #define MSVC_USE_FD_DIRECTLY 1
 #elif (PY_MAJOR_VERSION==3 && PY_MINOR_VERSION<=2 && (_MSC_VER >= 1500 && _MSC_VER < 1600))
 #define MSVC_USE_FD_DIRECTLY 1
-#elif (PY_MAJOR_VERSION==3 && PY_MINOR_VERSION>=3 && (_MSC_VER >= 1600 && _MSC_VER < 1700))
+#elif (PY_MAJOR_VERSION==3 && PY_MINOR_VERSION<=4 && (_MSC_VER >= 1600 && _MSC_VER < 1700))
 #define MSVC_USE_FD_DIRECTLY 1
 #endif
 #endif
 
-#ifndef MSVC_USE_FD_DIRECTLY
+#if !defined(MSVC_USE_FD_DIRECTLY) && !defined(__MINGW64_VERSION_MAJOR)
   {
 #if defined(PY_MAJOR_VERSION) && PY_MAJOR_VERSION==2 && PY_MINOR_VERSION==5
 #define PYTHON_MSVCRXX_DLL "msvcr71.dll"
-#elif defined(PY_MAJOR_VERSION) && PY_MAJOR_VERSION==2 && PY_MINOR_VERSION==6
-#define PYTHON_MSVCRXX_DLL "msvcr90.dll"
 #elif defined(PY_MAJOR_VERSION) && PY_MAJOR_VERSION==2 && PY_MINOR_VERSION==7
 #define PYTHON_MSVCRXX_DLL "msvcr90.dll"
-#elif defined(PY_MAJOR_VERSION) && PY_MAJOR_VERSION==3 && PY_MINOR_VERSION==2
+#elif defined(PY_MAJOR_VERSION) && PY_MAJOR_VERSION==3 && PY_MINOR_VERSION<=2
 #define PYTHON_MSVCRXX_DLL "msvcr90.dll"
-#elif defined(PY_MAJOR_VERSION) && PY_MAJOR_VERSION==3 && PY_MINOR_VERSION>=3
+#elif defined(PY_MAJOR_VERSION) && PY_MAJOR_VERSION==3 &&  PY_MINOR_VERSION<=4
 #define PYTHON_MSVCRXX_DLL "msvcr100.dll"
+#elif defined(PY_MAJOR_VERSION) && PY_MAJOR_VERSION==3 && PY_MINOR_VERSION>=5
+#define PYTHON_MSVCRXX_DLL "ucrtbase.dll"
 #else
 #error This Python version not handled
 #endif
@@ -593,10 +624,41 @@ pygi_source_scanner_get_comments (PyGISourceScanner *self)
   for (l = comments; l; l = l->next)
     {
       GISourceComment *comment = l->data;
-      PyObject *item = Py_BuildValue ("(ssi)", comment->comment,
-                                      comment->filename,
-                                      comment->line);
+      PyObject *comment_obj;
+      PyObject *filename_obj;
+      PyObject *item;
+
+      if (comment->comment)
+        {
+          comment_obj = PyUnicode_FromString (comment->comment);
+          if (!comment_obj)
+            {
+              g_print ("Comment is not valid Unicode in %s line %d\n", comment->filename, comment->line);
+              Py_INCREF (Py_None);
+              comment_obj = Py_None;
+            }
+        }
+      else
+        {
+          Py_INCREF (Py_None);
+          comment_obj = Py_None;
+        }
+
+      if (comment->filename)
+        {
+          filename_obj = PyUnicode_FromString (comment->filename);
+        }
+      else
+        {
+          Py_INCREF (Py_None);
+          filename_obj = Py_None;
+        }
+
+      item = Py_BuildValue ("(OOi)", comment_obj, filename_obj, comment->line);
       PyList_SetItem (list, i++, item);
+
+      Py_DECREF (comment_obj);
+      Py_DECREF (filename_obj);
     }
 
   g_slist_free (comments);
@@ -644,9 +706,9 @@ static int calc_attrs_length(PyObject *attributes, int indent,
         if (!s) {
           return -1;
         }
-        value = PyString_AsString(s);
-      } else if (PyString_Check(pyvalue)) {
-        value = PyString_AsString(pyvalue);
+        value = PyBytes_AsString(s);
+      } else if (PyBytes_Check(pyvalue)) {
+        value = PyBytes_AsString(pyvalue);
       } else {
         PyErr_SetString(PyExc_TypeError,
                         "value must be string or unicode");
@@ -731,9 +793,9 @@ pygi_collect_attributes (PyObject *self,
         s = PyUnicode_AsUTF8String(pyvalue);
         if (!s)
 	  goto out;
-        value = PyString_AsString(s);
-      } else if (PyString_Check(pyvalue)) {
-        value = PyString_AsString(pyvalue);
+        value = PyBytes_AsString(s);
+      } else if (PyBytes_Check(pyvalue)) {
+        value = PyBytes_AsString(pyvalue);
       } else {
         PyErr_SetString(PyExc_TypeError,
                         "value must be string or unicode");
@@ -767,25 +829,43 @@ pygi_collect_attributes (PyObject *self,
 
 /* Module */
 
-static const PyMethodDef pyscanner_functions[] = {
+static PyMethodDef pyscanner_functions[] = {
   { "collect_attributes",
     (PyCFunction) pygi_collect_attributes, METH_VARARGS },
   { NULL, NULL, 0, NULL }
 };
 
-DL_EXPORT(void)
-init_giscanner(void)
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef moduledef = {
+	PyModuleDef_HEAD_INIT,
+	NULL, /* m_name */
+	NULL, /* m_doc */
+	0,
+	pyscanner_functions,
+	NULL
+};
+#endif /* PY_MAJOR_VERSION >= 3 */
+
+
+MOD_INIT(_giscanner)
 {
     PyObject *m, *d;
     gboolean is_uninstalled;
+    const char *module_name;
 
     /* Hack to avoid having to create a fake directory structure; when
      * running uninstalled, the module will be in the top builddir,
      * with no _giscanner prefix.
      */
     is_uninstalled = g_getenv ("UNINSTALLED_INTROSPECTION_SRCDIR") != NULL;
-    m = Py_InitModule (is_uninstalled ? "_giscanner" : "giscanner._giscanner",
-		       (PyMethodDef*)pyscanner_functions);
+    module_name = is_uninstalled ? "_giscanner" : "giscanner._giscanner";
+
+#if PY_MAJOR_VERSION >= 3
+    moduledef.m_name = module_name;
+    m = PyModule_Create (&moduledef);
+#else
+    m = Py_InitModule (module_name, (PyMethodDef*)pyscanner_functions);
+#endif
     d = PyModule_GetDict (m);
 
     PyGISourceScanner_Type.tp_init = (initproc)pygi_source_scanner_init;
@@ -797,4 +877,8 @@ init_giscanner(void)
 
     PyGISourceType_Type.tp_getset = (PyGetSetDef*)_PyGISourceType_getsets;
     REGISTER_TYPE (d, "SourceType", PyGISourceType_Type);
+
+#if PY_MAJOR_VERSION >= 3
+    return m;
+#endif
 }

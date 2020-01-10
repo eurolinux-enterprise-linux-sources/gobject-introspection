@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.0.2.  */
+/* A Bison parser, made by GNU Bison 3.0.4.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "3.0.2"
+#define YYBISON_VERSION "3.0.4"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -62,7 +62,7 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 29 "giscanner/scannerparser.y" /* yacc.c:339  */
+#line 29 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:339  */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -439,10 +439,10 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE YYSTYPE;
+
 union YYSTYPE
 {
-#line 212 "giscanner/scannerparser.y" /* yacc.c:355  */
+#line 212 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:355  */
 
   char *str;
   GList *list;
@@ -455,6 +455,8 @@ union YYSTYPE
 
 #line 457 "scannerparser.c" /* yacc.c:355  */
 };
+
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -468,7 +470,7 @@ int yyparse (GISourceScanner* scanner);
 
 /* Copy the second part of user declarations.  */
 
-#line 472 "scannerparser.c" /* yacc.c:358  */
+#line 474 "scannerparser.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -2361,7 +2363,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 305 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 305 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = g_hash_table_lookup (const_table, (yyvsp[0].str));
 		if ((yyval.symbol) == NULL) {
@@ -2370,11 +2372,11 @@ yyreduce:
 			(yyval.symbol) = gi_source_symbol_ref ((yyval.symbol));
 		}
 	  }
-#line 2374 "scannerparser.c" /* yacc.c:1646  */
+#line 2376 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 314 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 314 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		char *rest;
 		guint64 value;
@@ -2390,58 +2392,58 @@ yyreduce:
 		(yyval.symbol)->const_int = value;
 		(yyval.symbol)->const_int_is_unsigned = (rest && (rest[0] == 'U'));
 	  }
-#line 2394 "scannerparser.c" /* yacc.c:1646  */
+#line 2396 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 330 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 330 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_boolean_set = TRUE;
 		(yyval.symbol)->const_boolean = g_ascii_strcasecmp (yytext, "true") == 0 ? TRUE : FALSE;
 	  }
-#line 2404 "scannerparser.c" /* yacc.c:1646  */
+#line 2406 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 336 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 336 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
 		(yyval.symbol)->const_int = g_utf8_get_char(yytext + 1);
 	  }
-#line 2414 "scannerparser.c" /* yacc.c:1646  */
+#line 2416 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 342 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 342 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_double_set = TRUE;
 		(yyval.symbol)->const_double = 0.0;
         sscanf (yytext, "%lf", &((yyval.symbol)->const_double));
 	  }
-#line 2425 "scannerparser.c" /* yacc.c:1646  */
+#line 2427 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 350 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 350 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[-1].symbol);
 	  }
-#line 2433 "scannerparser.c" /* yacc.c:1646  */
+#line 2435 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 354 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 354 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 2441 "scannerparser.c" /* yacc.c:1646  */
+#line 2443 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 362 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 362 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		yytext[strlen (yytext) - 1] = '\0';
@@ -2456,11 +2458,11 @@ yyreduce:
                   }
 
 	  }
-#line 2460 "scannerparser.c" /* yacc.c:1646  */
+#line 2462 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 377 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 377 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		char *strings, *string2;
 		(yyval.symbol) = (yyvsp[-1].symbol);
@@ -2471,91 +2473,91 @@ yyreduce:
 		g_free (string2);
 		(yyval.symbol)->const_string = strings;
 	  }
-#line 2475 "scannerparser.c" /* yacc.c:1646  */
+#line 2477 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 391 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 391 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.str) = g_strdup (yytext);
 	  }
-#line 2483 "scannerparser.c" /* yacc.c:1646  */
+#line 2485 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 404 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 404 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 2491 "scannerparser.c" /* yacc.c:1646  */
+#line 2493 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 408 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 408 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 2499 "scannerparser.c" /* yacc.c:1646  */
+#line 2501 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 412 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 412 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 2507 "scannerparser.c" /* yacc.c:1646  */
+#line 2509 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 416 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 416 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 2515 "scannerparser.c" /* yacc.c:1646  */
+#line 2517 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 420 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 420 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 2523 "scannerparser.c" /* yacc.c:1646  */
+#line 2525 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 424 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 424 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 2531 "scannerparser.c" /* yacc.c:1646  */
+#line 2533 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 428 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 428 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 2539 "scannerparser.c" /* yacc.c:1646  */
+#line 2541 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 441 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 441 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 2547 "scannerparser.c" /* yacc.c:1646  */
+#line 2549 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 445 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 445 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 2555 "scannerparser.c" /* yacc.c:1646  */
+#line 2557 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 449 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 449 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		switch ((yyvsp[-1].unary_operator)) {
 		case UNARY_PLUS:
@@ -2578,98 +2580,98 @@ yyreduce:
 			break;
 		}
 	  }
-#line 2582 "scannerparser.c" /* yacc.c:1646  */
+#line 2584 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 472 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 472 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[-1].symbol);
 		if ((yyval.symbol)->const_int_set) {
 			(yyval.symbol)->base_type = gi_source_basic_type_new ((yyval.symbol)->const_int_is_unsigned ? "guint64" : "gint64");
 		}
 	  }
-#line 2593 "scannerparser.c" /* yacc.c:1646  */
+#line 2595 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 479 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 479 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[-1].symbol);
 		if ((yyval.symbol)->const_int_set) {
 			(yyval.symbol)->base_type = gi_source_basic_type_new ("guint64");
 		}
 	  }
-#line 2604 "scannerparser.c" /* yacc.c:1646  */
+#line 2606 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 486 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 486 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 2612 "scannerparser.c" /* yacc.c:1646  */
+#line 2614 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 490 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 490 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		ctype_free ((yyvsp[-1].ctype));
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 2621 "scannerparser.c" /* yacc.c:1646  */
+#line 2623 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 498 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 498 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.unary_operator) = UNARY_ADDRESS_OF;
 	  }
-#line 2629 "scannerparser.c" /* yacc.c:1646  */
+#line 2631 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 502 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 502 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.unary_operator) = UNARY_POINTER_INDIRECTION;
 	  }
-#line 2637 "scannerparser.c" /* yacc.c:1646  */
+#line 2639 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 506 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 506 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.unary_operator) = UNARY_PLUS;
 	  }
-#line 2645 "scannerparser.c" /* yacc.c:1646  */
+#line 2647 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 510 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 510 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.unary_operator) = UNARY_MINUS;
 	  }
-#line 2653 "scannerparser.c" /* yacc.c:1646  */
+#line 2655 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 514 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 514 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.unary_operator) = UNARY_BITWISE_COMPLEMENT;
 	  }
-#line 2661 "scannerparser.c" /* yacc.c:1646  */
+#line 2663 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 518 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 518 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.unary_operator) = UNARY_LOGICAL_NEGATION;
 	  }
-#line 2669 "scannerparser.c" /* yacc.c:1646  */
+#line 2671 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 526 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 526 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[0].symbol);
 		if ((yyval.symbol)->const_int_set || (yyval.symbol)->const_double_set || (yyval.symbol)->const_string != NULL) {
@@ -2678,21 +2680,21 @@ yyreduce:
 			ctype_free ((yyvsp[-2].ctype));
 		}
 	  }
-#line 2682 "scannerparser.c" /* yacc.c:1646  */
+#line 2684 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 539 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 539 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
 		(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int * (yyvsp[0].symbol)->const_int;
 	  }
-#line 2692 "scannerparser.c" /* yacc.c:1646  */
+#line 2694 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 545 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 545 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
@@ -2700,11 +2702,11 @@ yyreduce:
 			(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int / (yyvsp[0].symbol)->const_int;
 		}
 	  }
-#line 2704 "scannerparser.c" /* yacc.c:1646  */
+#line 2706 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 553 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 553 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
@@ -2712,31 +2714,31 @@ yyreduce:
 			(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int % (yyvsp[0].symbol)->const_int;
 		}
 	  }
-#line 2716 "scannerparser.c" /* yacc.c:1646  */
+#line 2718 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 565 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 565 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
 		(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int + (yyvsp[0].symbol)->const_int;
 	  }
-#line 2726 "scannerparser.c" /* yacc.c:1646  */
+#line 2728 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 571 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 571 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
 		(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int - (yyvsp[0].symbol)->const_int;
 	  }
-#line 2736 "scannerparser.c" /* yacc.c:1646  */
+#line 2738 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 581 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 581 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
@@ -2748,111 +2750,111 @@ yyreduce:
 		 */
 		is_bitfield = TRUE;
 	  }
-#line 2752 "scannerparser.c" /* yacc.c:1646  */
+#line 2754 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 593 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 593 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
 		(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int >> (yyvsp[0].symbol)->const_int;
 	  }
-#line 2762 "scannerparser.c" /* yacc.c:1646  */
+#line 2764 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 603 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 603 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
 		(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int < (yyvsp[0].symbol)->const_int;
 	  }
-#line 2772 "scannerparser.c" /* yacc.c:1646  */
+#line 2774 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 609 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 609 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
 		(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int > (yyvsp[0].symbol)->const_int;
 	  }
-#line 2782 "scannerparser.c" /* yacc.c:1646  */
+#line 2784 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 615 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 615 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
 		(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int <= (yyvsp[0].symbol)->const_int;
 	  }
-#line 2792 "scannerparser.c" /* yacc.c:1646  */
+#line 2794 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 621 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 621 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
 		(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int >= (yyvsp[0].symbol)->const_int;
 	  }
-#line 2802 "scannerparser.c" /* yacc.c:1646  */
+#line 2804 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 631 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 631 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
 		(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int == (yyvsp[0].symbol)->const_int;
 	  }
-#line 2812 "scannerparser.c" /* yacc.c:1646  */
+#line 2814 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 637 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 637 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
 		(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int != (yyvsp[0].symbol)->const_int;
 	  }
-#line 2822 "scannerparser.c" /* yacc.c:1646  */
+#line 2824 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 647 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 647 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
 		(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int & (yyvsp[0].symbol)->const_int;
 	  }
-#line 2832 "scannerparser.c" /* yacc.c:1646  */
+#line 2834 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 657 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 657 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
 		(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int ^ (yyvsp[0].symbol)->const_int;
 	  }
-#line 2842 "scannerparser.c" /* yacc.c:1646  */
+#line 2844 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 667 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 667 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
 		(yyval.symbol)->const_int = (yyvsp[-2].symbol)->const_int | (yyvsp[0].symbol)->const_int;
 	  }
-#line 2852 "scannerparser.c" /* yacc.c:1646  */
+#line 2854 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 677 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 677 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
@@ -2860,11 +2862,11 @@ yyreduce:
 		  gi_source_symbol_get_const_boolean ((yyvsp[-2].symbol)) &&
 		  gi_source_symbol_get_const_boolean ((yyvsp[0].symbol));
 	  }
-#line 2864 "scannerparser.c" /* yacc.c:1646  */
+#line 2866 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 689 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 689 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		(yyval.symbol)->const_int_set = TRUE;
@@ -2872,35 +2874,35 @@ yyreduce:
 		  gi_source_symbol_get_const_boolean ((yyvsp[-2].symbol)) ||
 		  gi_source_symbol_get_const_boolean ((yyvsp[0].symbol));
 	  }
-#line 2876 "scannerparser.c" /* yacc.c:1646  */
+#line 2878 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 701 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 701 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_get_const_boolean ((yyvsp[-4].symbol)) ? (yyvsp[-2].symbol) : (yyvsp[0].symbol);
 	  }
-#line 2884 "scannerparser.c" /* yacc.c:1646  */
+#line 2886 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 709 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 709 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 2892 "scannerparser.c" /* yacc.c:1646  */
+#line 2894 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 86:
-#line 732 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 732 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 2900 "scannerparser.c" /* yacc.c:1646  */
+#line 2902 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 88:
-#line 745 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 745 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		GList *l;
 		for (l = (yyvsp[-1].list); l != NULL; l = l->next) {
@@ -2918,37 +2920,37 @@ yyreduce:
 		}
 		ctype_free ((yyvsp[-2].ctype));
 	  }
-#line 2922 "scannerparser.c" /* yacc.c:1646  */
+#line 2924 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 89:
-#line 763 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 763 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		ctype_free ((yyvsp[-1].ctype));
 	  }
-#line 2930 "scannerparser.c" /* yacc.c:1646  */
+#line 2932 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 90:
-#line 770 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 770 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = (yyvsp[0].ctype);
 		(yyval.ctype)->storage_class_specifier |= (yyvsp[-1].storage_class_specifier);
 	  }
-#line 2939 "scannerparser.c" /* yacc.c:1646  */
+#line 2941 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 91:
-#line 775 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 775 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_type_new (CTYPE_INVALID);
 		(yyval.ctype)->storage_class_specifier |= (yyvsp[0].storage_class_specifier);
 	  }
-#line 2948 "scannerparser.c" /* yacc.c:1646  */
+#line 2950 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 92:
-#line 780 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 780 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = (yyvsp[-1].ctype);
 		/* combine basic types like unsigned int and long long */
@@ -2961,192 +2963,192 @@ yyreduce:
 			(yyval.ctype)->base_type = (yyvsp[0].ctype);
 		}
 	  }
-#line 2965 "scannerparser.c" /* yacc.c:1646  */
+#line 2967 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 94:
-#line 794 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 794 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = (yyvsp[0].ctype);
 		(yyval.ctype)->type_qualifier |= (yyvsp[-1].type_qualifier);
 	  }
-#line 2974 "scannerparser.c" /* yacc.c:1646  */
+#line 2976 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 95:
-#line 799 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 799 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_type_new (CTYPE_INVALID);
 		(yyval.ctype)->type_qualifier |= (yyvsp[0].type_qualifier);
 	  }
-#line 2983 "scannerparser.c" /* yacc.c:1646  */
+#line 2985 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 96:
-#line 804 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 804 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = (yyvsp[0].ctype);
 		(yyval.ctype)->function_specifier |= (yyvsp[-1].function_specifier);
 	  }
-#line 2992 "scannerparser.c" /* yacc.c:1646  */
+#line 2994 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 97:
-#line 809 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 809 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_type_new (CTYPE_INVALID);
 		(yyval.ctype)->function_specifier |= (yyvsp[0].function_specifier);
 	  }
-#line 3001 "scannerparser.c" /* yacc.c:1646  */
+#line 3003 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 98:
-#line 817 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 817 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.list) = g_list_append (NULL, (yyvsp[0].symbol));
 	  }
-#line 3009 "scannerparser.c" /* yacc.c:1646  */
+#line 3011 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 99:
-#line 821 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 821 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.list) = g_list_append ((yyvsp[-2].list), (yyvsp[0].symbol));
 	  }
-#line 3017 "scannerparser.c" /* yacc.c:1646  */
+#line 3019 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 102:
-#line 833 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 833 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.storage_class_specifier) = STORAGE_CLASS_TYPEDEF;
 	  }
-#line 3025 "scannerparser.c" /* yacc.c:1646  */
+#line 3027 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 103:
-#line 837 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 837 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.storage_class_specifier) = STORAGE_CLASS_EXTERN;
 	  }
-#line 3033 "scannerparser.c" /* yacc.c:1646  */
+#line 3035 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 104:
-#line 841 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 841 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.storage_class_specifier) = STORAGE_CLASS_STATIC;
 	  }
-#line 3041 "scannerparser.c" /* yacc.c:1646  */
+#line 3043 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 105:
-#line 845 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 845 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.storage_class_specifier) = STORAGE_CLASS_AUTO;
 	  }
-#line 3049 "scannerparser.c" /* yacc.c:1646  */
+#line 3051 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 106:
-#line 849 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 849 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.storage_class_specifier) = STORAGE_CLASS_REGISTER;
 	  }
-#line 3057 "scannerparser.c" /* yacc.c:1646  */
+#line 3059 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 107:
-#line 856 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 856 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_type_new (CTYPE_VOID);
 	  }
-#line 3065 "scannerparser.c" /* yacc.c:1646  */
+#line 3067 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 108:
-#line 860 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 860 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_basic_type_new ("char");
 	  }
-#line 3073 "scannerparser.c" /* yacc.c:1646  */
+#line 3075 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 109:
-#line 864 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 864 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_basic_type_new ("short");
 	  }
-#line 3081 "scannerparser.c" /* yacc.c:1646  */
+#line 3083 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 110:
-#line 868 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 868 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_basic_type_new ("int");
 	  }
-#line 3089 "scannerparser.c" /* yacc.c:1646  */
+#line 3091 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 111:
-#line 872 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 872 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_basic_type_new ("long");
 	  }
-#line 3097 "scannerparser.c" /* yacc.c:1646  */
+#line 3099 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 112:
-#line 876 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 876 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_basic_type_new ("float");
 	  }
-#line 3105 "scannerparser.c" /* yacc.c:1646  */
+#line 3107 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 113:
-#line 880 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 880 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_basic_type_new ("double");
 	  }
-#line 3113 "scannerparser.c" /* yacc.c:1646  */
+#line 3115 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 114:
-#line 884 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 884 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_basic_type_new ("signed");
 	  }
-#line 3121 "scannerparser.c" /* yacc.c:1646  */
+#line 3123 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 115:
-#line 888 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 888 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_basic_type_new ("unsigned");
 	  }
-#line 3129 "scannerparser.c" /* yacc.c:1646  */
+#line 3131 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 116:
-#line 892 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 892 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_basic_type_new ("bool");
 	  }
-#line 3137 "scannerparser.c" /* yacc.c:1646  */
+#line 3139 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 119:
-#line 898 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 898 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_typedef_new ((yyvsp[0].str));
 		g_free ((yyvsp[0].str));
 	  }
-#line 3146 "scannerparser.c" /* yacc.c:1646  */
+#line 3148 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 120:
-#line 906 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 906 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		GISourceSymbol *sym;
 		(yyval.ctype) = (yyvsp[-4].ctype);
@@ -3166,55 +3168,55 @@ yyreduce:
 		gi_source_scanner_add_symbol (scanner, sym);
 		gi_source_symbol_unref (sym);
 	  }
-#line 3170 "scannerparser.c" /* yacc.c:1646  */
+#line 3172 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 121:
-#line 926 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 926 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = (yyvsp[-3].ctype);
 		(yyval.ctype)->child_list = (yyvsp[-1].list);
 	  }
-#line 3179 "scannerparser.c" /* yacc.c:1646  */
+#line 3181 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 122:
-#line 931 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 931 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = (yyvsp[-1].ctype);
 		(yyval.ctype)->name = (yyvsp[0].str);
 	  }
-#line 3188 "scannerparser.c" /* yacc.c:1646  */
+#line 3190 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 123:
-#line 939 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 939 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
                 scanner->private = FALSE;
 		(yyval.ctype) = gi_source_struct_new (NULL);
 	  }
-#line 3197 "scannerparser.c" /* yacc.c:1646  */
+#line 3199 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 124:
-#line 944 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 944 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
                 scanner->private = FALSE;
 		(yyval.ctype) = gi_source_union_new (NULL);
 	  }
-#line 3206 "scannerparser.c" /* yacc.c:1646  */
+#line 3208 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 126:
-#line 953 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 953 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.list) = g_list_concat ((yyvsp[-1].list), (yyvsp[0].list));
 	  }
-#line 3214 "scannerparser.c" /* yacc.c:1646  */
+#line 3216 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 127:
-#line 960 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 960 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 	    GList *l;
 	    (yyval.list) = NULL;
@@ -3231,70 +3233,70 @@ yyreduce:
 	      }
 	    ctype_free ((yyvsp[-2].ctype));
 	  }
-#line 3235 "scannerparser.c" /* yacc.c:1646  */
+#line 3237 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 128:
-#line 980 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 980 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = (yyvsp[-1].ctype);
 		(yyval.ctype)->base_type = (yyvsp[0].ctype);
 	  }
-#line 3244 "scannerparser.c" /* yacc.c:1646  */
+#line 3246 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 130:
-#line 986 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 986 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = (yyvsp[0].ctype);
 		(yyval.ctype)->type_qualifier |= (yyvsp[-1].type_qualifier);
 	  }
-#line 3253 "scannerparser.c" /* yacc.c:1646  */
+#line 3255 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 131:
-#line 991 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 991 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_type_new (CTYPE_INVALID);
 		(yyval.ctype)->type_qualifier |= (yyvsp[0].type_qualifier);
 	  }
-#line 3262 "scannerparser.c" /* yacc.c:1646  */
+#line 3264 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 132:
-#line 999 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 999 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.list) = g_list_append (NULL, (yyvsp[0].symbol));
 	  }
-#line 3270 "scannerparser.c" /* yacc.c:1646  */
+#line 3272 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 133:
-#line 1003 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1003 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.list) = g_list_append ((yyvsp[-2].list), (yyvsp[0].symbol));
 	  }
-#line 3278 "scannerparser.c" /* yacc.c:1646  */
+#line 3280 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 134:
-#line 1010 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1010 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 3286 "scannerparser.c" /* yacc.c:1646  */
+#line 3288 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 136:
-#line 1015 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1015 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
-#line 3294 "scannerparser.c" /* yacc.c:1646  */
+#line 3296 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 137:
-#line 1019 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1019 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[-2].symbol);
 		if ((yyvsp[0].symbol)->const_int_set) {
@@ -3302,99 +3304,99 @@ yyreduce:
 		  (yyval.symbol)->const_int = (yyvsp[0].symbol)->const_int;
 		}
 	  }
-#line 3306 "scannerparser.c" /* yacc.c:1646  */
+#line 3308 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 138:
-#line 1030 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1030 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_enum_new ((yyvsp[-3].str));
 		(yyval.ctype)->child_list = (yyvsp[-1].list);
 		(yyval.ctype)->is_bitfield = is_bitfield || scanner->flags;
 		last_enum_value = -1;
 	  }
-#line 3317 "scannerparser.c" /* yacc.c:1646  */
+#line 3319 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 139:
-#line 1037 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1037 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_enum_new (NULL);
 		(yyval.ctype)->child_list = (yyvsp[-1].list);
 		(yyval.ctype)->is_bitfield = is_bitfield || scanner->flags;
 		last_enum_value = -1;
 	  }
-#line 3328 "scannerparser.c" /* yacc.c:1646  */
+#line 3330 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 140:
-#line 1044 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1044 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_enum_new ((yyvsp[-4].str));
 		(yyval.ctype)->child_list = (yyvsp[-2].list);
 		(yyval.ctype)->is_bitfield = is_bitfield || scanner->flags;
 		last_enum_value = -1;
 	  }
-#line 3339 "scannerparser.c" /* yacc.c:1646  */
+#line 3341 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 141:
-#line 1051 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1051 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_enum_new (NULL);
 		(yyval.ctype)->child_list = (yyvsp[-2].list);
 		(yyval.ctype)->is_bitfield = is_bitfield || scanner->flags;
 		last_enum_value = -1;
 	  }
-#line 3350 "scannerparser.c" /* yacc.c:1646  */
+#line 3352 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 142:
-#line 1058 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1058 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_enum_new ((yyvsp[0].str));
 	  }
-#line 3358 "scannerparser.c" /* yacc.c:1646  */
+#line 3360 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 143:
-#line 1065 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1065 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
                 scanner->flags = FALSE;
                 scanner->private = FALSE;
           }
-#line 3367 "scannerparser.c" /* yacc.c:1646  */
+#line 3369 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 144:
-#line 1073 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1073 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		/* reset flag before the first enum value */
 		is_bitfield = FALSE;
 	  }
-#line 3376 "scannerparser.c" /* yacc.c:1646  */
+#line 3378 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 145:
-#line 1078 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1078 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
             (yyvsp[0].symbol)->private = scanner->private;
             (yyval.list) = g_list_append (NULL, (yyvsp[0].symbol));
 	  }
-#line 3385 "scannerparser.c" /* yacc.c:1646  */
+#line 3387 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 146:
-#line 1083 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1083 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
             (yyvsp[0].symbol)->private = scanner->private;
             (yyval.list) = g_list_append ((yyvsp[-2].list), (yyvsp[0].symbol));
 	  }
-#line 3394 "scannerparser.c" /* yacc.c:1646  */
+#line 3396 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 147:
-#line 1091 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1091 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_OBJECT, scanner->current_file, lineno);
 		(yyval.symbol)->ident = (yyvsp[0].str);
@@ -3402,11 +3404,11 @@ yyreduce:
 		(yyval.symbol)->const_int = ++last_enum_value;
 		g_hash_table_insert (const_table, g_strdup ((yyval.symbol)->ident), gi_source_symbol_ref ((yyval.symbol)));
 	  }
-#line 3406 "scannerparser.c" /* yacc.c:1646  */
+#line 3408 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 148:
-#line 1099 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1099 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_OBJECT, scanner->current_file, lineno);
 		(yyval.symbol)->ident = (yyvsp[-2].str);
@@ -3415,95 +3417,95 @@ yyreduce:
 		last_enum_value = (yyval.symbol)->const_int;
 		g_hash_table_insert (const_table, g_strdup ((yyval.symbol)->ident), gi_source_symbol_ref ((yyval.symbol)));
 	  }
-#line 3419 "scannerparser.c" /* yacc.c:1646  */
+#line 3421 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 149:
-#line 1111 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1111 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.type_qualifier) = TYPE_QUALIFIER_CONST;
 	  }
-#line 3427 "scannerparser.c" /* yacc.c:1646  */
+#line 3429 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 150:
-#line 1115 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1115 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.type_qualifier) = TYPE_QUALIFIER_RESTRICT;
 	  }
-#line 3435 "scannerparser.c" /* yacc.c:1646  */
+#line 3437 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 151:
-#line 1119 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1119 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.type_qualifier) = TYPE_QUALIFIER_EXTENSION;
 	  }
-#line 3443 "scannerparser.c" /* yacc.c:1646  */
+#line 3445 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 152:
-#line 1123 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1123 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.type_qualifier) = TYPE_QUALIFIER_VOLATILE;
 	  }
-#line 3451 "scannerparser.c" /* yacc.c:1646  */
+#line 3453 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 153:
-#line 1130 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1130 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.function_specifier) = FUNCTION_INLINE;
 	  }
-#line 3459 "scannerparser.c" /* yacc.c:1646  */
+#line 3461 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 154:
-#line 1137 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1137 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[0].symbol);
 		gi_source_symbol_merge_type ((yyval.symbol), (yyvsp[-1].ctype));
 	  }
-#line 3468 "scannerparser.c" /* yacc.c:1646  */
+#line 3470 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 156:
-#line 1146 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1146 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		(yyval.symbol)->ident = (yyvsp[0].str);
 	  }
-#line 3477 "scannerparser.c" /* yacc.c:1646  */
+#line 3479 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 157:
-#line 1151 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1151 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[-1].symbol);
 	  }
-#line 3485 "scannerparser.c" /* yacc.c:1646  */
+#line 3487 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 158:
-#line 1155 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1155 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[-3].symbol);
 		gi_source_symbol_merge_type ((yyval.symbol), gi_source_array_new ((yyvsp[-1].symbol)));
 	  }
-#line 3494 "scannerparser.c" /* yacc.c:1646  */
+#line 3496 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 159:
-#line 1160 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1160 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[-2].symbol);
 		gi_source_symbol_merge_type ((yyval.symbol), gi_source_array_new (NULL));
 	  }
-#line 3503 "scannerparser.c" /* yacc.c:1646  */
+#line 3505 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 160:
-#line 1165 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1165 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		GISourceType *func = gi_source_function_new ();
 		// ignore (void) parameter list
@@ -3513,49 +3515,49 @@ yyreduce:
 		(yyval.symbol) = (yyvsp[-3].symbol);
 		gi_source_symbol_merge_type ((yyval.symbol), func);
 	  }
-#line 3517 "scannerparser.c" /* yacc.c:1646  */
+#line 3519 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 161:
-#line 1175 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1175 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		GISourceType *func = gi_source_function_new ();
 		func->child_list = (yyvsp[-1].list);
 		(yyval.symbol) = (yyvsp[-3].symbol);
 		gi_source_symbol_merge_type ((yyval.symbol), func);
 	  }
-#line 3528 "scannerparser.c" /* yacc.c:1646  */
+#line 3530 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 162:
-#line 1182 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1182 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		GISourceType *func = gi_source_function_new ();
 		(yyval.symbol) = (yyvsp[-2].symbol);
 		gi_source_symbol_merge_type ((yyval.symbol), func);
 	  }
-#line 3538 "scannerparser.c" /* yacc.c:1646  */
+#line 3540 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 163:
-#line 1191 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1191 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_pointer_new (NULL);
 		(yyval.ctype)->type_qualifier = (yyvsp[0].type_qualifier);
 	  }
-#line 3547 "scannerparser.c" /* yacc.c:1646  */
+#line 3549 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 164:
-#line 1196 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1196 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.ctype) = gi_source_pointer_new (NULL);
 	  }
-#line 3555 "scannerparser.c" /* yacc.c:1646  */
+#line 3557 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 165:
-#line 1200 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1200 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		GISourceType **base = &((yyvsp[0].ctype)->base_type);
 
@@ -3566,11 +3568,11 @@ yyreduce:
 		(*base)->type_qualifier = (yyvsp[-1].type_qualifier);
 		(yyval.ctype) = (yyvsp[0].ctype);
 	  }
-#line 3570 "scannerparser.c" /* yacc.c:1646  */
+#line 3572 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 166:
-#line 1211 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1211 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		GISourceType **base = &((yyvsp[0].ctype)->base_type);
 
@@ -3580,162 +3582,162 @@ yyreduce:
 		*base = gi_source_pointer_new (NULL);
 		(yyval.ctype) = (yyvsp[0].ctype);
 	  }
-#line 3584 "scannerparser.c" /* yacc.c:1646  */
+#line 3586 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 168:
-#line 1225 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1225 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.type_qualifier) = (yyvsp[-1].type_qualifier) | (yyvsp[0].type_qualifier);
 	  }
-#line 3592 "scannerparser.c" /* yacc.c:1646  */
+#line 3594 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 169:
-#line 1232 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1232 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.list) = g_list_append (NULL, (yyvsp[0].symbol));
 	  }
-#line 3600 "scannerparser.c" /* yacc.c:1646  */
+#line 3602 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 170:
-#line 1236 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1236 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.list) = g_list_append ((yyvsp[-2].list), (yyvsp[0].symbol));
 	  }
-#line 3608 "scannerparser.c" /* yacc.c:1646  */
+#line 3610 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 171:
-#line 1243 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1243 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[0].symbol);
 		gi_source_symbol_merge_type ((yyval.symbol), (yyvsp[-1].ctype));
 	  }
-#line 3617 "scannerparser.c" /* yacc.c:1646  */
+#line 3619 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 172:
-#line 1248 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1248 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[0].symbol);
 		gi_source_symbol_merge_type ((yyval.symbol), (yyvsp[-1].ctype));
 	  }
-#line 3626 "scannerparser.c" /* yacc.c:1646  */
+#line 3628 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 173:
-#line 1253 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1253 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		(yyval.symbol)->base_type = (yyvsp[0].ctype);
 	  }
-#line 3635 "scannerparser.c" /* yacc.c:1646  */
+#line 3637 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 174:
-#line 1258 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1258 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_ELLIPSIS, scanner->current_file, lineno);
 	  }
-#line 3643 "scannerparser.c" /* yacc.c:1646  */
+#line 3645 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 175:
-#line 1265 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1265 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		GISourceSymbol *sym = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		sym->ident = (yyvsp[0].str);
 		(yyval.list) = g_list_append (NULL, sym);
 	  }
-#line 3653 "scannerparser.c" /* yacc.c:1646  */
+#line 3655 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 176:
-#line 1271 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1271 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		GISourceSymbol *sym = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		sym->ident = (yyvsp[0].str);
 		(yyval.list) = g_list_append ((yyvsp[-2].list), sym);
 	  }
-#line 3663 "scannerparser.c" /* yacc.c:1646  */
+#line 3665 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 179:
-#line 1285 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1285 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		gi_source_symbol_merge_type ((yyval.symbol), (yyvsp[0].ctype));
 	  }
-#line 3672 "scannerparser.c" /* yacc.c:1646  */
+#line 3674 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 181:
-#line 1291 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1291 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[0].symbol);
 		gi_source_symbol_merge_type ((yyval.symbol), (yyvsp[-1].ctype));
 	  }
-#line 3681 "scannerparser.c" /* yacc.c:1646  */
+#line 3683 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 182:
-#line 1299 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1299 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[-1].symbol);
 	  }
-#line 3689 "scannerparser.c" /* yacc.c:1646  */
+#line 3691 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 183:
-#line 1303 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1303 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		gi_source_symbol_merge_type ((yyval.symbol), gi_source_array_new (NULL));
 	  }
-#line 3698 "scannerparser.c" /* yacc.c:1646  */
+#line 3700 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 184:
-#line 1308 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1308 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		gi_source_symbol_merge_type ((yyval.symbol), gi_source_array_new ((yyvsp[-1].symbol)));
 	  }
-#line 3707 "scannerparser.c" /* yacc.c:1646  */
+#line 3709 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 185:
-#line 1313 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1313 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[-2].symbol);
 		gi_source_symbol_merge_type ((yyval.symbol), gi_source_array_new (NULL));
 	  }
-#line 3716 "scannerparser.c" /* yacc.c:1646  */
+#line 3718 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 186:
-#line 1318 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1318 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.symbol) = (yyvsp[-3].symbol);
 		gi_source_symbol_merge_type ((yyval.symbol), gi_source_array_new ((yyvsp[-1].symbol)));
 	  }
-#line 3725 "scannerparser.c" /* yacc.c:1646  */
+#line 3727 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 187:
-#line 1323 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1323 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		GISourceType *func = gi_source_function_new ();
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		gi_source_symbol_merge_type ((yyval.symbol), func);
 	  }
-#line 3735 "scannerparser.c" /* yacc.c:1646  */
+#line 3737 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 188:
-#line 1329 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1329 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		GISourceType *func = gi_source_function_new ();
 		// ignore (void) parameter list
@@ -3745,21 +3747,21 @@ yyreduce:
 		(yyval.symbol) = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		gi_source_symbol_merge_type ((yyval.symbol), func);
 	  }
-#line 3749 "scannerparser.c" /* yacc.c:1646  */
+#line 3751 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 189:
-#line 1339 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1339 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		GISourceType *func = gi_source_function_new ();
 		(yyval.symbol) = (yyvsp[-2].symbol);
 		gi_source_symbol_merge_type ((yyval.symbol), func);
 	  }
-#line 3759 "scannerparser.c" /* yacc.c:1646  */
+#line 3761 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 190:
-#line 1345 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1345 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		GISourceType *func = gi_source_function_new ();
 		// ignore (void) parameter list
@@ -3769,35 +3771,35 @@ yyreduce:
 		(yyval.symbol) = (yyvsp[-3].symbol);
 		gi_source_symbol_merge_type ((yyval.symbol), func);
 	  }
-#line 3773 "scannerparser.c" /* yacc.c:1646  */
+#line 3775 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 191:
-#line 1358 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1358 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.str) = g_strdup (yytext);
 	  }
-#line 3781 "scannerparser.c" /* yacc.c:1646  */
+#line 3783 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 241:
-#line 1465 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1465 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.str) = g_strdup (yytext + strlen ("#define "));
 	  }
-#line 3789 "scannerparser.c" /* yacc.c:1646  */
+#line 3791 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 242:
-#line 1472 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1472 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		(yyval.str) = g_strdup (yytext + strlen ("#define "));
 	  }
-#line 3797 "scannerparser.c" /* yacc.c:1646  */
+#line 3799 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 244:
-#line 1483 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1483 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		if ((yyvsp[0].symbol)->const_int_set || (yyvsp[0].symbol)->const_boolean_set || (yyvsp[0].symbol)->const_double_set || (yyvsp[0].symbol)->const_string != NULL) {
 			(yyvsp[0].symbol)->ident = (yyvsp[-1].str);
@@ -3805,85 +3807,85 @@ yyreduce:
 			gi_source_symbol_unref ((yyvsp[0].symbol));
 		}
 	  }
-#line 3809 "scannerparser.c" /* yacc.c:1646  */
+#line 3811 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 245:
-#line 1494 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1494 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		push_conditional (scanner, FOR_GI_SCANNER);
 		update_skipping (scanner);
 	  }
-#line 3818 "scannerparser.c" /* yacc.c:1646  */
+#line 3820 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 246:
-#line 1499 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1499 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		push_conditional (scanner, NOT_GI_SCANNER);
 		update_skipping (scanner);
 	  }
-#line 3827 "scannerparser.c" /* yacc.c:1646  */
+#line 3829 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 247:
-#line 1504 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1504 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 	 	warn_if_cond_has_gi_scanner (scanner, yytext);
 		push_conditional (scanner, IRRELEVANT);
 	  }
-#line 3836 "scannerparser.c" /* yacc.c:1646  */
+#line 3838 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 248:
-#line 1509 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1509 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		warn_if_cond_has_gi_scanner (scanner, yytext);
 		push_conditional (scanner, IRRELEVANT);
 	  }
-#line 3845 "scannerparser.c" /* yacc.c:1646  */
+#line 3847 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 249:
-#line 1514 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1514 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		warn_if_cond_has_gi_scanner (scanner, yytext);
 		push_conditional (scanner, IRRELEVANT);
 	  }
-#line 3854 "scannerparser.c" /* yacc.c:1646  */
+#line 3856 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 250:
-#line 1519 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1519 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		warn_if_cond_has_gi_scanner (scanner, yytext);
 		pop_conditional (scanner);
 		push_conditional (scanner, IRRELEVANT);
 		update_skipping (scanner);
 	  }
-#line 3865 "scannerparser.c" /* yacc.c:1646  */
+#line 3867 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 251:
-#line 1526 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1526 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		toggle_conditional (scanner);
 		update_skipping (scanner);
 	  }
-#line 3874 "scannerparser.c" /* yacc.c:1646  */
+#line 3876 "scannerparser.c" /* yacc.c:1646  */
     break;
 
   case 252:
-#line 1531 "giscanner/scannerparser.y" /* yacc.c:1646  */
+#line 1531 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1646  */
     {
 		pop_conditional (scanner);
 		update_skipping (scanner);
 	  }
-#line 3883 "scannerparser.c" /* yacc.c:1646  */
+#line 3885 "scannerparser.c" /* yacc.c:1646  */
     break;
 
 
-#line 3887 "scannerparser.c" /* yacc.c:1646  */
+#line 3889 "scannerparser.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -4111,7 +4113,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 1544 "giscanner/scannerparser.y" /* yacc.c:1906  */
+#line 1544 "/home/fmuellner/src/gobject-introspection/giscanner/scannerparser.y" /* yacc.c:1906  */
 
 static void
 yyerror (GISourceScanner *scanner, const char *s)

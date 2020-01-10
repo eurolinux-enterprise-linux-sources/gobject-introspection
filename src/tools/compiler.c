@@ -40,7 +40,7 @@ gchar **includedirs = NULL;
 gchar **input = NULL;
 gchar *output = NULL;
 gchar *mname = NULL;
-gchar *shlib = NULL;
+gchar **shlibs = NULL;
 gboolean include_cwd = FALSE;
 gboolean debug = FALSE;
 gboolean verbose = FALSE;
@@ -131,7 +131,7 @@ static GOptionEntry options[] =
   { "includedir", 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &includedirs, "include directories in GIR search path", NULL }, 
   { "output", 'o', 0, G_OPTION_ARG_FILENAME, &output, "output file", "FILE" }, 
   { "module", 'm', 0, G_OPTION_ARG_STRING, &mname, "module to compile", "NAME" }, 
-  { "shared-library", 'l', 0, G_OPTION_ARG_FILENAME, &shlib, "shared library", "FILE" }, 
+  { "shared-library", 'l', 0, G_OPTION_ARG_FILENAME_ARRAY, &shlibs, "shared library", "FILE" }, 
   { "debug", 0, 0, G_OPTION_ARG_NONE, &debug, "show debug messages", NULL }, 
   { "verbose", 0, 0, G_OPTION_ARG_NONE, &verbose, "show verbose messages", NULL }, 
   { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &input, NULL, NULL },
@@ -152,6 +152,15 @@ main (int argc, char ** argv)
   g_option_context_add_main_entries (context, options, NULL);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
+
+  if (error)
+    {
+      g_fprintf (stderr, "error parsing arguments: %s\n", error->message);
+
+      g_error_free (error);
+
+      return 1;
+    }
 
   logged_levels = G_LOG_LEVEL_MASK & ~(G_LOG_LEVEL_MESSAGE|G_LOG_LEVEL_DEBUG);
   if (debug)
@@ -196,11 +205,11 @@ main (int argc, char ** argv)
   {
       GITypelib *typelib;
 
-      if (shlib)
+      if (shlibs)
 	{
           if (module->shared_library)
 	    g_free (module->shared_library);
-          module->shared_library = g_strdup (shlib);
+          module->shared_library = g_strjoinv (",", shlibs);
 	}
 
       g_debug ("[building] module %s", module->name);

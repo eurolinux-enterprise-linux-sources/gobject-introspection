@@ -25,9 +25,14 @@ test_parser.py
 Tests ensuring annotationparser.py continues to function correctly.
 '''
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import difflib
 import os
+import sys
 import subprocess
 import unittest
 import xml.etree.ElementTree as etree
@@ -35,6 +40,11 @@ import xml.etree.ElementTree as etree
 from giscanner.annotationparser import GtkDocCommentBlockParser, GtkDocCommentBlockWriter
 from giscanner.ast import Namespace
 from giscanner.message import MessageLogger, WARNING, ERROR, FATAL
+
+if sys.version_info.major < 3:
+    encode_name = lambda s: s.encode('ascii')
+else:
+    encode_name = lambda s: s
 
 
 XML_NS = 'http://schemas.gnome.org/gobject-introspection/2013/test'
@@ -396,7 +406,7 @@ def create_test_case(logger, tests_dir, tests_file):
     for counter, test in enumerate(tests_tree.findall(ns('{}test'))):
         test_name = 'test_%03d' % (counter + 1)
         test_method = TestCommentBlock.__create_test__(logger, test)
-        test_method.__name__ = test_name
+        test_method.__name__ = encode_name(test_name)
         test_methods[test_name] = test_method
 
     # Dynamically generate a new subclass of TestCommentBlock in TitleCase
@@ -404,7 +414,7 @@ def create_test_case(logger, tests_dir, tests_file):
     test_class_name = os.path.relpath(tests_file[:-4], tests_dir)
     test_class_name = test_class_name.replace('/', ' ').replace('\\', ' ').replace('.', ' ')
     test_class_name = 'Test' + test_class_name.title().replace(' ', '')
-    return type(test_class_name, (TestCommentBlock,), test_methods)
+    return type(encode_name(test_class_name), (TestCommentBlock,), test_methods)
 
 
 def create_test_cases():
@@ -436,26 +446,5 @@ _all_tests = create_test_cases()
 globals().update(_all_tests)
 
 
-# Hook function for Python test loader.
-def load_tests(loader, tests, pattern):
-    suite = unittest.TestSuite()
-    # add standard tests from module
-    suite.addTests(tests)
-
-    # Initialize message logger
-    namespace = Namespace('Test', '1.0')
-    logger = MessageLogger.get(namespace=namespace)
-    logger.enable_warnings((WARNING, ERROR, FATAL))
-
-    # Load test cases from disc
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-
-    for name, test_case in _all_tests.iteritems():
-        tests = loader.loadTestsFromTestCase(test_case)
-        suite.addTests(tests)
-    return suite
-
-
 if __name__ == '__main__':
-    # Run test suite
     unittest.main()

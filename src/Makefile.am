@@ -50,12 +50,16 @@ dist_make_DATA = Makefile.introspection
 EXTRA_DIST += 			\
 	COPYING.LGPL		\
 	COPYING.GPL		\
+	autogen.sh		\
 	CONTRIBUTORS		\
 	$(pkgconfig_DATA)	\
 	$(man_MANS)		\
 	$(m4_DATA)		\
 	misc/pep8.py		\
-	misc/pyflakes.py
+	misc/pyflakes.py	\
+	misc/update-glib-annotations.py	\
+	misc/update-gtkdoc-tests.py	\
+	misc/verbump.py
 
 # Default pep8.py --exclude + emacs backup files
 PEP8_EXCLUDES=--exclude='.svn,CVS,.bzr,.hg,.git,__pycache__,.\#*'
@@ -63,9 +67,9 @@ PEP8_EXCLUDES=--exclude='.svn,CVS,.bzr,.hg,.git,__pycache__,.\#*'
 check-local:
 	@echo "TEST: PEP-8 INQUISITION"
 	@find $(top_srcdir)/giscanner -name \*.py | sort | uniq | xargs \
-		$(PYTHON) $(top_srcdir)/misc/pep8.py --max-line-length=99 --ignore=E128 $(PEP8_EXCLUDES)
+		$(PYTHON) $(top_srcdir)/misc/pep8.py --max-line-length=99 --ignore=E128,W503 $(PEP8_EXCLUDES)
 	@find $(top_srcdir)/tests -name \*.py | sort | uniq | xargs \
-		$(PYTHON) $(top_srcdir)/misc/pep8.py --ignore=E127,E501 $(PEP8_EXCLUDES)
+		$(PYTHON) $(top_srcdir)/misc/pep8.py --ignore=E127,E402,E501,E731 $(PEP8_EXCLUDES)
 
 check-pyflakes:
 	@echo "  CHECK Pyflakes"
@@ -96,7 +100,7 @@ prepare-release-tag: Makefile
 	git tag -m "Tag $(TAG_VERSION)" -a $(TAG_PREFIX)$(TAG_VERSION)
 
 prepare-minor-release: $(DISTNAME) prepare-release-tag Makefile
-	env top_srcdir=$(top_srcdir) python $(top_srcdir)/tools/verbump.py
+	env top_srcdir=$(top_srcdir) python $(top_srcdir)/misc/verbump.py
 
 upload-release: $(DISTNAME) Makefile
 	git log origin/master..master

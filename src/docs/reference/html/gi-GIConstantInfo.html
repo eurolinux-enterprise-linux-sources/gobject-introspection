@@ -2,13 +2,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>GObject Introspection Reference Manual: GIConstantInfo</title>
-<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<title>GIConstantInfo: GObject Introspection Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="index.html" title="GObject Introspection Reference Manual">
 <link rel="up" href="ch01.html" title="GIRepository">
 <link rel="prev" href="gi-GIArgInfo.html" title="GIArgInfo">
 <link rel="next" href="gi-GIFieldInfo.html" title="GIFieldInfo">
-<meta name="generator" content="GTK-Doc V1.21.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -33,7 +33,7 @@
 </tr></table></div>
 <div class="refsect1">
 <a name="gi-GIConstantInfo.functions"></a><h2>Functions</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="functions_return">
 <col class="functions_name">
@@ -63,7 +63,7 @@
 </tr>
 <tr>
 <td class="function_type">
-<a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint"><span class="returnvalue">gint</span></a>
+<span class="returnvalue">gint</span>
 </td>
 <td class="function_name">
 <a class="link" href="gi-GIConstantInfo.html#g-constant-info-get-value" title="g_constant_info_get_value ()">g_constant_info_get_value</a> <span class="c_punctuation">()</span>
@@ -74,7 +74,7 @@
 </div>
 <div class="refsect1">
 <a name="gi-GIConstantInfo.other"></a><h2>Types and Values</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="name">
 <col class="description">
@@ -106,8 +106,8 @@ which can be obtained by calling <a class="link" href="gi-GIConstantInfo.html#g-
 <p>Checks if <em class="parameter"><code>info</code></em>
  is a <a class="link" href="gi-GIConstantInfo.html#GIConstantInfo" title="GIConstantInfo"><span class="type">GIConstantInfo</span></a>.</p>
 <div class="refsect3">
-<a name="id-1.4.2.18.6.2.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="GI-IS-CONSTANT-INFO.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -126,11 +126,12 @@ which can be obtained by calling <a class="link" href="gi-GIConstantInfo.html#g-
 <a name="g-constant-info-free-value"></a><h3>g_constant_info_free_value ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_constant_info_free_value (<em class="parameter"><code><a class="link" href="gi-GIConstantInfo.html#GIConstantInfo" title="GIConstantInfo"><span class="type">GIConstantInfo</span></a> *info</code></em>,
-                            <em class="parameter"><code><a class="link" href="gi-common-types.html#GIArgument" title="union GIArgument"><span class="type">GIArgument</span></a> *value</code></em>);</pre>
+                            <em class="parameter"><code><a class="link" href="gi-common-types.html#GIArgument" title="GIArgument"><span class="type">GIArgument</span></a> *value</code></em>);</pre>
 <p>Free the value returned from <a class="link" href="gi-GIConstantInfo.html#g-constant-info-get-value" title="g_constant_info_get_value ()"><code class="function">g_constant_info_get_value()</code></a>.</p>
+<p><span class="annotation">[<acronym title="Exposed in C code, not necessarily available in other languages."><span class="acronym">skip</span></acronym>]</span></p>
 <div class="refsect3">
-<a name="id-1.4.2.18.6.3.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-constant-info-free-value.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -150,7 +151,7 @@ g_constant_info_free_value (<em class="parameter"><code><a class="link" href="gi
 </tbody>
 </table></div>
 </div>
-<p class="since">Since 1.30.1</p>
+<p class="since">Since: <a class="link" href="api-index-1-30-1.html#api-index-1.30.1">1.30.1</a></p>
 </div>
 <hr>
 <div class="refsect2">
@@ -159,8 +160,8 @@ g_constant_info_free_value (<em class="parameter"><code><a class="link" href="gi
 g_constant_info_get_type (<em class="parameter"><code><a class="link" href="gi-GIConstantInfo.html#GIConstantInfo" title="GIConstantInfo"><span class="type">GIConstantInfo</span></a> *info</code></em>);</pre>
 <p>Obtain the type of the constant as a <a class="link" href="gi-GITypeInfo.html#GITypeInfo" title="GITypeInfo"><span class="type">GITypeInfo</span></a>.</p>
 <div class="refsect3">
-<a name="id-1.4.2.18.6.4.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-constant-info-get-type.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -174,7 +175,7 @@ g_constant_info_get_type (<em class="parameter"><code><a class="link" href="gi-G
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.18.6.4.6"></a><h4>Returns</h4>
+<a name="g-constant-info-get-type.returns"></a><h4>Returns</h4>
 <p> the <a class="link" href="gi-GITypeInfo.html#GITypeInfo" title="GITypeInfo"><span class="type">GITypeInfo</span></a>. Free the struct by calling
 <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
@@ -183,9 +184,9 @@ g_constant_info_get_type (<em class="parameter"><code><a class="link" href="gi-G
 <hr>
 <div class="refsect2">
 <a name="g-constant-info-get-value"></a><h3>g_constant_info_get_value ()</h3>
-<pre class="programlisting"><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint"><span class="returnvalue">gint</span></a>
+<pre class="programlisting"><span class="returnvalue">gint</span>
 g_constant_info_get_value (<em class="parameter"><code><a class="link" href="gi-GIConstantInfo.html#GIConstantInfo" title="GIConstantInfo"><span class="type">GIConstantInfo</span></a> *info</code></em>,
-                           <em class="parameter"><code><a class="link" href="gi-common-types.html#GIArgument" title="union GIArgument"><span class="type">GIArgument</span></a> *value</code></em>);</pre>
+                           <em class="parameter"><code><a class="link" href="gi-common-types.html#GIArgument" title="GIArgument"><span class="type">GIArgument</span></a> *value</code></em>);</pre>
 <p>Obtain the value associated with the <a class="link" href="gi-GIConstantInfo.html#GIConstantInfo" title="GIConstantInfo"><span class="type">GIConstantInfo</span></a> and store it in the
 <em class="parameter"><code>value</code></em>
  parameter. <em class="parameter"><code>argument</code></em>
@@ -193,9 +194,10 @@ g_constant_info_get_value (<em class="parameter"><code><a class="link" href="gi-
 The size of the constant value stored in <em class="parameter"><code>argument</code></em>
  will be returned.
 Free the value with <a class="link" href="gi-GIConstantInfo.html#g-constant-info-free-value" title="g_constant_info_free_value ()"><code class="function">g_constant_info_free_value()</code></a>.</p>
+<p><span class="annotation">[<acronym title="Exposed in C code, not necessarily available in other languages."><span class="acronym">skip</span></acronym>]</span></p>
 <div class="refsect3">
-<a name="id-1.4.2.18.6.5.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-constant-info-get-value.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -216,9 +218,8 @@ Free the value with <a class="link" href="gi-GIConstantInfo.html#g-constant-info
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.18.6.5.6"></a><h4>Returns</h4>
+<a name="g-constant-info-get-value.returns"></a><h4>Returns</h4>
 <p> size of the constant</p>
-<p></p>
 </div>
 </div>
 </div>
@@ -233,7 +234,6 @@ Free the value with <a class="link" href="gi-GIConstantInfo.html#g-constant-info
 </div>
 </div>
 <div class="footer">
-<hr>
-          Generated by GTK-Doc V1.21.1</div>
+<hr>Generated by GTK-Doc V1.25.1</div>
 </body>
 </html>

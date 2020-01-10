@@ -15,12 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\girepository\gthash.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\girmodule.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\girnode.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\giroffsets.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\girparser.c"><Filter>Sources</Filter></ClCompile>
-    <ClCompile Include="..\..\..\girepository\girwriter.c"><Filter>Sources</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\gthash.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\girmodule.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\girnode.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\giroffsets.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\girparser.c"><Filter>Source Files</Filter></ClCompile>
+   <ClCompile Include="..\..\..\girepository\girwriter.c"><Filter>Source Files</Filter></ClCompile>
     <ClCompile Include="..\..\..\tools\compiler.c"><Filter>Sources</Filter></ClCompile>
   </ItemGroup>
 </Project>

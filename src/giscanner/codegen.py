@@ -19,6 +19,10 @@
 #
 
 from __future__ import with_statement
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 from contextlib import contextmanager
 
@@ -84,28 +88,31 @@ class CCodeGenerator(object):
         self._write_prelude(self.out_h, func)
         self.out_h.write(";\n\n")
 
-    def _write_annotation_transfer(self, transfer):
-        self.out_c.write("(transfer %s)" % (transfer, ))
+    def _write_annotation_transfer(self, node):
+        if (node.type not in ast.BASIC_TYPES or
+                node.type.ctype.endswith('*')):
+            self.out_c.write(" (transfer %s)" % (node.transfer, ))
 
     def _write_docs(self, func):
         self.out_c.write("/**\n * %s:\n" % (func.symbol, ))
         for param in func.parameters:
-            self.out_c.write(" * @%s: " % (param.argname, ))
+            self.out_c.write(" * @%s" % (param.argname, ))
             if param.direction in (ast.PARAM_DIRECTION_OUT,
                                    ast.PARAM_DIRECTION_INOUT):
                 if param.caller_allocates:
                     allocate_string = ' caller-allocates'
                 else:
                     allocate_string = ''
-                self.out_c.write("(%s%s) " % (param.direction,
-                                              allocate_string))
-                self._write_annotation_transfer(param.transfer)
+                self.out_c.write(": (%s%s) " % (param.direction,
+                                                allocate_string))
+                self._write_annotation_transfer(param)
             self.out_c.write(":\n")
         self.out_c.write(' *\n')
-        self.out_c.write(' * Undocumented.\n')
-        self.out_c.write(' *\n')
-        self.out_c.write(' * Returns: ')
-        self._write_annotation_transfer(func.retval.transfer)
+        self.out_c.write(' * Undocumented.')
+        if func.retval.type != ast.TYPE_NONE:
+            self.out_c.write('\n *\n')
+            self.out_c.write(' * Returns: ')
+            self._write_annotation_transfer(func.retval)
         self.out_c.write('\n */')
 
     @contextmanager
@@ -162,7 +169,7 @@ class CCodeGenerator(object):
 
         self._codegen_start()
 
-        for node in self.namespace.itervalues():
+        for node in self.namespace.values():
             if isinstance(node, ast.Function):
                 with self._function(node):
                     body = self._function_bodies.get(node)

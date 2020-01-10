@@ -1,21 +1,20 @@
+%global glib2_version 2.50.0
+
 Name:           gobject-introspection
-Version:        1.42.0
+Version:        1.50.0
 Release:        1%{?dist}
 Summary:        Introspection system for GObject-based libraries
 
-Group:      Development/Libraries
 License:        GPLv2+, LGPLv2+, MIT
-URL:            http://live.gnome.org/GObjectIntrospection
-#VCS:           git:git://git.gnome.org/gobject-introspection
-Source0:        http://download.gnome.org/sources/gobject-introspection/1.42/%{name}-%{version}.tar.xz
+URL:            https://wiki.gnome.org/Projects/GObjectIntrospection
+Source0:        https://download.gnome.org/sources/gobject-introspection/1.50/%{name}-%{version}.tar.xz
 
-Obsoletes:      gir-repository
-
-BuildRequires:  glib2-devel
+BuildRequires:  glib2-devel >= %{glib2_version}
 BuildRequires:  python-devel >= 2.5
 BuildRequires:  gettext
 BuildRequires:  flex
 BuildRequires:  bison
+BuildRequires:  git
 BuildRequires:  libffi-devel
 BuildRequires:  mesa-libGL-devel
 BuildRequires:  cairo-gobject-devel
@@ -25,12 +24,11 @@ BuildRequires:  libX11-devel
 BuildRequires:  fontconfig-devel
 BuildRequires:  libXft-devel
 BuildRequires:  freetype-devel
-# Bootstrap requirements
-BuildRequires:  gnome-common
-BuildRequires:  intltool
 BuildRequires:  gtk-doc
 # For doctool
 BuildRequires:  python-mako
+
+Requires:       glib2%{?_isa} >= %{glib2_version}
 
 %description
 GObject Introspection can scan C header and source files in order to
@@ -40,28 +38,25 @@ things.
 
 %package devel
 Summary: Libraries and headers for gobject-introspection
-Group: Development/Libraries
 Requires: %{name}%{?_isa} = %{version}-%{release}
 # Not always, but whatever, it's a tiny dep to pull in
 Requires: libtool
 # For g-ir-doctool
 Requires: python-mako
-Obsoletes: gir-repository-devel
 
 %description devel
 Libraries and headers for gobject-introspection
 
 %prep
-%setup -q
+%autosetup -Sgit
 
 %build
-(if ! test -x configure; then NOCONFIGURE=1 ./autogen.sh; fi;)
 %configure --enable-gtk-doc --enable-doctool
 
-make V=1 %{?_smp_mflags}
+make %{?_smp_mflags} V=1
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install
 
 # Die libtool, die.
 find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
@@ -72,7 +67,7 @@ find $RPM_BUILD_ROOT -type f -name "*.a" -exec rm -f {} ';'
 %postun -p /sbin/ldconfig
 
 %files
-%doc COPYING
+%license COPYING
 
 %{_libdir}/lib*.so.*
 %dir %{_libdir}/girepository-1.0
@@ -94,6 +89,10 @@ find $RPM_BUILD_ROOT -type f -name "*.a" -exec rm -f {} ';'
 %{_datadir}/gtk-doc/html/gi/*
 
 %changelog
+* Wed Sep 28 2016 Kalev Lember <klember@redhat.com> - 1.50.0-1
+- Update to 1.50.0
+- Resolves: #1386972
+
 * Tue Apr 28 2015 Matthias Clasen <mclasen@redhat.com> - 1.42.0-1
 - Update to 1.42.0
 - Resolves: #1174439

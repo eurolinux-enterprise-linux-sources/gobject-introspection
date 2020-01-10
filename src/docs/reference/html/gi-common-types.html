@@ -2,13 +2,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>GObject Introspection Reference Manual: common types</title>
-<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<title>common types: GObject Introspection Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="index.html" title="GObject Introspection Reference Manual">
 <link rel="up" href="ch01.html" title="GIRepository">
 <link rel="prev" href="gi-struct-hierarchy.html" title="Struct hierarchy">
 <link rel="next" href="gi-GIBaseInfo.html" title="GIBaseInfo">
-<meta name="generator" content="GTK-Doc V1.21.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -33,36 +33,30 @@
 </tr></table></div>
 <div class="refsect1">
 <a name="gi-common-types.functions"></a><h2>Functions</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="functions_return">
 <col class="functions_name">
 </colgroup>
-<tbody>
-<tr>
-<td class="define_keyword">#define</td>
-<td class="function_name"><a class="link" href="gi-common-types.html#GI-TYPE-TAG-N-TYPES:CAPS" title="GI_TYPE_TAG_N_TYPES">GI_TYPE_TAG_N_TYPES</a></td>
-</tr>
-<tr>
+<tbody><tr>
 <td class="define_keyword">#define</td>
 <td class="function_name">
 <a class="link" href="gi-common-types.html#G-TYPE-TAG-IS-BASIC:CAPS" title="G_TYPE_TAG_IS_BASIC()">G_TYPE_TAG_IS_BASIC</a><span class="c_punctuation">()</span>
 </td>
-</tr>
-</tbody>
+</tr></tbody>
 </table></div>
 </div>
 <div class="refsect1">
 <a name="gi-common-types.other"></a><h2>Types and Values</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="name">
 <col class="description">
 </colgroup>
 <tbody>
 <tr>
-<td class="datatype_keyword">union</td>
-<td class="function_name"><a class="link" href="gi-common-types.html#GIArgument" title="union GIArgument">GIArgument</a></td>
+<td class="datatype_keyword"> </td>
+<td class="function_name"><a class="link" href="gi-common-types.html#GIArgument" title="GIArgument">GIArgument</a></td>
 </tr>
 <tr>
 <td class="datatype_keyword"> </td>
@@ -76,6 +70,10 @@
 <td class="datatype_keyword">enum</td>
 <td class="function_name"><a class="link" href="gi-common-types.html#GIArrayType" title="enum GIArrayType">GIArrayType</a></td>
 </tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="gi-common-types.html#GI-TYPE-TAG-N-TYPES:CAPS" title="GI_TYPE_TAG_N_TYPES">GI_TYPE_TAG_N_TYPES</a></td>
+</tr>
 </tbody>
 </table></div>
 </div>
@@ -86,21 +84,14 @@
 <div class="refsect1">
 <a name="gi-common-types.functions_details"></a><h2>Functions</h2>
 <div class="refsect2">
-<a name="GI-TYPE-TAG-N-TYPES:CAPS"></a><h3>GI_TYPE_TAG_N_TYPES</h3>
-<pre class="programlisting">#define GI_TYPE_TAG_N_TYPES (GI_TYPE_TAG_UNICHAR+1)
-</pre>
-<p>TODO</p>
-</div>
-<hr>
-<div class="refsect2">
 <a name="G-TYPE-TAG-IS-BASIC:CAPS"></a><h3>G_TYPE_TAG_IS_BASIC()</h3>
 <pre class="programlisting">#define G_TYPE_TAG_IS_BASIC(tag) (tag &lt; GI_TYPE_TAG_ARRAY || tag == GI_TYPE_TAG_UNICHAR)
 </pre>
 <p>Checks if <em class="parameter"><code>tag</code></em>
  is a basic type.</p>
 <div class="refsect3">
-<a name="id-1.4.2.4.6.3.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="G-TYPE-TAG-IS-BASIC.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -118,11 +109,11 @@
 <div class="refsect1">
 <a name="gi-common-types.other_details"></a><h2>Types and Values</h2>
 <div class="refsect2">
-<a name="GIArgument"></a><h3>union GIArgument</h3>
+<a name="GIArgument"></a><h3>GIArgument</h3>
 <p>Stores an argument of varying type</p>
 <div class="refsect3">
-<a name="id-1.4.2.4.7.2.4"></a><h4>Members</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="GIArgument.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="300px" class="union_members_name">
 <col class="union_members_description">
@@ -130,107 +121,107 @@
 </colgroup>
 <tbody>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gboolean"><span class="type">gboolean</span></a> <em class="structfield"><code><a name="GIArgument.v-boolean"></a>v_boolean</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gboolean</span> <em class="structfield"><code><a name="GIArgument.v-boolean"></a>v_boolean</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint8"><span class="type">gint8</span></a> <em class="structfield"><code><a name="GIArgument.v-int8"></a>v_int8</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gint8</span> <em class="structfield"><code><a name="GIArgument.v-int8"></a>v_int8</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#guint8"><span class="type">guint8</span></a> <em class="structfield"><code><a name="GIArgument.v-uint8"></a>v_uint8</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">guint8</span> <em class="structfield"><code><a name="GIArgument.v-uint8"></a>v_uint8</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint16"><span class="type">gint16</span></a> <em class="structfield"><code><a name="GIArgument.v-int16"></a>v_int16</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gint16</span> <em class="structfield"><code><a name="GIArgument.v-int16"></a>v_int16</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#guint16"><span class="type">guint16</span></a> <em class="structfield"><code><a name="GIArgument.v-uint16"></a>v_uint16</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">guint16</span> <em class="structfield"><code><a name="GIArgument.v-uint16"></a>v_uint16</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint32"><span class="type">gint32</span></a> <em class="structfield"><code><a name="GIArgument.v-int32"></a>v_int32</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gint32</span> <em class="structfield"><code><a name="GIArgument.v-int32"></a>v_int32</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#guint32"><span class="type">guint32</span></a> <em class="structfield"><code><a name="GIArgument.v-uint32"></a>v_uint32</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">guint32</span> <em class="structfield"><code><a name="GIArgument.v-uint32"></a>v_uint32</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint64"><span class="type">gint64</span></a> <em class="structfield"><code><a name="GIArgument.v-int64"></a>v_int64</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gint64</span> <em class="structfield"><code><a name="GIArgument.v-int64"></a>v_int64</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#guint64"><span class="type">guint64</span></a> <em class="structfield"><code><a name="GIArgument.v-uint64"></a>v_uint64</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">guint64</span> <em class="structfield"><code><a name="GIArgument.v-uint64"></a>v_uint64</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gfloat"><span class="type">gfloat</span></a> <em class="structfield"><code><a name="GIArgument.v-float"></a>v_float</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gfloat</span> <em class="structfield"><code><a name="GIArgument.v-float"></a>v_float</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gdouble"><span class="type">gdouble</span></a> <em class="structfield"><code><a name="GIArgument.v-double"></a>v_double</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gdouble</span> <em class="structfield"><code><a name="GIArgument.v-double"></a>v_double</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gshort"><span class="type">gshort</span></a> <em class="structfield"><code><a name="GIArgument.v-short"></a>v_short</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gshort</span> <em class="structfield"><code><a name="GIArgument.v-short"></a>v_short</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gushort"><span class="type">gushort</span></a> <em class="structfield"><code><a name="GIArgument.v-ushort"></a>v_ushort</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gushort</span> <em class="structfield"><code><a name="GIArgument.v-ushort"></a>v_ushort</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint"><span class="type">gint</span></a> <em class="structfield"><code><a name="GIArgument.v-int"></a>v_int</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gint</span> <em class="structfield"><code><a name="GIArgument.v-int"></a>v_int</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#guint"><span class="type">guint</span></a> <em class="structfield"><code><a name="GIArgument.v-uint"></a>v_uint</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">guint</span> <em class="structfield"><code><a name="GIArgument.v-uint"></a>v_uint</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#glong"><span class="type">glong</span></a> <em class="structfield"><code><a name="GIArgument.v-long"></a>v_long</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">glong</span> <em class="structfield"><code><a name="GIArgument.v-long"></a>v_long</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gulong"><span class="type">gulong</span></a> <em class="structfield"><code><a name="GIArgument.v-ulong"></a>v_ulong</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gulong</span> <em class="structfield"><code><a name="GIArgument.v-ulong"></a>v_ulong</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gssize"><span class="type">gssize</span></a> <em class="structfield"><code><a name="GIArgument.v-ssize"></a>v_ssize</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gssize</span> <em class="structfield"><code><a name="GIArgument.v-ssize"></a>v_ssize</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gsize"><span class="type">gsize</span></a> <em class="structfield"><code><a name="GIArgument.v-size"></a>v_size</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gsize</span> <em class="structfield"><code><a name="GIArgument.v-size"></a>v_size</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *<em class="structfield"><code><a name="GIArgument.v-string"></a>v_string</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gchar</span> *<em class="structfield"><code><a name="GIArgument.v-string"></a>v_string</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
 <tr>
-<td class="union_member_name"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gpointer"><span class="type">gpointer</span></a> <em class="structfield"><code><a name="GIArgument.v-pointer"></a>v_pointer</code></em>;</p></td>
+<td class="union_member_name"><p><span class="type">gpointer</span> <em class="structfield"><code><a name="GIArgument.v-pointer"></a>v_pointer</code></em>;</p></td>
 <td class="union_member_description"><p>TODO</p></td>
 <td class="union_member_annotations"> </td>
 </tr>
@@ -249,8 +240,8 @@
 <a name="GITypeTag"></a><h3>enum GITypeTag</h3>
 <p>The type tag of a <a class="link" href="gi-GITypeInfo.html#GITypeInfo" title="GITypeInfo"><span class="type">GITypeInfo</span></a>.</p>
 <div class="refsect3">
-<a name="id-1.4.2.4.7.4.4"></a><h4>Members</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="GITypeTag.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
 <col class="enum_members_description">
@@ -344,7 +335,7 @@
 <tr>
 <td class="enum_member_name"><p><a name="GI-TYPE-TAG-GTYPE:CAPS"></a>GI_TYPE_TAG_GTYPE</p></td>
 <td class="enum_member_description">
-<p>a <a href="http://library.gnome.org/devel/gobject/unstable/gobject-Type-Information.html#GType"><span class="type">GType</span></a></p>
+<p>a <span class="type">GType</span></p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
@@ -380,28 +371,28 @@
 <tr>
 <td class="enum_member_name"><p><a name="GI-TYPE-TAG-GLIST:CAPS"></a>GI_TYPE_TAG_GLIST</p></td>
 <td class="enum_member_description">
-<p>a <a href="http://library.gnome.org/devel/glib/unstable/glib-Doubly-Linked-Lists.html#GList"><span class="type">GList</span></a></p>
+<p>a <span class="type">GList</span></p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GI-TYPE-TAG-GSLIST:CAPS"></a>GI_TYPE_TAG_GSLIST</p></td>
 <td class="enum_member_description">
-<p>a <a href="http://library.gnome.org/devel/glib/unstable/glib-Singly-Linked-Lists.html#GSList"><span class="type">GSList</span></a></p>
+<p>a <span class="type">GSList</span></p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GI-TYPE-TAG-GHASH:CAPS"></a>GI_TYPE_TAG_GHASH</p></td>
 <td class="enum_member_description">
-<p>a <a href="http://library.gnome.org/devel/glib/unstable/glib-Hash-Tables.html#GHashTable"><span class="type">GHashTable</span></a></p>
+<p>a <span class="type">GHashTable</span></p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GI-TYPE-TAG-ERROR:CAPS"></a>GI_TYPE_TAG_ERROR</p></td>
 <td class="enum_member_description">
-<p>a <a href="http://library.gnome.org/devel/glib/unstable/glib-Error-Reporting.html#GError"><span class="type">GError</span></a></p>
+<p>a <span class="type">GError</span></p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
@@ -421,8 +412,8 @@
 <a name="GIArrayType"></a><h3>enum GIArrayType</h3>
 <p>The type of array in a <a class="link" href="gi-GITypeInfo.html#GITypeInfo" title="GITypeInfo"><span class="type">GITypeInfo</span></a>.</p>
 <div class="refsect3">
-<a name="id-1.4.2.4.7.5.4"></a><h4>Members</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="GIArrayType.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
 <col class="enum_members_description">
@@ -447,14 +438,14 @@
 <tr>
 <td class="enum_member_name"><p><a name="GI-ARRAY-TYPE-PTR-ARRAY:CAPS"></a>GI_ARRAY_TYPE_PTR_ARRAY</p></td>
 <td class="enum_member_description">
-<p>a <a href="http://library.gnome.org/devel/glib/unstable/glib-Pointer-Arrays.html#GPtrArray"><span class="type">GPtrArray</span></a> array</p>
+<p>a <span class="type">GPtrArray</span> array</p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GI-ARRAY-TYPE-BYTE-ARRAY:CAPS"></a>GI_ARRAY_TYPE_BYTE_ARRAY</p></td>
 <td class="enum_member_description">
-<p>a <a href="http://library.gnome.org/devel/glib/unstable/glib-Byte-Arrays.html#GByteArray"><span class="type">GByteArray</span></a> array</p>
+<p>a <span class="type">GByteArray</span> array</p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
@@ -462,10 +453,16 @@
 </table></div>
 </div>
 </div>
+<hr>
+<div class="refsect2">
+<a name="GI-TYPE-TAG-N-TYPES:CAPS"></a><h3>GI_TYPE_TAG_N_TYPES</h3>
+<pre class="programlisting">#define GI_TYPE_TAG_N_TYPES (GI_TYPE_TAG_UNICHAR+1)
+</pre>
+<p>TODO</p>
+</div>
 </div>
 </div>
 <div class="footer">
-<hr>
-          Generated by GTK-Doc V1.21.1</div>
+<hr>Generated by GTK-Doc V1.25.1</div>
 </body>
 </html>

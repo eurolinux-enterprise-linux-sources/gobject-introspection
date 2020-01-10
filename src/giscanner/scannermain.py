@@ -20,10 +20,16 @@
 # 02110-1301, USA.
 #
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import errno
 import optparse
 import os
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -164,6 +170,11 @@ the latter is not specified.""")
     parser.add_option("", "--symbol-prefix",
                       action="append", dest="symbol_prefixes", default=[],
                       help="Remove this prefix from C symbols (function names)")
+    parser.add_option("", "--symbol-filter-cmd",
+                      action="store", dest="symbol_filter_cmd", default='',
+                      help='Filter symbols (function names) through the given '
+                           'shell command which will receive the symbol name as input '
+                           'to stdin and is expected to output the filtered results to stdout.')
     parser.add_option("", "--accept-unprefixed",
                       action="store_true", dest="accept_unprefixed", default=False,
                       help="""If specified, accept symbols and identifiers that do not
@@ -245,7 +256,7 @@ def passthrough_gir(path, f):
     parser.parse(path)
 
     writer = GIRWriter(parser.get_namespace())
-    f.write(writer.get_xml())
+    f.write(writer.get_encoded_xml())
 
 
 def test_codegen(optstring,
@@ -266,7 +277,7 @@ def test_codegen(optstring,
                                       include_last_src)
         gen.write()
     else:
-        _error("Invaild namespace %r" % (namespace, ))
+        _error("Invaild namespace '%s'" % (namespace, ))
     return 0
 
 
@@ -280,7 +291,7 @@ def process_options(output, allowed_flags):
 
 
 def process_packages(options, packages):
-    args = ['pkg-config', '--cflags']
+    args = [os.environ.get('PKG_CONFIG', 'pkg-config'), '--cflags']
     args.extend(packages)
     output = subprocess.Popen(args,
                               stdout=subprocess.PIPE).communicate()[0]
@@ -288,6 +299,7 @@ def process_packages(options, packages):
         # the error output should have already appeared on our stderr,
         # so we just exit
         return 1
+    output = output.decode('ascii')
     # Some pkg-config files on Windows have options we don't understand,
     # so we explicitly filter to only the ones we need.
     options_whitelist = ['-I', '-D', '-U', '-l', '-L']
@@ -317,8 +329,8 @@ def extract_filelist(options):
     filenames = []
     if not os.path.exists(options.filelist):
         _error('%s: no such filelist file' % (options.filelist, ))
-    filelist_file = open(options.filelist, "r")
-    lines = filelist_file.readlines()
+    with open(options.filelist, "r") as filelist_file:
+        lines = filelist_file.readlines()
     for line in lines:
         # We don't support real C++ parsing yet, but we should be able
         # to understand C API implemented in C++ files.
@@ -337,8 +349,8 @@ def extract_filelist(options):
 
 def create_namespace(options):
     if options.strip_prefix:
-        print """g-ir-scanner: warning: Option --strip-prefix has been deprecated;
-see --identifier-prefix and --symbol-prefix."""
+        print("""g-ir-scanner: warning: Option --strip-prefix has been deprecated;
+see --identifier-prefix and --symbol-prefix.""")
         options.identifier_prefixes.append(options.strip_prefix)
 
     # We do this dance because the empty list has different semantics from
@@ -367,19 +379,20 @@ see --identifier-prefix and --symbol-prefix."""
 def create_transformer(namespace, options):
     transformer = Transformer(namespace,
                               accept_unprefixed=options.accept_unprefixed,
-                              identifier_filter_cmd=options.identifier_filter_cmd)
+                              identifier_filter_cmd=options.identifier_filter_cmd,
+                              symbol_filter_cmd=options.symbol_filter_cmd)
     transformer.set_include_paths(options.include_paths)
-    if options.passthrough_gir:
+    if options.passthrough_gir or options.reparse_validate_gir:
         transformer.disable_cache()
         transformer.set_passthrough_mode()
 
     for include in options.includes:
         if os.sep in include:
-            _error("Invalid include path %r" % (include, ))
+            _error("Invalid include path '%s'" % (include, ))
         try:
             include_obj = Include.from_string(include)
         except:
-            _error("Malformed include %r\n" % (include, ))
+            _error("Malformed include '%s'\n" % (include, ))
         transformer.register_include(include_obj)
     for include_path in options.includes_uninstalled:
         transformer.register_include_uninstalled(include_path)
@@ -433,20 +446,26 @@ def create_source_scanner(options, args):
 
 
 def write_output(data, options):
+    """Write encoded XML 'data' to the filename specified in 'options'."""
     if options.output == "-":
         output = sys.stdout
     elif options.reparse_validate_gir:
         main_f, main_f_name = tempfile.mkstemp(suffix='.gir')
-        main_f = os.fdopen(main_f, 'w')
-        main_f.write(data)
-        main_f.close()
+
+        if (os.path.isfile(options.output)):
+            shutil.copystat(options.output, main_f_name)
+        else:
+            os.chmod(main_f_name,
+                     stat.S_IWUSR | stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+
+        with os.fdopen(main_f, 'wb') as main_f:
+            main_f.write(data)
 
         temp_f, temp_f_name = tempfile.mkstemp(suffix='.gir')
-        temp_f = os.fdopen(temp_f, 'w')
-        passthrough_gir(main_f_name, temp_f)
-        temp_f.close()
+        with os.fdopen(temp_f, 'wb') as temp_f:
+            passthrough_gir(main_f_name, temp_f)
         if not utils.files_are_identical(main_f_name, temp_f_name):
-            _error("Failed to re-parse gir file; scanned=%r passthrough=%r" % (
+            _error("Failed to re-parse gir file; scanned='%s' passthrough='%s'" % (
                 main_f_name, temp_f_name))
         os.unlink(temp_f_name)
         try:
@@ -454,12 +473,11 @@ def write_output(data, options):
         except OSError as e:
             if e.errno == errno.EPERM:
                 os.unlink(main_f_name)
-                return 0
             raise
         return 0
     else:
         try:
-            output = open(options.output, "w")
+            output = open(options.output, 'wb')
         except IOError as e:
             _error("opening output for writing: %s" % (e.strerror, ))
 
@@ -542,8 +560,9 @@ def scanner_main(args):
         message.fatal("warnings configured as fatal")
         return 1
     elif warning_count > 0 and options.warn_all is False:
-        print ("g-ir-scanner: %s: warning: %d warnings suppressed (use --warn-all to see them)"
-               % (transformer.namespace.name, warning_count, ))
+        print("g-ir-scanner: %s: warning: %d warnings suppressed "
+              "(use --warn-all to see them)" %
+              (transformer.namespace.name, warning_count, ))
 
     # Write out AST
     if options.packages_export:
@@ -554,7 +573,7 @@ def scanner_main(args):
     transformer.namespace.c_includes = options.c_includes
     transformer.namespace.exported_packages = exported_packages
     writer = Writer(transformer.namespace)
-    data = writer.get_xml()
+    data = writer.get_encoded_xml()
 
     write_output(data, options)
 

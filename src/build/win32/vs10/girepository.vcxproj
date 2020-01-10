@@ -83,17 +83,15 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
-    <PreLinkEvent>
-      <Command>$(GenerateGIRDef)</Command>
-    </PreLinkEvent>
     <Link>
       <AdditionalDependencies>libffi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(LibGIDllPrefix)$(ProjectName)$(LibGIDllSuffix).dll</OutputFile>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(TargetDir)$(ProjectName)-$(ApiVersion).lib</ImportLibrary>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(LibGIDllPrefix)$(ProjectName)$(LibGIDllSuffix).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -110,17 +108,15 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
-    <PreLinkEvent>
-      <Command>$(GenerateGIRDef)</Command>
-    </PreLinkEvent>
     <Link>
       <AdditionalDependencies>libffi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(LibGIDllPrefix)$(ProjectName)$(LibGIDllSuffix).dll</OutputFile>
+      <ImportLibrary>$(TargetDir)$(ProjectName)-$(ApiVersion).lib</ImportLibrary>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(LibGIDllPrefix)$(ProjectName)$(LibGIDllSuffix).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <ImportLibrary>$(TargetDir)$(ProjectName)-$(ApiVersion).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -140,15 +136,13 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
-    <PreLinkEvent>
-      <Command>$(GenerateGIRDef)</Command>
-    </PreLinkEvent>
     <Link>
       <AdditionalDependencies>libffi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(LibGIDllPrefix)$(ProjectName)$(LibGIDllSuffix).dll</OutputFile>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(TargetDir)$(ProjectName)-$(ApiVersion).lib</ImportLibrary>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(LibGIDllPrefix)$(ProjectName)$(LibGIDllSuffix).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -168,43 +162,41 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
-    <PreLinkEvent>
-      <Command>$(GenerateGIRDef)</Command>
-    </PreLinkEvent>
     <Link>
       <AdditionalDependencies>libffi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(LibGIDllPrefix)$(ProjectName)$(LibGIDllSuffix).dll</OutputFile>
+      <ImportLibrary>$(TargetDir)$(ProjectName)-$(ApiVersion).lib</ImportLibrary>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(LibGIDllPrefix)$(ProjectName)$(LibGIDllSuffix).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <ImportLibrary>$(TargetDir)$(ProjectName)-$(ApiVersion).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\girepository\gdump.c" />
-    <ClCompile Include="..\..\..\girepository\giarginfo.c" />
-    <ClCompile Include="..\..\..\girepository\gibaseinfo.c" />
-    <ClCompile Include="..\..\..\girepository\gicallableinfo.c" />
-    <ClCompile Include="..\..\..\girepository\giconstantinfo.c" />
-    <ClCompile Include="..\..\..\girepository\gienuminfo.c" />
-    <ClCompile Include="..\..\..\girepository\gifieldinfo.c" />
-    <ClCompile Include="..\..\..\girepository\gifunctioninfo.c" />
-    <ClCompile Include="..\..\..\girepository\ginvoke.c" />
-    <ClCompile Include="..\..\..\girepository\giinterfaceinfo.c" />
-    <ClCompile Include="..\..\..\girepository\giobjectinfo.c" />
-    <ClCompile Include="..\..\..\girepository\gipropertyinfo.c" />
-    <ClCompile Include="..\..\..\girepository\giregisteredtypeinfo.c" />
-    <ClCompile Include="..\..\..\girepository\girepository.c" />
-    <ClCompile Include="..\..\..\girepository\girffi.c" />
-    <ClCompile Include="..\..\..\girepository\gisignalinfo.c" />
-    <ClCompile Include="..\..\..\girepository\gistructinfo.c" />
-    <ClCompile Include="..\..\..\girepository\gitypeinfo.c" />
-    <ClCompile Include="..\..\..\girepository\gitypelib.c" />
-    <ClCompile Include="..\..\..\girepository\giunioninfo.c" />
-    <ClCompile Include="..\..\..\girepository\givfuncinfo.c" />
-    <ClCompile Include="..\..\..\girepository\gthash.c" />
+   <ClCompile Include="..\..\..\girepository\gdump.c" />
+   <ClCompile Include="..\..\..\girepository\giarginfo.c" />
+   <ClCompile Include="..\..\..\girepository\gibaseinfo.c" />
+   <ClCompile Include="..\..\..\girepository\gicallableinfo.c" />
+   <ClCompile Include="..\..\..\girepository\giconstantinfo.c" />
+   <ClCompile Include="..\..\..\girepository\gienuminfo.c" />
+   <ClCompile Include="..\..\..\girepository\gifieldinfo.c" />
+   <ClCompile Include="..\..\..\girepository\gifunctioninfo.c" />
+   <ClCompile Include="..\..\..\girepository\ginvoke.c" />
+   <ClCompile Include="..\..\..\girepository\giinterfaceinfo.c" />
+   <ClCompile Include="..\..\..\girepository\giobjectinfo.c" />
+   <ClCompile Include="..\..\..\girepository\gipropertyinfo.c" />
+   <ClCompile Include="..\..\..\girepository\giregisteredtypeinfo.c" />
+   <ClCompile Include="..\..\..\girepository\girepository.c" />
+   <ClCompile Include="..\..\..\girepository\girffi.c" />
+   <ClCompile Include="..\..\..\girepository\gisignalinfo.c" />
+   <ClCompile Include="..\..\..\girepository\gistructinfo.c" />
+   <ClCompile Include="..\..\..\girepository\gitypeinfo.c" />
+   <ClCompile Include="..\..\..\girepository\gitypelib.c" />
+   <ClCompile Include="..\..\..\girepository\giunioninfo.c" />
+   <ClCompile Include="..\..\..\girepository\givfuncinfo.c" />
+   <ClCompile Include="..\..\..\girepository\gthash.c" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="gi-prebuild.vcxproj">

@@ -1,5 +1,8 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+/* This file gets installed, so we can't assume config.h is available */
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #include <string.h>
 #include <stdlib.h>
@@ -20,6 +23,30 @@ void
 regress_set_abort_on_error (gboolean in)
 {
   abort_on_error = in;
+}
+
+/* return annotations */
+
+/**
+ * regress_test_return_allow_none:
+ *
+ * Returns: (allow-none):
+ */
+char *
+regress_test_return_allow_none (void)
+{
+  return NULL;
+}
+
+/**
+ * regress_test_return_nullable:
+ *
+ * Returns: (nullable):
+ */
+char *
+regress_test_return_nullable (void)
+{
+  return NULL;
 }
 
 /* basic types */
@@ -493,6 +520,7 @@ regress_test_utf8_inout (char **inout)
 {
   /* inout parameter, transfer mode full */
   g_assert (strcmp (*inout, utf8_const) == 0);
+  g_free (*inout);
   *inout = g_strdup (utf8_nonconst);
 }
 
@@ -636,6 +664,8 @@ regress_test_array_int_inout (int *n_ints, int **ints)
       new_ints = g_malloc(sizeof(**ints) * *n_ints);
       for (i = 0; i < *n_ints; i++)
 	new_ints[i] = (*ints)[i + 1] + 1;
+
+      g_free (*ints);
       *ints = new_ints;
     }
 }
@@ -987,6 +1017,24 @@ regress_assert_test_sequence_list (const GList *in)
 }
 
 /**
+ * regress_test_glist_gtype_container_in:
+ * @in: (element-type GType) (transfer container):
+ */
+void
+regress_test_glist_gtype_container_in (GList *in)
+{
+  GList *l = in;
+
+  g_assert (GPOINTER_TO_SIZE (l->data) == REGRESS_TEST_TYPE_OBJ);
+  l = l->next;
+  g_assert (GPOINTER_TO_SIZE (l->data) == REGRESS_TEST_TYPE_SUB_OBJ);
+  l = l->next;
+  g_assert (l == NULL);
+
+  g_list_free (in);
+}
+
+/**
  * regress_test_glist_nothing_in:
  * @in: (element-type utf8):
  */
@@ -1251,34 +1299,38 @@ static const gchar *string_array[] = {
 GHashTable *
 regress_test_ghash_gvalue_return (void)
 {
-  GHashTable *hash;
-  GValue *value;
-  hash = g_hash_table_new_full(g_str_hash, g_str_equal,
-                               g_free, (GDestroyNotify)g_value_free);
+  static GHashTable *hash = NULL;
 
-  value = g_value_new(G_TYPE_INT);
-  g_value_set_int(value, 12);
-  g_hash_table_insert(hash, g_strdup("integer"), value);
+  if (hash == NULL)
+    {
+      GValue *value;
+      hash = g_hash_table_new_full(g_str_hash, g_str_equal,
+                                   g_free, (GDestroyNotify)g_value_free);
 
-  value = g_value_new(G_TYPE_BOOLEAN);
-  g_value_set_boolean(value, TRUE);
-  g_hash_table_insert(hash, g_strdup("boolean"), value);
+      value = g_value_new(G_TYPE_INT);
+      g_value_set_int(value, 12);
+      g_hash_table_insert(hash, g_strdup("integer"), value);
 
-  value = g_value_new(G_TYPE_STRING);
-  g_value_set_string(value, "some text");
-  g_hash_table_insert(hash, g_strdup("string"), value);
+      value = g_value_new(G_TYPE_BOOLEAN);
+      g_value_set_boolean(value, TRUE);
+      g_hash_table_insert(hash, g_strdup("boolean"), value);
 
-  value = g_value_new(G_TYPE_STRV);
-  g_value_set_boxed(value, string_array);
-  g_hash_table_insert(hash, g_strdup("strings"), value);
+      value = g_value_new(G_TYPE_STRING);
+      g_value_set_string(value, "some text");
+      g_hash_table_insert(hash, g_strdup("string"), value);
 
-  value = g_value_new(REGRESS_TEST_TYPE_FLAGS);
-  g_value_set_flags(value, REGRESS_TEST_FLAG1 | REGRESS_TEST_FLAG3);
-  g_hash_table_insert(hash, g_strdup("flags"), value);
+      value = g_value_new(G_TYPE_STRV);
+      g_value_set_boxed(value, string_array);
+      g_hash_table_insert(hash, g_strdup("strings"), value);
 
-  value = g_value_new(regress_test_enum_get_type());
-  g_value_set_enum(value, REGRESS_TEST_VALUE2);
-  g_hash_table_insert(hash, g_strdup("enum"), value);
+      value = g_value_new(REGRESS_TEST_TYPE_FLAGS);
+      g_value_set_flags(value, REGRESS_TEST_FLAG1 | REGRESS_TEST_FLAG3);
+      g_hash_table_insert(hash, g_strdup("flags"), value);
+
+      value = g_value_new(regress_test_enum_get_type());
+      g_value_set_enum(value, REGRESS_TEST_VALUE2);
+      g_hash_table_insert(hash, g_strdup("enum"), value);
+    }
 
   return hash;
 }
@@ -1685,6 +1737,23 @@ regress_test_struct_a_parse (RegressTestStructA *a_out,
                              const gchar *string)
 {
 	a_out->some_int = 23;
+}
+
+/**
+ * regress_test_array_struct_out:
+ * @arr: (out) (array length=len) (transfer full):
+ * @len: (out)
+ *
+ * This is similar to gdk_keymap_get_entries_for_keyval().
+ */
+void
+regress_test_array_struct_out (RegressTestStructA **arr, int *len)
+{
+  *arr = g_new0(RegressTestStructA, 3);
+  (*arr)[0].some_int = 22;
+  (*arr)[1].some_int = 33;
+  (*arr)[2].some_int = 44;
+  *len = 3;
 }
 
 /**
@@ -2260,7 +2329,9 @@ regress_test_obj_class_init (RegressTestObjClass *klass)
    * @arr: (array length=len) (element-type uint) (allow-none): numbers, or %NULL
    * @len: length of @arr, or 0
    *
-   * This test signal similar to GSettings::change-event
+   * This test signal similar to GSettings::change-event.
+   * You can use this with regress_test_obj_emit_sig_with_array_len_prop(), or
+   * raise from the introspection client language.
    */
   regress_test_obj_signals[REGRESS_TEST_OBJ_SIGNAL_SIG_NEW_WITH_ARRAY_LEN_PROP] =
     g_signal_new ("sig-with-array-len-prop",
@@ -2687,6 +2758,16 @@ regress_test_obj_emit_sig_with_uint64 (RegressTestObj *obj)
   g_assert (ret == G_MAXUINT64);
 }
 
+/**
+ * regress_test_obj_emit_sig_with_array_len_prop:
+ */
+void
+regress_test_obj_emit_sig_with_array_len_prop (RegressTestObj *obj)
+{
+  int arr[] = { 0, 1, 2, 3, 4 };
+  g_signal_emit_by_name (obj, "sig-with-array-len-prop", &arr, 5);
+}
+
 int
 regress_test_obj_instance_method (RegressTestObj *obj)
 {
@@ -2978,6 +3059,39 @@ regress_test_obj_null_out (RegressTestObj **obj)
 {
   if (obj)
     *obj = NULL;
+}
+
+/**
+ * regress_func_obj_nullable_in:
+ * @obj: (nullable): A #RegressTestObj
+ */
+void
+regress_func_obj_nullable_in (RegressTestObj *obj)
+{
+}
+
+/**
+ * regress_test_obj_not_nullable_typed_gpointer_in:
+ * @obj: A #RegressTestObj
+ * @input: (type GObject): some #GObject
+ */
+void
+regress_test_obj_not_nullable_typed_gpointer_in (RegressTestObj *obj,
+                                                 gpointer        input)
+{
+}
+
+/**
+ * regress_test_obj_not_nullable_element_typed_gpointer_in:
+ * @obj: A #RegressTestObj
+ * @input: (element-type guint8) (array length=count): some uint8 array
+ * @count: length of @input
+ */
+void
+regress_test_obj_not_nullable_element_typed_gpointer_in (RegressTestObj *obj,
+                                                         gpointer        input,
+                                                         guint           count)
+{
 }
 
 /**
@@ -3422,8 +3536,23 @@ regress_test_simple_callback (RegressTestSimpleCallback callback)
 }
 
 /**
+ * regress_test_noptr_callback:
+ * @callback: (scope call) (allow-none):
+ *
+ **/
+void
+regress_test_noptr_callback (RegressTestNoPtrCallback callback)
+{
+    if (callback != NULL)
+        callback();
+
+    return;
+}
+
+/**
  * regress_test_callback_user_data:
  * @callback: (scope call):
+ * @user_data: (not nullable):
  *
  * Call - callback parameter persists for the duration of the method
  * call and can be released on return.
@@ -3433,6 +3562,20 @@ regress_test_callback_user_data (RegressTestCallbackUserData callback,
                          gpointer user_data)
 {
   return callback(user_data);
+}
+
+/**
+ * regress_test_callback_return_full:
+ * @callback: (scope call):
+ *
+ **/
+void
+regress_test_callback_return_full (RegressTestCallbackReturnFull callback)
+{
+  RegressTestObj *obj;
+
+  obj = callback ();
+  g_object_unref (obj);
 }
 
 static GSList *notified_callbacks = NULL;
@@ -3552,9 +3695,12 @@ regress_test_callback_thaw_async (void)
 void
 regress_test_async_ready_callback (GAsyncReadyCallback callback)
 {
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   GSimpleAsyncResult *result = g_simple_async_result_new (NULL, callback, NULL,
     regress_test_async_ready_callback);
   g_simple_async_result_complete_in_idle (result);
+  g_object_unref (result);
+  G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 /**
@@ -4065,4 +4211,15 @@ regress_like_xkl_config_item_set_name (RegressLikeXklConfigItem *self,
 {
   strncpy (self->name, name, sizeof (self->name) - 1);
   self->name[sizeof(self->name)-1] = '\0';
+}
+
+/**
+ * regress_get_variant:
+ *
+ * Returns: (transfer floating): A new variant
+ */
+GVariant *
+regress_get_variant (void)
+{
+  return g_variant_new_int32 (42);
 }

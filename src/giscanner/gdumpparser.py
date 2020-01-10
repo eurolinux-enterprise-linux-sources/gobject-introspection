@@ -18,6 +18,11 @@
 # Boston, MA 02111-1307, USA.
 #
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import os
 import sys
 import tempfile
@@ -84,12 +89,12 @@ class GDumpParser(object):
         """
 
         # First pass: parsing
-        for node in self._namespace.itervalues():
+        for node in self._namespace.values():
             if isinstance(node, ast.Function):
                 self._initparse_function(node)
 
         if self._namespace.name == 'GObject' or self._namespace.name == 'GLib':
-            for node in self._namespace.itervalues():
+            for node in self._namespace.values():
                 if isinstance(node, ast.Record):
                     self._initparse_gobject_record(node)
 
@@ -116,16 +121,16 @@ class GDumpParser(object):
                 self._introspect_type(child)
 
         # Pair up boxed types and class records
-        for name, boxed in self._boxed_types.iteritems():
+        for name, boxed in self._boxed_types.items():
             self._pair_boxed_type(boxed)
-        for node in self._namespace.itervalues():
+        for node in self._namespace.values():
             if isinstance(node, (ast.Class, ast.Interface)):
                 self._find_class_record(node)
 
         # Clear the _get_type functions out of the namespace;
         # Anyone who wants them can get them from the ast.Class/Interface/Boxed
         to_remove = []
-        for name, node in self._namespace.iteritems():
+        for name, node in self._namespace.items():
             if isinstance(node, ast.Registered) and node.get_type is not None:
                 get_type_name = node.get_type
                 if get_type_name == 'intern':
@@ -145,19 +150,24 @@ class GDumpParser(object):
         """Load the library (or executable), returning an XML
 blob containing data gleaned from GObject's primitive introspection."""
         in_path = os.path.join(self._binary.tmpdir, 'functions.txt')
-        f = open(in_path, 'w')
-        for func in self._get_type_functions:
-            f.write('get-type:')
-            f.write(func)
-            f.write('\n')
-        for func in self._error_quark_functions:
-            f.write('error-quark:')
-            f.write(func)
-            f.write('\n')
-        f.close()
+        with open(in_path, 'w') as f:
+            for func in self._get_type_functions:
+                f.write('get-type:')
+                f.write(func)
+                f.write('\n')
+            for func in self._error_quark_functions:
+                f.write('error-quark:')
+                f.write(func)
+                f.write('\n')
         out_path = os.path.join(self._binary.tmpdir, 'dump.xml')
 
         args = []
+
+        # Prepend the launcher command and arguments, if defined
+        launcher = os.environ.get('GI_CROSS_LAUNCHER')
+        if launcher:
+            args.extend(launcher.split())
+
         args.extend(self._binary.args)
         args.append('--introspect-dump=%s,%s' % (in_path, out_path))
 
@@ -203,7 +213,7 @@ blob containing data gleaned from GObject's primitive introspection."""
 
     def _initparse_gobject_record(self, record):
         if (record.name.startswith('ParamSpec')
-        and not record.name in ('ParamSpecPool', 'ParamSpecClass', 'ParamSpecTypeInfo')):
+        and record.name not in ('ParamSpecPool', 'ParamSpecClass', 'ParamSpecTypeInfo')):
             parent = None
             if record.name != 'ParamSpec':
                 parent = ast.Type(target_giname='GObject.ParamSpec')
@@ -297,7 +307,7 @@ blob containing data gleaned from GObject's primitive introspection."""
         (ns, name) = self._transformer.split_csymbol(get_type)
         assert ns is self._namespace
         if name in ('get_type', '_get_gtype'):
-            message.fatal("""The GObject name %r isn't compatible
+            message.fatal("""The GObject name '%s' isn't compatible
 with the configured identifier prefixes:
   %r
 The class would have no name.  Most likely you want to specify a
@@ -350,7 +360,7 @@ different --identifier-prefix.""" % (xmlnode.attrib['name'], self._namespace.ide
         if isinstance(record, ast.Record):
             node.ctype = record.ctype
         else:
-            message.warn_node(node, "Couldn't find associated structure for '%r'" % (node.name, ))
+            message.warn_node(node, "Couldn't find associated structure for '%s'" % (node.name, ))
 
         # GtkFileChooserEmbed is an example of a private interface, we
         # just filter them out
@@ -359,7 +369,7 @@ different --identifier-prefix.""" % (xmlnode.attrib['name'], self._namespace.ide
         else:
             self._namespace.append(node, replace=True)
 
-    ## WORKAROUND ##
+    # WORKAROUND
     # https://bugzilla.gnome.org/show_bug.cgi?id=550616
     def _introspect_boxed_gstreamer_workaround(self, xmlnode):
         node = ast.Boxed('ParamSpecMiniObject', gtype_name='GParamSpecMiniObject',
@@ -439,8 +449,8 @@ different --identifier-prefix.""" % (xmlnode.attrib['name'], self._namespace.ide
     def _parse_parents(self, xmlnode, node):
         parents_str = xmlnode.attrib.get('parents', '')
         if parents_str != '':
-            parent_types = map(lambda s: ast.Type.create_from_gtype_name(s),
-                               parents_str.split(','))
+            parent_types = list(map(lambda s: ast.Type.create_from_gtype_name(s),
+                                    parents_str.split(',')))
         else:
             parent_types = []
         node.parent_chain = parent_types

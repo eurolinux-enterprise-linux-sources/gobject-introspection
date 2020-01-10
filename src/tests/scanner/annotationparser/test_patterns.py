@@ -18,7 +18,6 @@
 # 02110-1301, USA.
 #
 
-
 '''
 test_patterns.py
 
@@ -30,13 +29,24 @@ should match, resulting symbolic groups are verified
 against the expected output.
 '''
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import sys
+import unittest
 
 from giscanner.annotationparser import (COMMENT_BLOCK_START_RE, COMMENT_BLOCK_END_RE,
                                         COMMENT_ASTERISK_RE, INDENTATION_RE, EMPTY_LINE_RE,
                                         SECTION_RE, SYMBOL_RE, PROPERTY_RE,
                                         SIGNAL_RE, PARAMETER_RE, TAG_RE,
                                         TAG_VALUE_VERSION_RE, TAG_VALUE_STABILITY_RE)
-import unittest
+
+if sys.version_info.major < 3:
+    encode_name = lambda s: s.encode('ascii')
+else:
+    encode_name = lambda s: s
 
 
 comment_start_tests = [
@@ -889,14 +899,13 @@ def create_test_method(testcase):
 
 def create_test_case(tests_class_name, testcases):
     test_methods = {}
-    for (index, testcase) in enumerate(testcases):
-        test_method_name = 'test_%03d' % index
+    for counter, test in enumerate(testcases):
+        test_name = 'test_%03d' % (counter + 1)
+        test_method = create_test_method(test)
+        test_method.__name__ = encode_name(test_name)
+        test_methods[test_name] = test_method
 
-        test_method = create_test_method(testcase)
-        test_method.__name__ = test_method_name
-        test_methods[test_method_name] = test_method
-
-    return type(tests_class_name, (unittest.TestCase,), test_methods)
+    return type(encode_name(tests_class_name), (unittest.TestCase,), test_methods)
 
 
 def create_test_cases():
@@ -914,7 +923,8 @@ def create_test_cases():
                             ('TestTag', tag_tests),
                             ('TestTagValueVersion', tag_value_version_tests),
                             ('TestTagValueStability', tag_value_stability_tests)):
-        test_cases[name] = create_test_case(name, test_data)
+        test_case = create_test_case(name, test_data)
+        test_cases[test_case.__name__] = test_case
 
     return test_cases
 
@@ -925,18 +935,6 @@ def create_test_cases():
 # are run in parameterized mode, e.g: python -m unittest test_parser.Test...
 _all_tests = create_test_cases()
 globals().update(_all_tests)
-
-
-# Hook function for Python test loader.
-def load_tests(loader, tests, pattern):
-    suite = unittest.TestSuite()
-    # add standard tests from module
-    suite.addTests(tests)
-
-    for name, test_case in _all_tests.iteritems():
-        tests = loader.loadTestsFromTestCase(test_case)
-        suite.addTests(tests)
-    return suite
 
 
 if __name__ == '__main__':

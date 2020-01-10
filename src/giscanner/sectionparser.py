@@ -17,6 +17,11 @@
 # Boston, MA 02111-1307, USA.
 #
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import re
 from . import ast
 from .utils import to_underscores
@@ -134,7 +139,7 @@ def generate_sections_file(transformer):
 
     general_section = new_section("main", "Main")
 
-    for node in ns.itervalues():
+    for node in ns.values():
         if isinstance(node, ast.Function):
             append_symbol(general_section, node.symbol)
         elif isinstance(node, (ast.Class, ast.Interface)):

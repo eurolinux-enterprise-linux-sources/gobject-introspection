@@ -18,9 +18,20 @@
 # Boston, MA 02111-1307, USA.
 #
 
-from StringIO import StringIO
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import sys
+
 from . import ast
 from .codegen import CCodeGenerator
+
+if sys.version_info.major < 3:
+    from StringIO import StringIO
+else:
+    from io import StringIO
 
 DEFAULT_C_VALUES = {ast.TYPE_ANY: 'NULL',
                     ast.TYPE_STRING: '""',
@@ -65,6 +76,9 @@ class EverythingCodeGenerator(object):
                                   include_last_src)
 
     def write(self):
+        types = [ast.TYPE_ANY]
+        types.extend(ast.INTROSPECTABLE_BASIC)
+
         func = ast.Function('nullfunc',
                             ast.Return(ast.TYPE_NONE, transfer=ast.PARAM_TRANSFER_NONE),
                             [], False, self.gen.gen_symbol('nullfunc'))
@@ -74,7 +88,7 @@ class EverythingCodeGenerator(object):
 
         # First pass, generate constant returns
         prefix = 'const return '
-        for typeval in ast.INTROSPECTABLE_BASIC:
+        for typeval in types:
             name = prefix + uscore_from_type(typeval)
             sym = self.gen.gen_symbol(name)
             func = ast.Function(name,
@@ -87,7 +101,7 @@ class EverythingCodeGenerator(object):
 
         # Void return, one parameter
         prefix = 'oneparam '
-        for typeval in ast.INTROSPECTABLE_BASIC:
+        for typeval in types:
             if typeval is ast.TYPE_NONE:
                 continue
             name = prefix + uscore_from_type(typeval)
@@ -101,7 +115,7 @@ class EverythingCodeGenerator(object):
 
         # Void return, one (out) parameter
         prefix = 'one_outparam '
-        for typeval in ast.INTROSPECTABLE_BASIC:
+        for typeval in types:
             if typeval is ast.TYPE_NONE:
                 continue
             name = prefix + uscore_from_type(typeval)
@@ -119,7 +133,7 @@ class EverythingCodeGenerator(object):
 
         # Passthrough one parameter
         prefix = 'passthrough_one '
-        for typeval in ast.INTROSPECTABLE_BASIC:
+        for typeval in types:
             if typeval is ast.TYPE_NONE:
                 continue
             name = prefix + uscore_from_type(typeval)

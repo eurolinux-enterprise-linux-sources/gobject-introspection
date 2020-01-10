@@ -2,13 +2,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>GObject Introspection Reference Manual: GITypeInfo</title>
-<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<title>GITypeInfo: GObject Introspection Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="index.html" title="GObject Introspection Reference Manual">
 <link rel="up" href="ch01.html" title="GIRepository">
 <link rel="prev" href="gi-GIPropertyInfo.html" title="GIPropertyInfo">
 <link rel="next" href="gi-GIValueInfo.html" title="GIValueInfo">
-<meta name="generator" content="GTK-Doc V1.21.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -33,7 +33,7 @@
 </tr></table></div>
 <div class="refsect1">
 <a name="gi-GITypeInfo.functions"></a><h2>Functions</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="functions_return">
 <col class="functions_name">
@@ -46,14 +46,14 @@
 </td>
 </tr>
 <tr>
-<td class="function_type">const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+<td class="function_type">const <span class="returnvalue">gchar</span> *
 </td>
 <td class="function_name">
 <a class="link" href="gi-GITypeInfo.html#g-type-tag-to-string" title="g_type_tag_to_string ()">g_type_tag_to_string</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 <tr>
-<td class="function_type">const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+<td class="function_type">const <span class="returnvalue">gchar</span> *
 </td>
 <td class="function_name">
 <a class="link" href="gi-GITypeInfo.html#g-info-type-to-string" title="g_info_type_to_string ()">g_info_type_to_string</a> <span class="c_punctuation">()</span>
@@ -61,7 +61,7 @@
 </tr>
 <tr>
 <td class="function_type">
-<a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+<span class="returnvalue">gboolean</span>
 </td>
 <td class="function_name">
 <a class="link" href="gi-GITypeInfo.html#g-type-info-is-pointer" title="g_type_info_is_pointer ()">g_type_info_is_pointer</a> <span class="c_punctuation">()</span>
@@ -93,7 +93,7 @@
 </tr>
 <tr>
 <td class="function_type">
-<a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint"><span class="returnvalue">gint</span></a>
+<span class="returnvalue">gint</span>
 </td>
 <td class="function_name">
 <a class="link" href="gi-GITypeInfo.html#g-type-info-get-array-length" title="g_type_info_get_array_length ()">g_type_info_get_array_length</a> <span class="c_punctuation">()</span>
@@ -101,7 +101,7 @@
 </tr>
 <tr>
 <td class="function_type">
-<a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint"><span class="returnvalue">gint</span></a>
+<span class="returnvalue">gint</span>
 </td>
 <td class="function_name">
 <a class="link" href="gi-GITypeInfo.html#g-type-info-get-array-fixed-size" title="g_type_info_get_array_fixed_size ()">g_type_info_get_array_fixed_size</a> <span class="c_punctuation">()</span>
@@ -109,7 +109,7 @@
 </tr>
 <tr>
 <td class="function_type">
-<a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+<span class="returnvalue">gboolean</span>
 </td>
 <td class="function_name">
 <a class="link" href="gi-GITypeInfo.html#g-type-info-is-zero-terminated" title="g_type_info_is_zero_terminated ()">g_type_info_is_zero_terminated</a> <span class="c_punctuation">()</span>
@@ -128,7 +128,7 @@
 </div>
 <div class="refsect1">
 <a name="gi-GITypeInfo.other"></a><h2>Types and Values</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="name">
 <col class="description">
@@ -165,8 +165,8 @@ interface.</p>
 <p>Checks if <em class="parameter"><code>info</code></em>
  is a <a class="link" href="gi-GITypeInfo.html#GITypeInfo" title="GITypeInfo"><span class="type">GITypeInfo</span></a>.</p>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.2.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="GI-IS-TYPE-INFO.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -183,13 +183,13 @@ interface.</p>
 <hr>
 <div class="refsect2">
 <a name="g-type-tag-to-string"></a><h3>g_type_tag_to_string ()</h3>
-<pre class="programlisting">const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
 g_type_tag_to_string (<em class="parameter"><code><a class="link" href="gi-common-types.html#GITypeTag" title="enum GITypeTag"><span class="type">GITypeTag</span></a> type</code></em>);</pre>
 <p>Obtain a string representation of <em class="parameter"><code>type</code></em>
 </p>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.3.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-type-tag-to-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -203,21 +203,20 @@ g_type_tag_to_string (<em class="parameter"><code><a class="link" href="gi-commo
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.3.6"></a><h4>Returns</h4>
+<a name="g-type-tag-to-string.returns"></a><h4>Returns</h4>
 <p> the string</p>
-<p></p>
 </div>
 </div>
 <hr>
 <div class="refsect2">
 <a name="g-info-type-to-string"></a><h3>g_info_type_to_string ()</h3>
-<pre class="programlisting">const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
 g_info_type_to_string (<em class="parameter"><code><a class="link" href="gi-GIBaseInfo.html#GIInfoType" title="enum GIInfoType"><span class="type">GIInfoType</span></a> type</code></em>);</pre>
 <p>Obtain a string representation of <em class="parameter"><code>type</code></em>
 </p>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.4.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-info-type-to-string.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -231,20 +230,23 @@ g_info_type_to_string (<em class="parameter"><code><a class="link" href="gi-GIBa
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.4.6"></a><h4>Returns</h4>
+<a name="g-info-type-to-string.returns"></a><h4>Returns</h4>
 <p> the string</p>
-<p></p>
 </div>
 </div>
 <hr>
 <div class="refsect2">
 <a name="g-type-info-is-pointer"></a><h3>g_type_info_is_pointer ()</h3>
-<pre class="programlisting"><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
 g_type_info_is_pointer (<em class="parameter"><code><a class="link" href="gi-GITypeInfo.html#GITypeInfo" title="GITypeInfo"><span class="type">GITypeInfo</span></a> *info</code></em>);</pre>
 <p>Obtain if the type is passed as a reference.</p>
+<p>Note that the types of <a class="link" href="gi-GIArgInfo.html#GI-DIRECTION-OUT:CAPS"><code class="literal">GI_DIRECTION_OUT</code></a> and <a class="link" href="gi-GIArgInfo.html#GI-DIRECTION-INOUT:CAPS"><code class="literal">GI_DIRECTION_INOUT</code></a> parameters
+will only be pointers if the underlying type being transferred is a pointer
+(i.e. only if the type of the C function’s formal parameter is a pointer to a
+pointer).</p>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.5.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-type-info-is-pointer.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -258,9 +260,8 @@ g_type_info_is_pointer (<em class="parameter"><code><a class="link" href="gi-GIT
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.5.6"></a><h4>Returns</h4>
-<p> <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if it is a pointer</p>
-<p></p>
+<a name="g-type-info-is-pointer.returns"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> if it is a pointer</p>
 </div>
 </div>
 <hr>
@@ -271,8 +272,8 @@ g_type_info_get_tag (<em class="parameter"><code><a class="link" href="gi-GIType
 <p>Obtain the type tag for the type. See <a class="link" href="gi-common-types.html#GITypeTag" title="enum GITypeTag"><span class="type">GITypeTag</span></a> for a list
 of type tags.</p>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.6.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-type-info-get-tag.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -286,9 +287,8 @@ of type tags.</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.6.6"></a><h4>Returns</h4>
+<a name="g-type-info-get-tag.returns"></a><h4>Returns</h4>
 <p> the type tag</p>
-<p></p>
 </div>
 </div>
 <hr>
@@ -296,12 +296,12 @@ of type tags.</p>
 <a name="g-type-info-get-param-type"></a><h3>g_type_info_get_param_type ()</h3>
 <pre class="programlisting"><a class="link" href="gi-GITypeInfo.html#GITypeInfo" title="GITypeInfo"><span class="returnvalue">GITypeInfo</span></a> *
 g_type_info_get_param_type (<em class="parameter"><code><a class="link" href="gi-GITypeInfo.html#GITypeInfo" title="GITypeInfo"><span class="type">GITypeInfo</span></a> *info</code></em>,
-                            <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint"><span class="type">gint</span></a> n</code></em>);</pre>
+                            <em class="parameter"><code><span class="type">gint</span> n</code></em>);</pre>
 <p>Obtain the parameter type <em class="parameter"><code>n</code></em>
 .</p>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.7.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-type-info-get-param-type.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -322,7 +322,7 @@ g_type_info_get_param_type (<em class="parameter"><code><a class="link" href="gi
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.7.6"></a><h4>Returns</h4>
+<a name="g-type-info-get-param-type.returns"></a><h4>Returns</h4>
 <p> the param type info. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -337,8 +337,8 @@ this function returns full information about the referenced type.  You can then
 inspect the type of the returned <span class="type">GIBaseInfo</span> to further query whether it is
 a concrete GObject, a GInterface, a structure, etc. using <a class="link" href="gi-GIBaseInfo.html#g-base-info-get-type" title="g_base_info_get_type ()"><code class="function">g_base_info_get_type()</code></a>.</p>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.8.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-type-info-get-interface.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -352,8 +352,8 @@ a concrete GObject, a GInterface, a structure, etc. using <a class="link" href="
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.8.6"></a><h4>Returns</h4>
-<p> the <span class="type">GIBaseInfo</span>, or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. Free it with
+<a name="g-type-info-get-interface.returns"></a><h4>Returns</h4>
+<p> the <span class="type">GIBaseInfo</span>, or <code class="literal">NULL</code>. Free it with
 <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -361,13 +361,13 @@ a concrete GObject, a GInterface, a structure, etc. using <a class="link" href="
 <hr>
 <div class="refsect2">
 <a name="g-type-info-get-array-length"></a><h3>g_type_info_get_array_length ()</h3>
-<pre class="programlisting"><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint"><span class="returnvalue">gint</span></a>
+<pre class="programlisting"><span class="returnvalue">gint</span>
 g_type_info_get_array_length (<em class="parameter"><code><a class="link" href="gi-GITypeInfo.html#GITypeInfo" title="GITypeInfo"><span class="type">GITypeInfo</span></a> *info</code></em>);</pre>
 <p>Obtain the array length of the type. The type tag must be a
 <a class="link" href="gi-common-types.html#GI-TYPE-TAG-ARRAY:CAPS"><span class="type">GI_TYPE_TAG_ARRAY</span></a> or -1 will returned.</p>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.9.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-type-info-get-array-length.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -381,21 +381,20 @@ g_type_info_get_array_length (<em class="parameter"><code><a class="link" href="
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.9.6"></a><h4>Returns</h4>
+<a name="g-type-info-get-array-length.returns"></a><h4>Returns</h4>
 <p> the array length, or -1 if the type is not an array</p>
-<p></p>
 </div>
 </div>
 <hr>
 <div class="refsect2">
 <a name="g-type-info-get-array-fixed-size"></a><h3>g_type_info_get_array_fixed_size ()</h3>
-<pre class="programlisting"><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint"><span class="returnvalue">gint</span></a>
+<pre class="programlisting"><span class="returnvalue">gint</span>
 g_type_info_get_array_fixed_size (<em class="parameter"><code><a class="link" href="gi-GITypeInfo.html#GITypeInfo" title="GITypeInfo"><span class="type">GITypeInfo</span></a> *info</code></em>);</pre>
 <p>Obtain the fixed array size of the type. The type tag must be a
 <a class="link" href="gi-common-types.html#GI-TYPE-TAG-ARRAY:CAPS"><span class="type">GI_TYPE_TAG_ARRAY</span></a> or -1 will returned.</p>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.10.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-type-info-get-array-fixed-size.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -409,21 +408,20 @@ g_type_info_get_array_fixed_size (<em class="parameter"><code><a class="link" hr
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.10.6"></a><h4>Returns</h4>
+<a name="g-type-info-get-array-fixed-size.returns"></a><h4>Returns</h4>
 <p> the size or -1 if it's not an array</p>
-<p></p>
 </div>
 </div>
 <hr>
 <div class="refsect2">
 <a name="g-type-info-is-zero-terminated"></a><h3>g_type_info_is_zero_terminated ()</h3>
-<pre class="programlisting"><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
 g_type_info_is_zero_terminated (<em class="parameter"><code><a class="link" href="gi-GITypeInfo.html#GITypeInfo" title="GITypeInfo"><span class="type">GITypeInfo</span></a> *info</code></em>);</pre>
-<p>Obtain if the last element of the array is <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. The type tag must be a
-<a class="link" href="gi-common-types.html#GI-TYPE-TAG-ARRAY:CAPS"><span class="type">GI_TYPE_TAG_ARRAY</span></a> or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#FALSE:CAPS"><code class="literal">FALSE</code></a> will returned.</p>
+<p>Obtain if the last element of the array is <code class="literal">NULL</code>. The type tag must be a
+<a class="link" href="gi-common-types.html#GI-TYPE-TAG-ARRAY:CAPS"><span class="type">GI_TYPE_TAG_ARRAY</span></a> or <code class="literal">FALSE</code> will returned.</p>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.11.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-type-info-is-zero-terminated.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -437,9 +435,8 @@ g_type_info_is_zero_terminated (<em class="parameter"><code><a class="link" href
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.11.6"></a><h4>Returns</h4>
-<p> <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if zero terminated</p>
-<p></p>
+<a name="g-type-info-is-zero-terminated.returns"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> if zero terminated</p>
 </div>
 </div>
 <hr>
@@ -451,8 +448,8 @@ g_type_info_get_array_type (<em class="parameter"><code><a class="link" href="gi
 possible values. If the type tag of this type is not array, -1 will be
 returned.</p>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.12.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-type-info-get-array-type.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -466,9 +463,8 @@ returned.</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.21.6.12.6"></a><h4>Returns</h4>
+<a name="g-type-info-get-array-type.returns"></a><h4>Returns</h4>
 <p> the array type or -1</p>
-<p></p>
 </div>
 </div>
 </div>
@@ -483,7 +479,6 @@ returned.</p>
 </div>
 </div>
 <div class="footer">
-<hr>
-          Generated by GTK-Doc V1.21.1</div>
+<hr>Generated by GTK-Doc V1.25.1</div>
 </body>
 </html>

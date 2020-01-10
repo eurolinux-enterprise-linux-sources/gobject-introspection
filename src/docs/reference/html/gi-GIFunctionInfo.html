@@ -2,13 +2,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>GObject Introspection Reference Manual: GIFunctionInfo</title>
-<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<title>GIFunctionInfo: GObject Introspection Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="index.html" title="GObject Introspection Reference Manual">
 <link rel="up" href="ch01.html" title="GIRepository">
 <link rel="prev" href="gi-GICallableInfo.html" title="GICallableInfo">
 <link rel="next" href="gi-GICallbackInfo.html" title="GICallbackInfo">
-<meta name="generator" content="GTK-Doc V1.21.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -33,7 +33,7 @@
 </tr></table></div>
 <div class="refsect1">
 <a name="gi-GIFunctionInfo.functions"></a><h2>Functions</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="functions_return">
 <col class="functions_name">
@@ -62,7 +62,7 @@
 </td>
 </tr>
 <tr>
-<td class="function_type">const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+<td class="function_type">const <span class="returnvalue">gchar</span> *
 </td>
 <td class="function_name">
 <a class="link" href="gi-GIFunctionInfo.html#g-function-info-get-symbol" title="g_function_info_get_symbol ()">g_function_info_get_symbol</a> <span class="c_punctuation">()</span>
@@ -78,19 +78,15 @@
 </tr>
 <tr>
 <td class="function_type">
-<a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+<span class="returnvalue">gboolean</span>
 </td>
 <td class="function_name">
 <a class="link" href="gi-GIFunctionInfo.html#g-function-info-invoke" title="g_function_info_invoke ()">g_function_info_invoke</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 <tr>
-<td class="define_keyword">#define</td>
-<td class="function_name"><a class="link" href="gi-GIFunctionInfo.html#G-INVOKE-ERROR:CAPS" title="G_INVOKE_ERROR">G_INVOKE_ERROR</a></td>
-</tr>
-<tr>
 <td class="function_type">
-<a href="http://library.gnome.org/devel/glib/unstable/glib-Quarks.html#GQuark"><span class="returnvalue">GQuark</span></a>
+<span class="returnvalue">GQuark</span>
 </td>
 <td class="function_name">
 <a class="link" href="gi-GIFunctionInfo.html#g-invoke-error-quark" title="g_invoke_error_quark ()">g_invoke_error_quark</a> <span class="c_punctuation">()</span>
@@ -101,7 +97,7 @@
 </div>
 <div class="refsect1">
 <a name="gi-GIFunctionInfo.other"></a><h2>Types and Values</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="name">
 <col class="description">
@@ -114,6 +110,10 @@
 <tr>
 <td class="datatype_keyword">enum</td>
 <td class="function_name"><a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfoFlags" title="enum GIFunctionInfoFlags">GIFunctionInfoFlags</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="gi-GIFunctionInfo.html#G-INVOKE-ERROR:CAPS" title="G_INVOKE_ERROR">G_INVOKE_ERROR</a></td>
 </tr>
 <tr>
 <td class="datatype_keyword">enum</td>
@@ -148,8 +148,8 @@ other metadata.</p>
 <p>Checks if <em class="parameter"><code>info</code></em>
  is a <a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunctionInfo"><span class="type">GIFunctionInfo</span></a>.</p>
 <div class="refsect3">
-<a name="id-1.4.2.7.6.2.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="GI-IS-FUNCTION-INFO.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -171,8 +171,8 @@ g_function_info_get_flags (<em class="parameter"><code><a class="link" href="gi-
 <p>Obtain the <a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfoFlags" title="enum GIFunctionInfoFlags"><span class="type">GIFunctionInfoFlags</span></a> for the <em class="parameter"><code>info</code></em>
 .</p>
 <div class="refsect3">
-<a name="id-1.4.2.7.6.3.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-function-info-get-flags.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -186,9 +186,8 @@ g_function_info_get_flags (<em class="parameter"><code><a class="link" href="gi-
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.7.6.3.6"></a><h4>Returns</h4>
+<a name="g-function-info-get-flags.returns"></a><h4>Returns</h4>
 <p> the flags</p>
-<p></p>
 </div>
 </div>
 <hr>
@@ -199,10 +198,10 @@ g_function_info_get_property (<em class="parameter"><code><a class="link" href="
 <p>Obtain the property associated with this <a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunctionInfo"><span class="type">GIFunctionInfo</span></a>.
 Only <a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunctionInfo"><span class="type">GIFunctionInfo</span></a> with the flag <a class="link" href="gi-GIFunctionInfo.html#GI-FUNCTION-IS-GETTER:CAPS"><code class="literal">GI_FUNCTION_IS_GETTER</code></a> or
 <a class="link" href="gi-GIFunctionInfo.html#GI-FUNCTION-IS-SETTER:CAPS"><code class="literal">GI_FUNCTION_IS_SETTER</code></a> have a property set. For other cases,
-<a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> will be returned.</p>
+<code class="literal">NULL</code> will be returned.</p>
 <div class="refsect3">
-<a name="id-1.4.2.7.6.4.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-function-info-get-property.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -216,8 +215,8 @@ Only <a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunct
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.7.6.4.6"></a><h4>Returns</h4>
-<p> the property or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> if not set. Free it with
+<a name="g-function-info-get-property.returns"></a><h4>Returns</h4>
+<p> the property or <code class="literal">NULL</code> if not set. Free it with
 <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -225,14 +224,14 @@ Only <a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunct
 <hr>
 <div class="refsect2">
 <a name="g-function-info-get-symbol"></a><h3>g_function_info_get_symbol ()</h3>
-<pre class="programlisting">const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+<pre class="programlisting">const <span class="returnvalue">gchar</span> *
 g_function_info_get_symbol (<em class="parameter"><code><a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunctionInfo"><span class="type">GIFunctionInfo</span></a> *info</code></em>);</pre>
 <p>Obtain the symbol of the function. The symbol is the name of the
 exported function, suitable to be used as an argument to
-<a href="http://library.gnome.org/devel/glib/unstable/glib-Dynamic-Loading-of-Modules.html#g-module-symbol"><code class="function">g_module_symbol()</code></a>.</p>
+<code class="function">g_module_symbol()</code>.</p>
 <div class="refsect3">
-<a name="id-1.4.2.7.6.5.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-function-info-get-symbol.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -246,9 +245,8 @@ exported function, suitable to be used as an argument to
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.7.6.5.6"></a><h4>Returns</h4>
+<a name="g-function-info-get-symbol.returns"></a><h4>Returns</h4>
 <p> the symbol</p>
-<p></p>
 </div>
 </div>
 <hr>
@@ -258,10 +256,10 @@ exported function, suitable to be used as an argument to
 g_function_info_get_vfunc (<em class="parameter"><code><a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunctionInfo"><span class="type">GIFunctionInfo</span></a> *info</code></em>);</pre>
 <p>Obtain the virtual function associated with this <a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunctionInfo"><span class="type">GIFunctionInfo</span></a>.
 Only <a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunctionInfo"><span class="type">GIFunctionInfo</span></a> with the flag <a class="link" href="gi-GIFunctionInfo.html#GI-FUNCTION-WRAPS-VFUNC:CAPS"><code class="literal">GI_FUNCTION_WRAPS_VFUNC</code></a> has
-a virtual function set. For other cases, <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> will be returned.</p>
+a virtual function set. For other cases, <code class="literal">NULL</code> will be returned.</p>
 <div class="refsect3">
-<a name="id-1.4.2.7.6.6.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-function-info-get-vfunc.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -275,8 +273,8 @@ a virtual function set. For other cases, <a href="http://library.gnome.org/devel
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.7.6.6.6"></a><h4>Returns</h4>
-<p> the virtual function or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> if not set.
+<a name="g-function-info-get-vfunc.returns"></a><h4>Returns</h4>
+<p> the virtual function or <code class="literal">NULL</code> if not set.
 Free it by calling <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -284,24 +282,25 @@ Free it by calling <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" t
 <hr>
 <div class="refsect2">
 <a name="g-function-info-invoke"></a><h3>g_function_info_invoke ()</h3>
-<pre class="programlisting"><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
 g_function_info_invoke (<em class="parameter"><code><a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunctionInfo"><span class="type">GIFunctionInfo</span></a> *info</code></em>,
-                        <em class="parameter"><code>const <a class="link" href="gi-common-types.html#GIArgument" title="union GIArgument"><span class="type">GIArgument</span></a> *in_args</code></em>,
+                        <em class="parameter"><code>const <a class="link" href="gi-common-types.html#GIArgument" title="GIArgument"><span class="type">GIArgument</span></a> *in_args</code></em>,
                         <em class="parameter"><code><span class="type">int</span> n_in_args</code></em>,
-                        <em class="parameter"><code>const <a class="link" href="gi-common-types.html#GIArgument" title="union GIArgument"><span class="type">GIArgument</span></a> *out_args</code></em>,
+                        <em class="parameter"><code>const <a class="link" href="gi-common-types.html#GIArgument" title="GIArgument"><span class="type">GIArgument</span></a> *out_args</code></em>,
                         <em class="parameter"><code><span class="type">int</span> n_out_args</code></em>,
-                        <em class="parameter"><code><a class="link" href="gi-common-types.html#GIArgument" title="union GIArgument"><span class="type">GIArgument</span></a> *return_value</code></em>,
-                        <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
+                        <em class="parameter"><code><a class="link" href="gi-common-types.html#GIArgument" title="GIArgument"><span class="type">GIArgument</span></a> *return_value</code></em>,
+                        <em class="parameter"><code><span class="type">GError</span> **error</code></em>);</pre>
 <p>Invokes the function described in <em class="parameter"><code>info</code></em>
  with the given
 arguments. Note that inout parameters must appear in both
 argument lists. This function uses <code class="function">dlsym()</code> to obtain a pointer
 to the function, so the library or shared object containing the
 described function must either be linked to the caller, or must
-have been <a href="http://library.gnome.org/devel/glib/unstable/glib-Dynamic-Loading-of-Modules.html#g-module-symbol"><code class="function">g_module_symbol()</code></a>ed before calling this function.</p>
+have been <code class="function">g_module_symbol()</code>ed before calling this function.</p>
+<p><span class="annotation">[<acronym title="Exposed in C code, not necessarily available in other languages."><span class="acronym">skip</span></acronym>]</span></p>
 <div class="refsect3">
-<a name="id-1.4.2.7.6.7.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="g-function-info-invoke.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -315,10 +314,10 @@ have been <a href="http://library.gnome.org/devel/glib/unstable/glib-Dynamic-Loa
 </tr>
 <tr>
 <td class="parameter_name"><p>in_args</p></td>
-<td class="parameter_description"><p>an array of <a class="link" href="gi-common-types.html#GIArgument" title="union GIArgument"><span class="type">GIArgument</span></a>s, one for each in
+<td class="parameter_description"><p>an array of <a class="link" href="gi-common-types.html#GIArgument" title="GIArgument"><span class="type">GIArgument</span></a>s, one for each in
 parameter of <em class="parameter"><code>info</code></em>
 . If there are no in parameter, <em class="parameter"><code>in_args</code></em>
-can be <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
+can be <code class="literal">NULL</code></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
@@ -329,10 +328,10 @@ array</p></td>
 </tr>
 <tr>
 <td class="parameter_name"><p>out_args</p></td>
-<td class="parameter_description"><p>an array of <a class="link" href="gi-common-types.html#GIArgument" title="union GIArgument"><span class="type">GIArgument</span></a>s, one for each out
+<td class="parameter_description"><p>an array of <a class="link" href="gi-common-types.html#GIArgument" title="GIArgument"><span class="type">GIArgument</span></a>s, one for each out
 parameter of <em class="parameter"><code>info</code></em>
 . If there are no out parameters, <em class="parameter"><code>out_args</code></em>
-may be <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
+may be <code class="literal">NULL</code></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
@@ -346,41 +345,32 @@ array</p></td>
 <td class="parameter_description"><p>return location for the return value of the
 function. If the function returns void, <em class="parameter"><code>return_value</code></em>
 may be
-<a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
+<code class="literal">NULL</code></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
 <td class="parameter_name"><p>error</p></td>
-<td class="parameter_description"><p>return location for detailed error information, or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
+<td class="parameter_description"><p>return location for detailed error information, or <code class="literal">NULL</code></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.2.7.6.7.6"></a><h4>Returns</h4>
-<p> <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if the function has been invoked, <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#FALSE:CAPS"><code class="literal">FALSE</code></a> if an
+<a name="g-function-info-invoke.returns"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> if the function has been invoked, <code class="literal">FALSE</code> if an
 error occurred.</p>
-<p></p>
 </div>
-</div>
-<hr>
-<div class="refsect2">
-<a name="G-INVOKE-ERROR:CAPS"></a><h3>G_INVOKE_ERROR</h3>
-<pre class="programlisting">#define G_INVOKE_ERROR (g_invoke_error_quark ())
-</pre>
-<p>TODO</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="g-invoke-error-quark"></a><h3>g_invoke_error_quark ()</h3>
-<pre class="programlisting"><a href="http://library.gnome.org/devel/glib/unstable/glib-Quarks.html#GQuark"><span class="returnvalue">GQuark</span></a>
+<pre class="programlisting"><span class="returnvalue">GQuark</span>
 g_invoke_error_quark (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
 <p>TODO</p>
 <div class="refsect3">
-<a name="id-1.4.2.7.6.9.5"></a><h4>Returns</h4>
+<a name="g-invoke-error-quark.returns"></a><h4>Returns</h4>
 <p> TODO</p>
-<p></p>
 </div>
 </div>
 </div>
@@ -397,8 +387,8 @@ g_invoke_error_quark (<em class="parameter"><code><span class="type">void</span>
 <a name="GIFunctionInfoFlags"></a><h3>enum GIFunctionInfoFlags</h3>
 <p>Flags for a <a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunctionInfo"><span class="type">GIFunctionInfo</span></a> struct.</p>
 <div class="refsect3">
-<a name="id-1.4.2.7.7.3.4"></a><h4>Members</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="GIFunctionInfoFlags.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
 <col class="enum_members_description">
@@ -453,12 +443,19 @@ g_invoke_error_quark (<em class="parameter"><code><span class="type">void</span>
 </div>
 <hr>
 <div class="refsect2">
+<a name="G-INVOKE-ERROR:CAPS"></a><h3>G_INVOKE_ERROR</h3>
+<pre class="programlisting">#define G_INVOKE_ERROR (g_invoke_error_quark ())
+</pre>
+<p>TODO</p>
+</div>
+<hr>
+<div class="refsect2">
 <a name="GInvokeError"></a><h3>enum GInvokeError</h3>
 <p>An error occuring while invoking a function via
 <a class="link" href="gi-GIFunctionInfo.html#g-function-info-invoke" title="g_function_info_invoke ()"><code class="function">g_function_info_invoke()</code></a>.</p>
 <div class="refsect3">
-<a name="id-1.4.2.7.7.4.4"></a><h4>Members</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="GInvokeError.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
 <col class="enum_members_description">
@@ -495,7 +492,6 @@ the expected arguments for the functions type signature.</p>
 </div>
 </div>
 <div class="footer">
-<hr>
-          Generated by GTK-Doc V1.21.1</div>
+<hr>Generated by GTK-Doc V1.25.1</div>
 </body>
 </html>

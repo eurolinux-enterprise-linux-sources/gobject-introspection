@@ -3,14 +3,14 @@
 
 dnl the gi version number
 m4_define(gi_major_version, 1)
-m4_define(gi_minor_version, 42)
+m4_define(gi_minor_version, 50)
 m4_define(gi_micro_version, 0)
 m4_define(gi_version, gi_major_version.gi_minor_version.gi_micro_version)
 
 AC_PREREQ([2.63])
 AC_INIT([gobject-introspection],
         [gi_version],
-        [http://bugzilla.gnome.org/enter_bug.cgi?product=glib&component=introspection],
+        [http://bugzilla.gnome.org/enter_bug.cgi?product=gobject-introspection],
         [gobject-introspection])
 
 AC_CONFIG_HEADER([config.h])
@@ -128,7 +128,7 @@ GIR_DIR="$EXPANDED_DATADIR/$GIR_SUFFIX"
 AC_SUBST(GIR_DIR)
 AC_DEFINE_UNQUOTED(GIR_DIR, "$GIR_DIR", [Director prefix for gir installation])
 
-PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.36.0])
+PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.50.0])
 PKG_CHECK_MODULES(GOBJECT, [gobject-2.0])
 PKG_CHECK_MODULES(GMODULE, [gmodule-2.0])
 PKG_CHECK_MODULES(GIO, [gio-2.0])
@@ -251,7 +251,20 @@ AC_CHECK_FUNCS([memchr strchr strspn strstr strtol strtoull])
 AC_CHECK_FUNCS([backtrace backtrace_symbols])
 
 # Python
-AM_PATH_PYTHON([2.6])
+# option to specify python interpreter to use; this just sets $PYTHON, so that
+# we will fallback to reading $PYTHON if --with-python is not given, and
+# python.m4 will get the expected input
+AC_ARG_WITH(python,
+  AS_HELP_STRING([--with-python=PATH],[Path to Python interpreter; searches $PATH if only a program name is given; if not given, searches for a few standard names such as "python3" or "python2"]),
+  [PYTHON="$withval"], [])
+if test x"$PYTHON" = xyes; then
+    AC_MSG_ERROR([--with-python option requires a path or program argument])
+fi
+if test -n "$PYTHON" && ! which "$PYTHON"; then
+    AC_MSG_ERROR([Python interpreter $PYTHON does not exist])
+fi
+
+AM_PATH_PYTHON([2.7])
 case "$host" in
 *-*-mingw*)
 	# Change backslashes to forward slashes in pyexecdir to avoid
@@ -266,7 +279,7 @@ fi
 
 dnl Not enabled by default until 3.6 cycle when we can propose mako as
 dnl an external dependency
-AC_ARG_ENABLE(doctool,[  --disable-doctool           disable g-ir-doctool ],,enable_doctool=auto)
+AC_ARG_ENABLE(doctool,[  --disable-doctool           disable g-ir-doc-tool ],,enable_doctool=auto)
 AS_IF([ test x$enable_doctool != xno], [
    AM_CHECK_PYMOD(mako,,have_python_mako=yes,have_python_mako=no)
 ])
@@ -286,7 +299,7 @@ AC_MSG_CHECKING([for glib source directory to use for documentation])
 AC_ARG_WITH(glib-src,
 	[  --with-glib-src=PATH    Source directory for glib - needed to add docs to gir],
 	GLIBSRC=$withval
-) 
+)
 AM_CONDITIONAL(WITH_GLIBSRC, test x"$GLIBSRC" != x)
 AC_SUBST(GLIBSRC)
 AC_MSG_RESULT([$GLIBSRC])
@@ -364,7 +377,10 @@ config.h.win32
 build/Makefile
 build/win32/Makefile
 build/win32/vs9/Makefile
+build/win32/vs9/gi-version-paths.vsprops
 build/win32/vs10/Makefile
+build/win32/vs10/gi-version-paths.props
 build/win32/vs11/Makefile
-build/win32/vs12/Makefile])
+build/win32/vs12/Makefile
+build/win32/vs14/Makefile])
 AC_OUTPUT

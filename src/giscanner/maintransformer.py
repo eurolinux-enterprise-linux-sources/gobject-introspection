@@ -17,6 +17,11 @@
 # Boston, MA 02111-1307, USA.
 #
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import re
 
 from . import ast
@@ -27,10 +32,11 @@ from .annotationparser import (ANN_ALLOW_NONE, ANN_ARRAY, ANN_ATTRIBUTES, ANN_CL
                                ANN_GET_VALUE_FUNC, ANN_IN, ANN_INOUT, ANN_METHOD, ANN_OUT,
                                ANN_REF_FUNC, ANN_RENAME_TO, ANN_SCOPE, ANN_SET_VALUE_FUNC,
                                ANN_SKIP, ANN_TRANSFER, ANN_TYPE, ANN_UNREF_FUNC, ANN_VALUE,
-                               ANN_VFUNC, ANN_NULLABLE, ANN_OPTIONAL)
+                               ANN_VFUNC, ANN_NULLABLE, ANN_OPTIONAL, ANN_NOT)
 from .annotationparser import (OPT_ARRAY_FIXED_SIZE, OPT_ARRAY_LENGTH, OPT_ARRAY_ZERO_TERMINATED,
                                OPT_OUT_CALLEE_ALLOCATES, OPT_OUT_CALLER_ALLOCATES,
-                               OPT_TRANSFER_FLOATING, OPT_TRANSFER_NONE)
+                               OPT_TRANSFER_CONTAINER, OPT_TRANSFER_FLOATING, OPT_TRANSFER_NONE,
+                               OPT_NOT_NULLABLE)
 
 from .utils import to_underscores_noprefix
 
@@ -74,14 +80,14 @@ class MainTransformer(object):
         self._namespace.walk(self._pass_type_resolution)
 
         # Generate a reverse mapping "bar_baz" -> BarBaz
-        for node in self._namespace.itervalues():
+        for node in self._namespace.values():
             if isinstance(node, ast.Registered) and node.get_type is not None:
                 self._uscore_type_names[node.c_symbol_prefix] = node
             elif isinstance(node, (ast.Record, ast.Union)):
                 uscored = to_underscores_noprefix(node.name).lower()
                 self._uscore_type_names[uscored] = node
 
-        for node in list(self._namespace.itervalues()):
+        for node in list(self._namespace.values()):
             if isinstance(node, ast.Function):
                 # Discover which toplevel functions are actually methods
                 self._pair_function(node)
@@ -126,7 +132,7 @@ class MainTransformer(object):
                 origin_name = 'return value'
             message.log_node(
                 message.FATAL, parent,
-                "can't find parameter %s referenced by %s of %r"
+                "can't find parameter %s referenced by %s of '%s'"
                 % (param_name, origin_name, parent.name))
 
         return param.argname
@@ -140,7 +146,7 @@ class MainTransformer(object):
             origin_name = 'field %s' % (origin.name, )
             message.log_node(
                 message.FATAL, parent,
-                "can't find field %s referenced by %s of %r"
+                "can't find field %s referenced by %s of '%s'"
                 % (field_name, origin_name, parent.name))
 
         return field.name
@@ -155,17 +161,17 @@ class MainTransformer(object):
         target = self._namespace.get_by_symbol(rename_to)
         if not target:
             message.warn_node(node,
-                "Can't find symbol %r referenced by \"rename-to\" annotation" % (rename_to, ))
+                "Can't find symbol '%s' referenced by \"rename-to\" annotation" % (rename_to, ))
         elif target.shadowed_by:
             message.warn_node(node,
-                "Function %r already shadowed by %r, can't overwrite "
-                "with %r" % (target.symbol,
+                "Function '%s' already shadowed by '%s', can't overwrite "
+                "with '%s'" % (target.symbol,
                              target.shadowed_by,
                              rename_to))
         elif target.shadows:
             message.warn_node(node,
-                "Function %r already shadows %r, can't multiply shadow "
-                "with %r" % (target.symbol,
+                "Function '%s' already shadows '%s', can't multiply shadow "
+                "with '%s'" % (target.symbol,
                              target.shadows,
                              rename_to))
         else:
@@ -203,7 +209,7 @@ class MainTransformer(object):
             elif isinstance(node, ast.Registered) and node.gtype_name is not None:
                 return node.gtype_name
             return node.c_name
-        raise AssertionError("Unhandled node %r" % (node, ))
+        raise AssertionError("Unhandled node '%s'" % (node, ))
 
     def _get_block(self, node):
         return self._blocks.get(self._get_annotation_name(node))
@@ -293,7 +299,7 @@ class MainTransformer(object):
             elif isinstance(base, ast.Map) and len(rest) == 2:
                 return ast.Map(*rest)
             message.warn(
-                "Too many parameters in type specification %r" % (type_str, ))
+                "Too many parameters in type specification '%s'" % (type_str, ))
             return base
 
         def top_combiner(base, *rest):
@@ -303,7 +309,7 @@ class MainTransformer(object):
 
         result, rest = grab_one(type_str, resolver, top_combiner, combiner)
         if rest:
-            message.warn("Trailing components in type specification %r" % (
+            message.warn("Trailing components in type specification '%s'" % (
                 type_str, ))
 
         if not result.resolved:
@@ -313,7 +319,7 @@ class MainTransformer(object):
                 position = self._get_position(parent, node)
             else:
                 text = type_str
-            message.warn_node(parent, "%s: Unknown type: %r" %
+            message.warn_node(parent, "%s: Unknown type: '%s'" %
                               (text, type_str), positions=position)
         return result
 
@@ -349,7 +355,7 @@ class MainTransformer(object):
         # (except enums and flags) or basic types that are
         # as big as a gpointer
         if array_type == ast.Array.GLIB_PTRARRAY:
-            if ((element_type in ast.BASIC_GIR_TYPES and not element_type in ast.POINTER_TYPES)
+            if ((element_type in ast.BASIC_GIR_TYPES and element_type not in ast.POINTER_TYPES)
             or isinstance(element_type, (ast.Enum, ast.Bitfield))):
                 message.warn("invalid (element-type) for a GPtrArray, "
                              "must be a pointer", annotations.position)
@@ -358,7 +364,7 @@ class MainTransformer(object):
         if array_type == ast.Array.GLIB_BYTEARRAY:
             if element_type == ast.TYPE_ANY:
                 array.element_type = ast.TYPE_UINT8
-            elif not element_type in [ast.TYPE_UINT8, ast.TYPE_INT8, ast.TYPE_CHAR]:
+            elif element_type not in [ast.TYPE_UINT8, ast.TYPE_INT8, ast.TYPE_CHAR]:
                 message.warn("invalid (element-type) for a GByteArray, "
                              "must be one of guint8, gint8 or gchar",
                              annotations.position)
@@ -386,10 +392,14 @@ class MainTransformer(object):
         array_options = annotations.get(ANN_ARRAY)
         container_type = ast.Array(array_type, element_type_node, ctype=node.type.ctype,
                                    is_const=node.type.is_const)
-        if OPT_ARRAY_ZERO_TERMINATED in array_options:
-            container_type.zeroterminated = array_options.get(OPT_ARRAY_ZERO_TERMINATED) == '1'
-        else:
+        if array_options.get(OPT_ARRAY_ZERO_TERMINATED, '0') == '0':
             container_type.zeroterminated = False
+        else:
+            if (OPT_ARRAY_ZERO_TERMINATED in array_options
+            or array_options.get(OPT_ARRAY_ZERO_TERMINATED) == '1'):
+                container_type.zeroterminated = True
+            else:
+                container_type.zeroterminated = False
 
         length = array_options.get(OPT_ARRAY_LENGTH)
         if length:
@@ -463,7 +473,7 @@ class MainTransformer(object):
     def _get_transfer_default_returntype_basic(self, typeval):
         if (typeval.is_equiv(ast.BASIC_GIR_TYPES)
         or typeval.is_const
-        or typeval.is_equiv(ast.TYPE_NONE)):
+        or typeval.is_equiv((ast.TYPE_ANY, ast.TYPE_NONE))):
             return ast.PARAM_TRANSFER_NONE
         elif typeval.is_equiv(ast.TYPE_STRING):
             # Non-const strings default to FULL
@@ -504,7 +514,11 @@ class MainTransformer(object):
         elif isinstance(parent, ast.Function) and parent.is_constructor:
             if isinstance(target, ast.Class):
                 initially_unowned_type = ast.Type(target_giname='GObject.InitiallyUnowned')
-                initially_unowned = self._transformer.lookup_typenode(initially_unowned_type)
+                try:
+                    initially_unowned = self._transformer.lookup_typenode(initially_unowned_type)
+                except KeyError as e:
+                    message.error_node(node, "constructor found but GObject is not in includes")
+                    return None
                 if initially_unowned and self._is_gi_subclass(typeval, initially_unowned_type):
                     return ast.PARAM_TRANSFER_NONE
                 else:
@@ -532,6 +546,63 @@ class MainTransformer(object):
             return ast.PARAM_TRANSFER_NONE
         else:
             raise AssertionError(node)
+
+    def _is_pointer_type(self, node, annotations):
+        if (not isinstance(node, ast.Return) and
+                node.direction in (ast.PARAM_DIRECTION_OUT,
+                                   ast.PARAM_DIRECTION_INOUT)):
+            return True
+
+        target = self._transformer.lookup_typenode(node.type)
+        target = self._transformer.resolve_aliases(target)
+        target = node.type if target is None else target
+
+        return (not isinstance(target, ast.Type) or
+                target not in ast.BASIC_TYPES or
+                target.ctype.endswith('*'))
+
+    def _apply_transfer_annotation(self, parent, node, annotations):
+        transfer_annotation = annotations.get(ANN_TRANSFER)
+        if not transfer_annotation or len(transfer_annotation) != 1:
+            return
+
+        transfer = transfer_annotation[0]
+
+        target = self._transformer.lookup_typenode(node.type)
+        target = self._transformer.resolve_aliases(target)
+        target = node.type if target is None else target
+        node_type = target if isinstance(target, ast.Type) else node.type
+
+        if transfer == OPT_TRANSFER_FLOATING:
+            transfer = OPT_TRANSFER_NONE
+
+            if (not isinstance(target, (ast.Class, ast.Interface))
+                    and node_type.target_giname != 'GLib.Variant'):
+                message.warn('invalid "transfer" annotation for {0}: '
+                             'only valid for object and GVariant types'.format(target),
+                             annotations.position)
+                return
+
+        elif transfer == OPT_TRANSFER_CONTAINER:
+            if (ANN_ARRAY not in annotations and
+                    not isinstance(target, (ast.Array, ast.List, ast.Map))):
+                message.warn('invalid "transfer" annotation for {0}: '
+                             'only valid for container types'.format(target),
+                             annotations.position)
+                return
+
+        elif (not self._is_pointer_type(node, annotations) and
+              node_type not in (ast.TYPE_STRING, ast.TYPE_FILENAME) and
+              not isinstance(target, (ast.Array, ast.List, ast.Map,
+                                      ast.Record, ast.Compound, ast.Boxed,
+                                      ast.Class, ast.Interface))):
+            message.warn('invalid "transfer" annotation for {0}: '
+                         'only valid for array, struct, union, boxed, '
+                         'object and interface types'.format(target),
+                         annotations.position)
+            return
+
+        node.transfer = transfer
 
     def _apply_annotations_param_ret_common(self, parent, node, tag):
         annotations = tag.annotations if tag else {}
@@ -573,31 +644,54 @@ class MainTransformer(object):
             # Also reset the transfer default if we're toggling direction
             node.transfer = self._get_transfer_default(parent, node)
 
-        transfer_annotation = annotations.get(ANN_TRANSFER)
-        if transfer_annotation and len(transfer_annotation) == 1:
-            transfer = transfer_annotation[0]
-            if transfer == OPT_TRANSFER_FLOATING:
-                transfer = OPT_TRANSFER_NONE
-            node.transfer = transfer
-
+        self._apply_transfer_annotation(parent, node, annotations)
         self._adjust_container_type(parent, node, annotations)
 
-        if ANN_NULLABLE in annotations:
+        # gpointer parameters and return values are always nullable unless:
+        #  - annotated with (type) and not also with (nullable); or
+        #  - annotated with (element-type) and not also with (nullable); or
+        #  - annotated (not nullable)
+        # See: https://bugzilla.gnome.org/show_bug.cgi?id=719966#c22
+        if node.type.is_equiv(ast.TYPE_ANY):
             node.nullable = True
+        if ANN_NULLABLE in annotations:
+            if self._is_pointer_type(node, annotations):
+                node.nullable = True
+                node.not_nullable = False
+            else:
+                message.warn('invalid "nullable" annotation: '
+                             'only valid for pointer types and out parameters',
+                             annotations.position)
 
         if ANN_OPTIONAL in annotations:
-            node.optional = True
-
-        if ANN_ALLOW_NONE in annotations:
-            if node.direction == ast.PARAM_DIRECTION_OUT:
+            if (not isinstance(node, ast.Return) and
+                    node.direction == ast.PARAM_DIRECTION_OUT):
                 node.optional = True
             else:
+                message.warn('invalid "optional" annotation: '
+                             'only valid for out parameters',
+                             annotations.position)
+
+        if ANN_ALLOW_NONE in annotations:
+            if (node.direction == ast.PARAM_DIRECTION_OUT and
+                    not isinstance(node, ast.Return)):
+                node.optional = True
+            elif self._is_pointer_type(node, annotations):
                 node.nullable = True
+            else:
+                message.warn('invalid "allow-none" annotation: '
+                             'only valid for pointer types and out parameters',
+                             annotations.position)
 
         if (node.direction != ast.PARAM_DIRECTION_OUT and
                 (node.type.target_giname == 'Gio.AsyncReadyCallback' or
                  node.type.target_giname == 'Gio.Cancellable')):
             node.nullable = True
+
+        # Final override for nullability
+        if ANN_NOT in annotations:
+            node.nullable = False
+            node.not_nullable = True
 
         if tag and tag.description:
             node.doc = tag.description
@@ -704,6 +798,12 @@ class MainTransformer(object):
             tag = block.tags.get(TAG_RETURNS)
         else:
             tag = None
+
+        if tag is not None and return_.type == ast.TYPE_NONE:
+            message.warn('%s: invalid return annotation' % (block.name,),
+                         tag.position)
+            tag = None
+
         self._apply_annotations_param_ret_common(parent, return_, tag)
 
     def _apply_annotations_params(self, parent, params, block):
@@ -736,13 +836,14 @@ class MainTransformer(object):
                 text = ''
             elif len(unused) == 1:
                 (param, ) = unused
-                text = ', should be %r' % (param, )
+                text = ", should be '%s'" % (param, )
             else:
-                text = ', should be one of %s' % (', '.join(repr(p) for p in unused), )
+                text = ", should be one of %s" % \
+                       (', '.join("'%s'" % p for p in sorted(unused)), )
 
             param = block.params.get(doc_name)
-            message.warn('%s: unknown parameter %r in documentation '
-                         'comment%s' % (block.name, doc_name, text),
+            message.warn("%s: unknown parameter '%s' in documentation "
+                         "comment%s" % (block.name, doc_name, text),
                 param.position)
 
     def _apply_annotations_callable(self, node, chain, block):
@@ -763,7 +864,7 @@ class MainTransformer(object):
         try:
             self._adjust_container_type(parent, field, tag.annotations)
         except AttributeError as ex:
-            print ex
+            print(ex)
 
     def _apply_annotations_property(self, parent, prop):
         prefix = self._get_annotation_name(parent)
@@ -790,7 +891,6 @@ class MainTransformer(object):
 
         if block:
             self._apply_annotations_annotated(signal, block)
-
             # We're only attempting to name the signal parameters if
             # the number of parameters (@foo) is the same or greater
             # than the number of signal parameters
@@ -861,7 +961,7 @@ class MainTransformer(object):
                             break
                     if not matched:
                         message.warn_node(node,
-                            "Virtual slot %r not found for %r annotation" % (invoker_name,
+                            "Virtual slot '%s' not found for '%s' annotation" % (invoker_name,
                                                                              ANN_VFUNC))
         return True
 
@@ -921,14 +1021,14 @@ the ones that failed to resolve removed."""
         # but only covers enums that are registered as GObject enums.
         # Create a fallback mapping based on all known enums in this module.
         uscore_enums = {}
-        for enum in self._namespace.itervalues():
+        for enum in self._namespace.values():
             if not isinstance(enum, ast.Enum):
                 continue
             uscored = to_underscores_noprefix(enum.name).lower()
             uscore_enums[uscored] = enum
             uscore_enums[enum.name] = enum
 
-        for node in self._namespace.itervalues():
+        for node in self._namespace.values():
             if not isinstance(node, ast.ErrorQuarkFunction):
                 continue
             full = node.symbol[:-len('_quark')]
@@ -1192,7 +1292,7 @@ method or constructor of some type."""
             if func.is_constructor:
                 message.warn_node(
                     func,
-                    "Can't find matching type for constructor; symbol=%r" % (func.symbol, ))
+                    "Can't find matching type for constructor; symbol='%s'" % (func.symbol, ))
             return False
 
         # Some sanity checks; only objects and boxeds can have ctors
@@ -1225,7 +1325,7 @@ method or constructor of some type."""
                 if parent is None:
                     message.warn_node(func,
                                       "Return value is not superclass for constructor; "
-                                      "symbol=%r constructed=%r return=%r" %
+                                      "symbol='%s' constructed='%s' return='%s'" %
                                       (func.symbol,
                                        str(origin_node.create_type()),
                                        str(func.retval.type)))
@@ -1233,8 +1333,8 @@ method or constructor of some type."""
         else:
             if origin_node != target:
                 message.warn_node(func,
-                                  "Constructor return type mismatch symbol=%r "
-                                  "constructed=%r return=%r" %
+                                  "Constructor return type mismatch symbol='%s' "
+                                  "constructed='%s' return='%s'" %
                                   (func.symbol,
                                    str(origin_node.create_type()),
                                    str(func.retval.type)))
@@ -1246,8 +1346,8 @@ method or constructor of some type."""
         """Look for virtual methods from the class structure."""
         if not node.glib_type_struct:
             # https://bugzilla.gnome.org/show_bug.cgi?id=629080
-            #message.warn_node(node,
-            #    "Failed to find class structure for %r" % (node.name, ))
+            # message.warn_node(node,
+            #    "Failed to find class structure for '%s'" % (node.name, ))
             return
 
         node_type = node.create_type()
@@ -1352,6 +1452,15 @@ method or constructor of some type."""
                   param.argname is not None and
                   param.argname.endswith('data')):
                 callback_param.closure_name = param.argname
+
+        for param in params:
+            # By convention, closure user_data parameters are always nullable.
+            if param.closure_name is not None:
+                idx = node.get_parameter_index(param.closure_name)
+                assert idx >= 0
+                closure_param = params[idx]
+                if not closure_param.not_nullable:
+                    closure_param.nullable = True
 
     def _pass3_callable_throws(self, node):
         """Check to see if we have anything that looks like a

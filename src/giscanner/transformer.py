@@ -18,12 +18,18 @@
 # Boston, MA 02111-1307, USA.
 #
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import os
 import sys
 import subprocess
 
 from . import ast
 from . import message
+from . import utils
 from .cachestore import CacheStore
 from .girparser import GIRParser
 from .sourcescanner import (
@@ -40,17 +46,11 @@ class TransformerException(Exception):
     pass
 
 
-_xdg_data_dirs = [x for x in os.environ.get('XDG_DATA_DIRS', '').split(os.pathsep)]
-_xdg_data_dirs.append(DATADIR)
-
-if os.name != 'nt':
-    _xdg_data_dirs.append('/usr/share')
-
-
 class Transformer(object):
     namespace = property(lambda self: self._namespace)
 
-    def __init__(self, namespace, accept_unprefixed=False, identifier_filter_cmd=''):
+    def __init__(self, namespace, accept_unprefixed=False,
+                 identifier_filter_cmd='', symbol_filter_cmd=''):
         self._cachestore = CacheStore()
         self._accept_unprefixed = accept_unprefixed
         self._namespace = namespace
@@ -60,6 +60,7 @@ class Transformer(object):
         self._includepaths = []
         self._passthrough_mode = False
         self._identifier_filter_cmd = identifier_filter_cmd
+        self._symbol_filter_cmd = symbol_filter_cmd
 
         # Cache a list of struct/unions in C's "tag namespace". This helps
         # manage various orderings of typedefs and structs. See:
@@ -100,7 +101,7 @@ class Transformer(object):
 
     def parse(self, symbols):
         for symbol in symbols:
-            ## WORKAROUND ##
+            # WORKAROUND
             # https://bugzilla.gnome.org/show_bug.cgi?id=550616
             if symbol.ident in ['gst_g_error_get_type']:
                 continue
@@ -120,7 +121,7 @@ class Transformer(object):
         # Run through the tag namespace looking for structs that have not been
         # promoted into the main namespace. In this case we simply promote them
         # with their struct tag.
-        for tag_name, struct in self._tag_ns.iteritems():
+        for tag_name, struct in self._tag_ns.items():
             if not struct.name:
                 try:
                     name = self.strip_identifier(tag_name)
@@ -142,7 +143,7 @@ class Transformer(object):
     def register_include_uninstalled(self, include_path):
         basename = os.path.basename(include_path)
         if not basename.endswith('.gir'):
-            raise SystemExit("Include path %r must be a filename path "
+            raise SystemExit("Include path '%s' must be a filename path "
                              "ending in .gir" % (include_path, ))
         girname = basename[:-4]
         include = ast.Include.from_string(girname)
@@ -163,7 +164,7 @@ namespaces."""
             if ns == self._namespace.name:
                 return self._namespace.get(giname)
             # Fallback to the main namespace if not a dependency and matches a prefix
-            if ns in self._namespace.identifier_prefixes and not ns in self._parsed_includes:
+            if ns in self._namespace.identifier_prefixes and ns not in self._parsed_includes:
                 message.warn(("Deprecated reference to identifier " +
                               "prefix %s in GIName %s") % (ns, name))
                 return self._namespace.get(giname)
@@ -180,9 +181,17 @@ None."""
 
     # Private
 
+    def _get_gi_data_dirs(self):
+        data_dirs = utils.get_system_data_dirs()
+        data_dirs.append(DATADIR)
+        if os.name != 'nt':
+            # For backwards compatibility, was always unconditionally added to the list.
+            data_dirs.append('/usr/share')
+        return data_dirs
+
     def _find_include(self, include):
         searchdirs = self._includepaths[:]
-        for path in _xdg_data_dirs:
+        for path in self._get_gi_data_dirs():
             searchdirs.append(os.path.join(path, 'gir-1.0'))
         searchdirs.append(os.path.join(DATADIR, 'gir-1.0'))
 
@@ -191,7 +200,8 @@ None."""
             path = os.path.join(d, girname)
             if os.path.exists(path):
                 return path
-        sys.stderr.write("Couldn't find include %r (search path: %r)\n" % (girname, searchdirs))
+        sys.stderr.write("Couldn't find include '%s' (search path: '%s')\n" %
+                         (girname, searchdirs))
         sys.exit(1)
 
     @classmethod
@@ -200,8 +210,7 @@ None."""
         if extra_include_dirs is not None:
             self.set_include_paths(extra_include_dirs)
         self.set_passthrough_mode()
-        self._parse_include(filename)
-        parser = self._cachestore.load(filename)
+        parser = self._parse_include(filename)
         self._namespace = parser.get_namespace()
         del self._parsed_includes[self._namespace.name]
         return self
@@ -226,22 +235,39 @@ None."""
                 self._pkg_config_packages.add(pkg)
         namespace = parser.get_namespace()
         self._parsed_includes[namespace.name] = namespace
+        return parser
 
     def _iter_namespaces(self):
         """Return an iterator over all included namespaces; the
 currently-scanned namespace is first."""
         yield self._namespace
-        for ns in self._parsed_includes.itervalues():
+        for ns in self._parsed_includes.values():
             yield ns
 
-    def _sort_matches(self, x, y):
-        if x[0] is self._namespace:
-            return 1
-        elif y[0] is self._namespace:
-            return -1
-        return cmp(x[2], y[2])
+    def _sort_matches(self, val):
+        """Key sort which ensures items in self._namespace are last by returning
+        a tuple key starting with 1 for self._namespace entries and 0 for
+        everythin else.
+        """
+        if val[0] == self._namespace:
+            return 1, val[2]
+        else:
+            return 0, val[2]
 
     def _split_c_string_for_namespace_matches(self, name, is_identifier=False):
+        if not is_identifier and self._symbol_filter_cmd:
+            proc = subprocess.Popen(self._symbol_filter_cmd,
+                                    stdin=subprocess.PIPE,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE,
+                                    shell=True)
+            _name = name
+            proc_name, err = proc.communicate(name.encode())
+            if proc.returncode:
+                raise ValueError('filter: "%s" exited: %d with error: %s' %
+                                 (self._symbol_filter_cmd, proc.returncode, err))
+            name = proc_name.decode('ascii')
+
         matches = []  # Namespaces which might contain this name
         unprefixed_namespaces = []  # Namespaces with no prefix, last resort
         for ns in self._iter_namespaces():
@@ -261,8 +287,8 @@ currently-scanned namespace is first."""
             else:
                 unprefixed_namespaces.append(ns)
         if matches:
-            matches.sort(self._sort_matches)
-            return map(lambda x: (x[0], x[1]), matches)
+            matches.sort(key=self._sort_matches)
+            return list(map(lambda x: (x[0], x[1]), matches))
         elif self._accept_unprefixed:
             return [(self._namespace, name)]
         elif unprefixed_namespaces:
@@ -272,7 +298,7 @@ currently-scanned namespace is first."""
             for ns in unprefixed_namespaces:
                 if name in ns:
                     return [(ns, name)]
-        raise ValueError("Unknown namespace for %s %r"
+        raise ValueError("Unknown namespace for %s '%s'"
                          % ('identifier' if is_identifier else 'symbol', name, ))
 
     def split_ctype_namespaces(self, ident):
@@ -301,10 +327,11 @@ raise ValueError."""
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE,
                                     shell=True)
-            ident, err = proc.communicate(ident)
+            proc_ident, err = proc.communicate(ident.encode())
             if proc.returncode:
                 raise ValueError('filter: "%s" exited: %d with error: %s' %
                                  (self._identifier_filter_cmd, proc.returncode, err))
+            ident = proc_ident.decode('ascii')
 
         hidden = ident.startswith('_')
         if hidden:
@@ -320,7 +347,7 @@ raise ValueError."""
                 return name
         (ns, name) = matches[-1]
         raise TransformerException(
-            "Skipping foreign identifier %r from namespace %s" % (ident, ns.name, ))
+            "Skipping foreign identifier '%s' from namespace %s" % (ident, ns.name, ))
         return None
 
     def _strip_symbol(self, symbol):
@@ -362,7 +389,7 @@ raise ValueError."""
         elif stype == CSYMBOL_TYPE_OBJECT:
             pass
         else:
-            print 'transformer: unhandled symbol: %r' % (symbol, )
+            print("transformer: unhandled symbol: '%s'" % (symbol, ))
 
     def _enum_common_prefix(self, symbol):
         def common_prefix(a, b):
@@ -486,8 +513,6 @@ raise ValueError."""
         return value
 
     def _create_parameters(self, symbol, base_type):
-        # warn if we see annotations for unknown parameters
-        param_names = set(child.ident for child in base_type.child_list)
         for i, child in enumerate(base_type.child_list):
             yield self._create_parameter(symbol, i, child)
 
@@ -573,6 +598,8 @@ raise ValueError."""
         ctype = symbol.base_type.type
         if (ctype == CTYPE_POINTER and symbol.base_type.base_type.type == CTYPE_FUNCTION):
             node = self._create_typedef_callback(symbol)
+        elif (ctype == CTYPE_FUNCTION):
+            node = self._create_typedef_callback(symbol)
         elif (ctype == CTYPE_POINTER and symbol.base_type.base_type.type == CTYPE_STRUCT):
             node = self._create_typedef_compound(ast.Record, symbol, disguised=True)
         elif ctype == CTYPE_STRUCT:
@@ -594,10 +621,13 @@ raise ValueError."""
                 target = ast.TYPE_ANY
             if name in ast.type_names:
                 return None
+            # https://bugzilla.gnome.org/show_bug.cgi?id=755882
+            if name.endswith('_autoptr'):
+                return None
             return ast.Alias(name, target, ctype=symbol.ident)
         else:
             raise NotImplementedError(
-                "symbol %r of type %s" % (symbol.ident, ctype_name(ctype)))
+                "symbol '%s' of type %s" % (symbol.ident, ctype_name(ctype)))
         return node
 
     def _canonicalize_ctype(self, ctype):
@@ -711,7 +741,7 @@ raise ValueError."""
         name = self._strip_symbol(symbol)
         if symbol.const_string is not None:
             typeval = ast.TYPE_STRING
-            value = unicode(symbol.const_string, 'utf-8')
+            value = symbol.const_string
         elif symbol.const_int is not None:
             if symbol.base_type is not None:
                 typeval = self._create_type_from_base(symbol.base_type)
@@ -845,8 +875,14 @@ raise ValueError."""
             compound.fields.append(field)
 
     def _create_callback(self, symbol, member=False):
-        parameters = list(self._create_parameters(symbol, symbol.base_type.base_type))
-        retval = self._create_return(symbol.base_type.base_type.base_type)
+        if (symbol.base_type.type == CTYPE_FUNCTION):  # function
+            paramtype = symbol.base_type
+            retvaltype = symbol.base_type.base_type
+        elif (symbol.base_type.type == CTYPE_POINTER):  # function pointer
+            paramtype = symbol.base_type.base_type
+            retvaltype = symbol.base_type.base_type.base_type
+        parameters = list(self._create_parameters(symbol, paramtype))
+        retval = self._create_return(retvaltype)
 
         # Mark the 'user_data' arguments
         for i, param in enumerate(parameters):
@@ -892,7 +928,7 @@ Note that type resolution may not succeed."""
         # which has nominal namespace of "Meta", but a few classes are
         # "Mutter".  We don't export that data in introspection currently.
         # Basically the library should be fixed, but we'll hack around it here.
-        for namespace in self._parsed_includes.itervalues():
+        for namespace in self._parsed_includes.values():
             target = namespace.get_by_ctype(pointer_stripped)
             if target:
                 typeval.target_giname = '%s.%s' % (namespace.name, target.name)
@@ -965,7 +1001,7 @@ Note that type resolution may not succeed."""
             if typenode.target.target_giname is not None:
                 typenode = self.lookup_giname(typenode.target.target_giname)
             elif typenode.target.target_fundamental is not None:
-                typenode = ast.type_names[typenode.target.target_fundamental]
+                typenode = typenode.target
             else:
                 break
         return typenode

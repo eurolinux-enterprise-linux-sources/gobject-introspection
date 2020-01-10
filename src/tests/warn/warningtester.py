@@ -1,14 +1,23 @@
-import __builtin__
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import os
 import sys
 import difflib
+
+if sys.version_info.major < 3:
+    import __builtin__ as builtins
+else:
+    import builtins
 
 path = os.getenv('UNINSTALLED_INTROSPECTION_SRCDIR', None)
 assert path is not None
 sys.path.insert(0, path)
 
 # Not correct, but enough to get the tests going uninstalled
-__builtin__.__dict__['DATADIR'] = path
+builtins.__dict__['DATADIR'] = path
 
 from giscanner.annotationparser import GtkDocCommentBlockParser
 from giscanner.ast import Include, Namespace
@@ -132,16 +141,16 @@ def check(args):
     emitted_warnings.sort(key=sortkey)
 
     if len(expected_warnings) != len(emitted_warnings):
-        raise SystemExit('ERROR in %r: %d warnings were emitted, '
-                         'expected %d:\n%s' % (os.path.basename(filename),
+        raise SystemExit("ERROR in '%s': %d warnings were emitted, "
+                         "expected %d:\n%s" % (os.path.basename(filename),
                                                len(emitted_warnings),
                                                len(expected_warnings),
                                                _diff(expected_warnings, emitted_warnings)))
 
     for emitted_warning, expected_warning in zip(emitted_warnings, expected_warnings):
         if expected_warning != emitted_warning:
-            raise SystemExit('ERROR in %r: expected warning does not match emitted '
-                             'warning:\n%s' % (filename,
+            raise SystemExit("ERROR in '%s': expected warning does not match emitted "
+                             "warning:\n%s" % (filename,
                                                _diff([expected_warning], [emitted_warning])))
 
 sys.exit(check(sys.argv[1:]))

@@ -96,6 +96,17 @@ gboolean
 g_callable_info_can_throw_gerror (GICallableInfo *info)
 {
   GIRealInfo *rinfo = (GIRealInfo*)info;
+  SignatureBlob *signature;
+
+  signature = (SignatureBlob *)&rinfo->typelib->data[signature_offset (info)];
+  if (signature->throws)
+    return TRUE;
+
+  /* Functions and VFuncs store "throws" in their own blobs.
+   * This info was additionally added to the SignatureBlob
+   * to support the other callables. For Functions and VFuncs,
+   * also check their legacy flag for compatibility.
+   */
   switch (rinfo->type) {
   case GI_INFO_TYPE_FUNCTION:
     {
@@ -256,7 +267,7 @@ g_callable_info_skip_return (GICallableInfo *info)
  * See whether the caller owns the return value of this callable.
  * #GITransfer contains a list of possible transfer values.
  *
- * Returns: %TRUE if the caller owns the return value, %FALSE otherwise.
+ * Returns: the transfer mode for the return value of the callable
  */
 GITransfer
 g_callable_info_get_caller_owns (GICallableInfo *info)
@@ -284,7 +295,7 @@ g_callable_info_get_caller_owns (GICallableInfo *info)
  * Obtains the ownership transfer for the instance argument.
  * #GITransfer contains a list of possible transfer values.
  *
- * Returns: the transfer
+ * Returns: the transfer mode of the instance argument
  */
 GITransfer
 g_callable_info_get_instance_ownership_transfer (GICallableInfo *info)
@@ -413,7 +424,7 @@ g_callable_info_get_return_attribute (GICallableInfo  *info,
 /**
  * g_callable_info_iterate_return_attributes:
  * @info: a #GICallableInfo
- * @iterator: a #GIAttributeIter structure, must be initialized; see below
+ * @iterator: (inout): a #GIAttributeIter structure, must be initialized; see below
  * @name: (out) (transfer none): Returned name, must not be freed
  * @value: (out) (transfer none): Returned name, must not be freed
  *

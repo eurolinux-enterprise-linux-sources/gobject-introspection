@@ -19,12 +19,17 @@
 # 02110-1301, USA.
 #
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import os
 import platform
 import re
 import subprocess
 
-from .utils import get_libtool_command, extract_libtool_shlib, which
+from .utils import get_libtool_command, extract_libtool_shlib
 from .ccompiler import CCompiler
 
 
@@ -111,7 +116,8 @@ def _resolve_non_libtool(options, binary, libraries):
 
         shlibs = []
         for line in proc.stdout:
-            for library, pattern in patterns.iteritems():
+            line = line.decode('ascii')
+            for library, pattern in patterns.items():
                 m = pattern.search(line)
                 if m:
                     del patterns[library]

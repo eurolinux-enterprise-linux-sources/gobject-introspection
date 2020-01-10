@@ -15,6 +15,13 @@
 _GI_TEST_EXTERN
 void regress_set_abort_on_error (gboolean abort_on_error);
 
+/* return annotations */
+_GI_TEST_EXTERN
+char *regress_test_return_allow_none (void);
+
+_GI_TEST_EXTERN
+char *regress_test_return_nullable (void);
+
 /* basic types */
 _GI_TEST_EXTERN
 gboolean regress_test_boolean (gboolean in);
@@ -204,6 +211,9 @@ GList *regress_test_glist_container_return (void);
 
 _GI_TEST_EXTERN
 GList *regress_test_glist_everything_return (void);
+
+_GI_TEST_EXTERN
+void regress_test_glist_gtype_container_in (GList *in);
 
 _GI_TEST_EXTERN
 void regress_test_glist_nothing_in (const GList *in);
@@ -531,6 +541,9 @@ void regress_test_struct_a_clone (RegressTestStructA *a,
 _GI_TEST_EXTERN
 void regress_test_struct_a_parse (RegressTestStructA *a_out, const gchar *string);
 
+_GI_TEST_EXTERN
+void regress_test_array_struct_out (RegressTestStructA **arr, int *len);
+
 struct _RegressTestStructB
 {
   gint8 some_int8;
@@ -815,6 +828,9 @@ _GI_TEST_EXTERN
 void       regress_test_obj_emit_sig_with_uint64 (RegressTestObj *obj);
 
 _GI_TEST_EXTERN
+void       regress_test_obj_emit_sig_with_array_len_prop (RegressTestObj *obj);
+
+_GI_TEST_EXTERN
 int        regress_test_obj_instance_method (RegressTestObj *obj);
 
 _GI_TEST_EXTERN
@@ -914,6 +930,15 @@ void regress_func_obj_null_in (RegressTestObj *obj);
 
 _GI_TEST_EXTERN
 void regress_test_obj_null_out (RegressTestObj **obj);
+
+void regress_func_obj_nullable_in (RegressTestObj *obj);
+
+void regress_test_obj_not_nullable_typed_gpointer_in (RegressTestObj *obj,
+                                                      gpointer        input);
+
+void regress_test_obj_not_nullable_element_typed_gpointer_in (RegressTestObj *obj,
+                                                              gpointer        input,
+                                                              guint           count);
 
 /* inheritance */
 #define REGRESS_TEST_TYPE_SUB_OBJ           (regress_test_sub_obj_get_type ())
@@ -1021,6 +1046,7 @@ regress_test_fundamental_sub_object_new (const char *data);
 
 /* callback */
 typedef void (*RegressTestSimpleCallback) (void);
+typedef void RegressTestNoPtrCallback (void);
 typedef int (*RegressTestCallback) (void);
 typedef int (*RegressTestCallbackUserData) (gpointer user_data);
 /**
@@ -1042,6 +1068,11 @@ typedef void (*RegressTestCallbackOwnedGError) (GError *error);
  */
 typedef int (*RegressTestCallbackFull) (int foo, double bar, char *path);
 /**
+ * RegressTestCallbackReturnFull:
+ * Return value: (transfer full):
+ */
+typedef RegressTestObj *(*RegressTestCallbackReturnFull) (void);
+/**
  * RegressTestCallbackArray:
  * @one: (array length=one_length):
  * @one_length:
@@ -1060,6 +1091,9 @@ _GI_TEST_EXTERN
 void regress_test_simple_callback (RegressTestSimpleCallback callback);
 
 _GI_TEST_EXTERN
+void regress_test_noptr_callback (RegressTestNoPtrCallback callback);
+
+_GI_TEST_EXTERN
 int regress_test_callback (RegressTestCallback callback);
 
 _GI_TEST_EXTERN
@@ -1074,6 +1108,9 @@ int regress_test_array_inout_callback (RegressTestCallbackArrayInOut callback);
 _GI_TEST_EXTERN
 int regress_test_callback_user_data (RegressTestCallbackUserData callback,
                              gpointer user_data);
+
+_GI_TEST_EXTERN
+void regress_test_callback_return_full (RegressTestCallbackReturnFull callback);
 
 _GI_TEST_EXTERN
 int regress_test_callback_destroy_notify (RegressTestCallbackUserData callback,
@@ -1275,12 +1312,12 @@ void regress_random_function_with_skipped_structure (int x,
 typedef struct _RegressIntset RegressIntset;
 
 /**
- * RegressIntSet: (skip)
+ * RegressIntsetAlias: (skip)
  *
  * Compatibility typedef, like telepathy-glib's TpIntSet
  *
  */
-typedef RegressIntset RegressIntSet;
+typedef RegressIntset RegressIntsetAlias;
 
 /**
  * RegressPtrArrayAlias:
@@ -1411,5 +1448,21 @@ typedef struct {
     guint padding[4];
   };
 } RegressAnAnonymousUnion;
+
+typedef struct {
+  int x;
+
+  union {
+    struct {
+      RegressLikeGnomeKeyringPasswordSchema *a;
+      RegressLikeXklConfigItem *b;
+    };
+
+    guint padding[4];
+  };
+} RegressAnonymousUnionAndStruct;
+
+GVariant *
+regress_get_variant (void);
 
 #endif /* __GITESTTYPES_H__ */
