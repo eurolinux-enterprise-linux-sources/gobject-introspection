@@ -8,7 +8,7 @@
 <link rel="up" href="ch01.html" title="GIRepository">
 <link rel="prev" href="gi-GIBaseInfo.html" title="GIBaseInfo">
 <link rel="next" href="gi-GIFunctionInfo.html" title="GIFunctionInfo">
-<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.28.1 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -289,7 +289,7 @@ g_callable_info_get_arg (<em class="parameter"><code><a class="link" href="gi-GI
 </div>
 <div class="refsect3">
 <a name="g-callable-info-get-arg.returns"></a><h4>Returns</h4>
-<p> the <a class="link" href="gi-GIArgInfo.html#GIArgInfo" title="GIArgInfo"><span class="type">GIArgInfo</span></a>. Free it with
+<p>the <a class="link" href="gi-GIArgInfo.html#GIArgInfo" title="GIArgInfo"><span class="type">GIArgInfo</span></a>. Free it with
 <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -378,7 +378,7 @@ g_callable_info_get_return_type (<em class="parameter"><code><a class="link" hre
 </div>
 <div class="refsect3">
 <a name="g-callable-info-get-return-type.returns"></a><h4>Returns</h4>
-<p> the <a class="link" href="gi-GITypeInfo.html#GITypeInfo" title="GITypeInfo"><span class="type">GITypeInfo</span></a>. Free the struct by calling
+<p>the <a class="link" href="gi-GITypeInfo.html#GITypeInfo" title="GITypeInfo"><span class="type">GITypeInfo</span></a>. Free the struct by calling
 <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -419,8 +419,8 @@ g_callable_info_invoke (<em class="parameter"><code><a class="link" href="gi-GIC
 </tr>
 <tr>
 <td class="parameter_name"><p>in_args</p></td>
-<td class="parameter_description"><p>TODO</p></td>
-<td class="parameter_annotations"> </td>
+<td class="parameter_description"><p>TODO. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter points to an array of items."><span class="acronym">array</span></acronym> length=n_in_args]</span></td>
 </tr>
 <tr>
 <td class="parameter_name"><p>n_in_args</p></td>
@@ -429,8 +429,8 @@ g_callable_info_invoke (<em class="parameter"><code><a class="link" href="gi-GIC
 </tr>
 <tr>
 <td class="parameter_name"><p>out_args</p></td>
-<td class="parameter_description"><p>TODO</p></td>
-<td class="parameter_annotations"> </td>
+<td class="parameter_description"><p>TODO. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter points to an array of items."><span class="acronym">array</span></acronym> length=n_out_args]</span></td>
 </tr>
 <tr>
 <td class="parameter_name"><p>n_out_args</p></td>
@@ -530,17 +530,17 @@ similar API.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>iterator</p></td>
-<td class="parameter_description"><p> a <a class="link" href="gi-GIBaseInfo.html#GIAttributeIter" title="GIAttributeIter"><span class="type">GIAttributeIter</span></a> structure, must be initialized; see below. </p></td>
+<td class="parameter_description"><p>a <a class="link" href="gi-GIBaseInfo.html#GIAttributeIter" title="GIAttributeIter"><span class="type">GIAttributeIter</span></a> structure, must be initialized; see below. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter for input and for returning results. Default is transfer full."><span class="acronym">inout</span></acronym>]</span></td>
 </tr>
 <tr>
 <td class="parameter_name"><p>name</p></td>
-<td class="parameter_description"><p> Returned name, must not be freed. </p></td>
+<td class="parameter_description"><p>Returned name, must not be freed. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter for returning results. Default is transfer full."><span class="acronym">out</span></acronym>][<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></td>
 </tr>
 <tr>
 <td class="parameter_name"><p>value</p></td>
-<td class="parameter_description"><p> Returned name, must not be freed. </p></td>
+<td class="parameter_description"><p>Returned name, must not be freed. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter for returning results. Default is transfer full."><span class="acronym">out</span></acronym>][<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></td>
 </tr>
 </tbody>
@@ -585,7 +585,7 @@ allocation.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>arg</p></td>
-<td class="parameter_description"><p> Initialize with argument number <em class="parameter"><code>n</code></em>
+<td class="parameter_description"><p>Initialize with argument number <em class="parameter"><code>n</code></em>
 . </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="Out parameter, where caller must allocate storage."><span class="acronym">out caller-allocates</span></acronym>]</span></td>
 </tr>
@@ -621,7 +621,7 @@ allocation.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>type</p></td>
-<td class="parameter_description"><p> Initialized with return type of <em class="parameter"><code>info</code></em>
+<td class="parameter_description"><p>Initialized with return type of <em class="parameter"><code>info</code></em>
 . </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="Out parameter, where caller must allocate storage."><span class="acronym">out caller-allocates</span></acronym>]</span></td>
 </tr>
@@ -694,6 +694,6 @@ g_callable_info_skip_return (<em class="parameter"><code><a class="link" href="g
 </div>
 </div>
 <div class="footer">
-<hr>Generated by GTK-Doc V1.25.1</div>
+<hr>Generated by GTK-Doc V1.28.1</div>
 </body>
 </html>

@@ -59,6 +59,15 @@ static void process_linemarks (GISourceScanner *scanner, gboolean has_line);
 static int check_identifier (GISourceScanner *scanner, const char *);
 static int parse_ignored_macro (void);
 static void print_error (GISourceScanner *scanner);
+
+#if (YY_FLEX_MAJOR_VERSION > 2) \
+  || ((YY_FLEX_MAJOR_VERSION == 2) && (YY_FLEX_MINOR_VERSION > 6)) \
+  || ((YY_FLEX_MAJOR_VERSION == 2) && (YY_FLEX_MINOR_VERSION == 6) && (YY_FLEX_SUBMINOR_VERSION >= 1))
+#define IS_EOF 0
+#else
+#define IS_EOF EOF
+#endif
+
 %}
 
 %option nounput
@@ -164,11 +173,16 @@ stringtext				([^\\\"])|(\\.)
 "__inline__"                            { return INLINE; }
 "__inline"				{ return INLINE; }
 "__nonnull" 			        { if (!parse_ignored_macro()) REJECT; }
+"_Nonnull"				{ /* Ignore */ }
+"_Nullable"				{ /* Ignore */ }
+"_Null_unspecified"			{ /* Ignore */ }
 "_Noreturn" 			        { /* Ignore */ }
 "__signed"                              { return SIGNED; }
 "__signed__"				{ return SIGNED; }
 "__restrict"				{ return RESTRICT; }
 "__restrict__"				{ return RESTRICT; }
+"thread_local"				{ return THREAD_LOCAL; }
+"_Thread_local"				{ return THREAD_LOCAL; }
 "__typeof"				{ if (!parse_ignored_macro()) REJECT; }
 "__volatile"	        	        { return VOLATILE; }
 "__volatile__"	        	        { return VOLATILE; }
@@ -180,7 +194,7 @@ stringtext				([^\\\"])|(\\.)
 "__stdcall" 			        { /* ignore */ }
 "__w64"					{ /* ignore */ }
 "__int64"				{ return INT; }
-
+"_Float128"                             { return FLOAT; }
 
 "G_GINT64_CONSTANT"			{ return INTL_CONST; }
 "G_GUINT64_CONSTANT"			{ return INTUL_CONST; }
@@ -270,7 +284,7 @@ parse_comment (GISourceScanner *scanner)
   c1 = input();
   c2 = input();
 
-  if (c2 != EOF && (c1 == '*' && c2 != '*' && c2 != '/')) {
+  if (c2 != IS_EOF && (c1 == '*' && c2 != '*' && c2 != '/')) {
     /*
      * Store GTK-Doc comment blocks,
      * starts with one '/' followed by exactly two '*' and not followed by a '/'
@@ -283,7 +297,7 @@ parse_comment (GISourceScanner *scanner)
 
     comment_lineno = lineno;
 
-    while (c2 != EOF && !(c1 == '*' && c2 == '/'))
+    while (c2 != IS_EOF && !(c1 == '*' && c2 == '/'))
       {
         if (!skip)
           g_string_append_c (string, c1);
@@ -311,7 +325,7 @@ parse_comment (GISourceScanner *scanner)
     /*
      * Ignore all other comment blocks
      */
-    while (c2 != EOF && !(c1 == '*' && c2 == '/'))
+    while (c2 != IS_EOF && !(c1 == '*' && c2 == '/'))
       {
         if (c1 == '\n')
           lineno++;
@@ -436,19 +450,19 @@ parse_ignored_macro (void)
 	int c;
 	int nest;
 
-	while ((c = input ()) != EOF && isspace (c))
+	while ((c = input ()) != IS_EOF && isspace (c))
 		;
 	if (c != '(')
 		return FALSE;
 
 	nest = 0;
-	while ((c = input ()) != EOF && (nest > 0 || c != ')')) {
+	while ((c = input ()) != IS_EOF && (nest > 0 || c != ')')) {
 		if (c == '(')
 			nest++;
 		else if (c == ')')
 			nest--;
 		else if (c == '"') {
-			while ((c = input ()) != EOF && c != '"') {
+			while ((c = input ()) != IS_EOF && c != '"') {
 				if (c == '\\')
 					c = input ();
 			}

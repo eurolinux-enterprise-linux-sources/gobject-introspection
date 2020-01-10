@@ -1,4 +1,4 @@
-prefix=/home/fmuellner/opt/gnome
+prefix=/home/rico/jhbuild/install
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 bindir=${exec_prefix}/bin
@@ -21,4 +21,4 @@ Libs.private:
 
 Name: gobject-introspection
 Description: GObject Introspection
-Version: 1.50.0
+Version: 1.56.1

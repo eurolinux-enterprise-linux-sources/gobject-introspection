@@ -3,8 +3,8 @@
 
 dnl the gi version number
 m4_define(gi_major_version, 1)
-m4_define(gi_minor_version, 50)
-m4_define(gi_micro_version, 0)
+m4_define(gi_minor_version, 56)
+m4_define(gi_micro_version, 1)
 m4_define(gi_version, gi_major_version.gi_minor_version.gi_micro_version)
 
 AC_PREREQ([2.63])
@@ -17,7 +17,7 @@ AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([build-aux])
 
-AM_INIT_AUTOMAKE([1.11 tar-ustar dist-xz no-dist-gzip foreign -Wno-portability parallel-tests])
+AM_INIT_AUTOMAKE([1.11 tar-ustar dist-xz no-dist-gzip foreign -Wno-portability parallel-tests subdir-objects])
 AM_MAINTAINER_MODE([enable])
 
 AM_SILENT_RULES([yes])
@@ -128,7 +128,8 @@ GIR_DIR="$EXPANDED_DATADIR/$GIR_SUFFIX"
 AC_SUBST(GIR_DIR)
 AC_DEFINE_UNQUOTED(GIR_DIR, "$GIR_DIR", [Director prefix for gir installation])
 
-PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.50.0])
+PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.56.1])
+
 PKG_CHECK_MODULES(GOBJECT, [gobject-2.0])
 PKG_CHECK_MODULES(GMODULE, [gmodule-2.0])
 PKG_CHECK_MODULES(GIO, [gio-2.0])
@@ -321,7 +322,7 @@ case "$host" in
     SAVED_CFLAGS="${CFLAGS}"
     CFLAGS="-fvisibility=hidden"
     AC_MSG_CHECKING([for -fvisibility=hidden compiler flag])
-    AC_TRY_COMPILE([], [int main (void) { return 0; }],
+    AC_TRY_COMPILE([], [return 0],
                    AC_MSG_RESULT(yes)
                    enable_fvisibility_hidden=yes,
                    AC_MSG_RESULT(no)
@@ -347,7 +348,7 @@ AC_ARG_ENABLE(Bsymbolic,
               [SAVED_LDFLAGS="${LDFLAGS}"
                AC_MSG_CHECKING([for -Bsymbolic-functions linker flag])
                LDFLAGS=-Wl,-Bsymbolic-functions
-               AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[int main (void) { return 0; }]])],
+               AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[return 0]])],
                               [AC_MSG_RESULT(yes)
                                enable_Bsymbolic=yes],
                               [AC_MSG_RESULT(no)
@@ -359,6 +360,12 @@ if test "x${enable_Bsymbolic}" = "xyes"; then
 fi
 
 AC_SUBST(EXTRA_LINK_FLAGS)
+
+dnl
+dnl Check whether MSVC toolset is explicitly set
+dnl
+AM_CONDITIONAL(MSVC_BASE_NO_TOOLSET_SET, [test x$MSVC_BASE_TOOLSET = x])
+AM_CONDITIONAL(MSVC_NO_TOOLSET_SET, [test x$MSVC_TOOLSET = x])
 
 AC_CONFIG_FILES([
 Makefile
@@ -374,13 +381,13 @@ docs/reference/version.xml
 gobject-introspection-1.0.pc
 gobject-introspection-no-export-1.0.pc
 config.h.win32
-build/Makefile
-build/win32/Makefile
-build/win32/vs9/Makefile
-build/win32/vs9/gi-version-paths.vsprops
-build/win32/vs10/Makefile
-build/win32/vs10/gi-version-paths.props
-build/win32/vs11/Makefile
-build/win32/vs12/Makefile
-build/win32/vs14/Makefile])
+win32/Makefile
+win32/vs9/Makefile
+win32/vs9/gi-version-paths.vsprops
+win32/vs10/Makefile
+win32/vs10/gi-version-paths.props
+win32/vs11/Makefile
+win32/vs12/Makefile
+win32/vs14/Makefile
+win32/vs15/Makefile])
 AC_OUTPUT

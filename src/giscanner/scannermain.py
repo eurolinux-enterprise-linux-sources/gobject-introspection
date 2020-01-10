@@ -140,6 +140,9 @@ def _get_option_parser():
     parser.add_option("-l", "--library",
                       action="append", dest="libraries", default=[],
                       help="libraries of this unit")
+    parser.add_option("", "--extra-library",
+                      action="append", dest="extra_libraries", default=[],
+                      help="Extra libraries to link the binary against")
     parser.add_option("-L", "--library-path",
                       action="append", dest="library_paths", default=[],
                       help="directories to search for libraries")
@@ -559,7 +562,7 @@ def scanner_main(args):
     if options.warn_fatal and warning_count > 0:
         message.fatal("warnings configured as fatal")
         return 1
-    elif warning_count > 0 and options.warn_all is False:
+    elif warning_count > 0 and options.warn_all is False and options.quiet is False:
         print("g-ir-scanner: %s: warning: %d warnings suppressed "
               "(use --warn-all to see them)" %
               (transformer.namespace.name, warning_count, ))

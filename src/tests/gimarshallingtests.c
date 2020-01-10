@@ -1376,6 +1376,66 @@ gi_marshalling_tests_array_uint8_in (const guint8 *chars, gint length)
 }
 
 /**
+ * gi_marshalling_tests_array_int64_in:
+ * @ints: (array length=length):
+ * @length:
+ */
+void
+gi_marshalling_tests_array_int64_in (const gint64 *ints, gint length)
+{
+  g_assert_cmpint (length, ==, 4);
+  g_assert_cmpint (ints[0], ==, -1);
+  g_assert_cmpint (ints[1], ==, 0);
+  g_assert_cmpint (ints[2], ==, 1);
+  g_assert_cmpint (ints[3], ==, 2);
+}
+
+/**
+ * gi_marshalling_tests_array_uint64_in:
+ * @ints: (array length=length):
+ * @length:
+ */
+void
+gi_marshalling_tests_array_uint64_in (const guint64 *ints, gint length)
+{
+  g_assert_cmpint (length, ==, 4);
+  g_assert_cmpint (ints[0], ==, -1);
+  g_assert_cmpint (ints[1], ==, 0);
+  g_assert_cmpint (ints[2], ==, 1);
+  g_assert_cmpint (ints[3], ==, 2);
+}
+
+/**
+ * gi_marshalling_tests_array_unichar_in:
+ * @chars: (array length=length):
+ * @length:
+ */
+void
+gi_marshalling_tests_array_unichar_in (const gunichar *chars, gint length)
+{
+  unsigned ix;
+  static const gunichar expected[] = GI_MARSHALLING_TESTS_CONSTANT_UCS4;
+  g_assert_cmpint (length, ==, 12);
+  for (ix = 0; ix < length; ix++)
+    g_assert_cmpuint (chars[ix], ==, expected[ix]);
+}
+
+/**
+ * gi_marshalling_tests_array_bool_in:
+ * @bools: (array length=length):
+ * @length:
+ */
+void
+gi_marshalling_tests_array_bool_in (const gboolean *bools, gint length)
+{
+  g_assert_cmpint (length, ==, 4);
+  g_assert_cmpint (bools[0], ==, TRUE);
+  g_assert_cmpint (bools[1], ==, FALSE);
+  g_assert_cmpint (bools[2], ==, TRUE);
+  g_assert_cmpint (bools[3], ==, TRUE);
+}
+
+/**
  * gi_marshalling_tests_array_struct_in:
  * @structs: (array length=length):
  */
@@ -1522,6 +1582,31 @@ gi_marshalling_tests_array_out_etc (gint first, gint **ints, gint *length, gint 
 }
 
 /**
+ * gi_marshalling_tests_array_bool_out:
+ * @bools: (out) (array length=length) (transfer none):
+ */
+void
+gi_marshalling_tests_array_bool_out (const gboolean **bools, gint *length)
+{
+  static const gboolean values[] = { TRUE, FALSE, TRUE, TRUE };
+
+  *length = 4;
+  *bools = values;
+}
+
+/**
+ * gi_marshalling_tests_array_unichar_out:
+ * @chars: (out) (array length=length) (transfer none):
+ */
+void
+gi_marshalling_tests_array_unichar_out (const gunichar **chars, gint *length)
+{
+  static const gunichar values[] = GI_MARSHALLING_TESTS_CONSTANT_UCS4;
+  *length = 12;
+  *chars = values;
+}
+
+/**
  * gi_marshalling_tests_array_inout:
  * @ints: (inout) (array length=length) (transfer none):
  * @length: (inout):
@@ -1626,6 +1711,20 @@ gi_marshalling_tests_array_zero_terminated_return_struct (void)
   ret[3] = NULL;
 
   return ret;
+}
+
+/**
+ * gi_marshalling_tests_array_zero_terminated_return_unichar:
+ *
+ * Returns: (array zero-terminated) (transfer full):
+ */
+gunichar *
+gi_marshalling_tests_array_zero_terminated_return_unichar (void)
+{
+  static const gunichar value[] = GI_MARSHALLING_TESTS_CONSTANT_UCS4;
+  gunichar *retval = g_new0(gunichar, 13);
+  memcpy (retval, value, 12 * sizeof (gunichar));
+  return retval;
 }
 
 /**
@@ -2052,6 +2151,34 @@ gi_marshalling_tests_garray_utf8_full_inout (GArray **array_)
 
   g_array_unref (*array_);
   *array_ = result;
+}
+
+/**
+ * gi_marshalling_tests_garray_bool_none_in:
+ * @array_: (element-type gboolean) (transfer none):
+ */
+void
+gi_marshalling_tests_garray_bool_none_in (GArray *array_)
+{
+  g_assert_cmpint (array_->len, ==, 4);
+  g_assert_cmpint (g_array_index (array_, gboolean, 0), ==, TRUE);
+  g_assert_cmpint (g_array_index (array_, gboolean, 1), ==, FALSE);
+  g_assert_cmpint (g_array_index (array_, gboolean, 2), ==, TRUE);
+  g_assert_cmpint (g_array_index (array_, gboolean, 3), ==, TRUE);
+}
+
+/**
+ * gi_marshalling_tests_garray_unichar_none_in:
+ * @array_: (element-type gunichar) (transfer none):
+ */
+void
+gi_marshalling_tests_garray_unichar_none_in (GArray *array_)
+{
+  unsigned ix;
+  static const gunichar expected[] = GI_MARSHALLING_TESTS_CONSTANT_UCS4;
+  g_assert_cmpint (array_->len, ==, 12);
+  for (ix = 0; ix < array_->len; ix++)
+    g_assert_cmpuint (g_array_index (array_, gunichar, ix), ==, expected[ix]);
 }
 
 /**
@@ -2979,6 +3106,90 @@ gi_marshalling_tests_ghashtable_utf8_none_in (GHashTable *hash_table)
   g_assert_cmpstr (g_hash_table_lookup (hash_table, "0"), ==, "0");
   g_assert_cmpstr (g_hash_table_lookup (hash_table, "1"), ==, "-1");
   g_assert_cmpstr (g_hash_table_lookup (hash_table, "2"), ==, "-2");
+}
+
+/**
+ * gi_marshalling_tests_ghashtable_double_in:
+ * @hash_table: (element-type utf8 double) (transfer none):
+ *
+ * Meant to test a value type that doesn't fit inside a pointer.
+ */
+void
+gi_marshalling_tests_ghashtable_double_in (GHashTable *hash_table)
+{
+  double *value;
+
+  value = g_hash_table_lookup (hash_table, "-1");
+  g_assert_cmpfloat (*value, ==, -0.1);
+  value = g_hash_table_lookup (hash_table, "0");
+  g_assert_cmpfloat (*value, ==, 0.0);
+  value = g_hash_table_lookup (hash_table, "1");
+  g_assert_cmpfloat (*value, ==, 0.1);
+  value = g_hash_table_lookup (hash_table, "2");
+  g_assert_cmpfloat (*value, ==, 0.2);
+}
+
+/**
+ * gi_marshalling_tests_ghashtable_float_in:
+ * @hash_table: (element-type utf8 float) (transfer none):
+ *
+ * Meant to test a value type that doesn't fit inside a pointer.
+ */
+void
+gi_marshalling_tests_ghashtable_float_in (GHashTable *hash_table)
+{
+  float *value;
+
+  value = g_hash_table_lookup (hash_table, "-1");
+  g_assert_cmpfloat (*value, ==, -0.1f);
+  value = g_hash_table_lookup (hash_table, "0");
+  g_assert_cmpfloat (*value, ==, 0.0f);
+  value = g_hash_table_lookup (hash_table, "1");
+  g_assert_cmpfloat (*value, ==, 0.1f);
+  value = g_hash_table_lookup (hash_table, "2");
+  g_assert_cmpfloat (*value, ==, 0.2f);
+}
+
+/**
+ * gi_marshalling_tests_ghashtable_int64_in:
+ * @hash_table: (element-type utf8 gint64) (transfer none):
+ *
+ * Meant to test a value type that doesn't fit inside a pointer.
+ */
+void
+gi_marshalling_tests_ghashtable_int64_in (GHashTable *hash_table)
+{
+  gint64 *value;
+
+  value = g_hash_table_lookup (hash_table, "-1");
+  g_assert_cmpint (*value, ==, -1);
+  value = g_hash_table_lookup (hash_table, "0");
+  g_assert_cmpint (*value, ==, 0);
+  value = g_hash_table_lookup (hash_table, "1");
+  g_assert_cmpint (*value, ==, 1);
+  value = g_hash_table_lookup (hash_table, "2");
+  g_assert_cmpint (*value, ==, (gint64) G_MAXUINT32 + 1);
+}
+
+/**
+ * gi_marshalling_tests_ghashtable_uint64_in:
+ * @hash_table: (element-type utf8 guint64) (transfer none):
+ *
+ * Meant to test a value type that doesn't fit inside a pointer.
+ */
+void
+gi_marshalling_tests_ghashtable_uint64_in (GHashTable *hash_table)
+{
+  guint64 *value;
+
+  value = g_hash_table_lookup (hash_table, "-1");
+  g_assert_cmpuint (*value, ==, (guint64) G_MAXUINT32 + 1);
+  value = g_hash_table_lookup (hash_table, "0");
+  g_assert_cmpuint (*value, ==, 0);
+  value = g_hash_table_lookup (hash_table, "1");
+  g_assert_cmpuint (*value, ==, 1);
+  value = g_hash_table_lookup (hash_table, "2");
+  g_assert_cmpuint (*value, ==, 2);
 }
 
 /**
@@ -5140,7 +5351,10 @@ enum
   SOME_BOXED_STRUCT_PROPERTY,
   SOME_VARIANT_PROPERTY,
   SOME_BOXED_GLIST_PROPERTY,
+  SOME_GVALUE_PROPERTY,
   SOME_OBJECT_PROPERTY,
+  SOME_FLAGS_PROPERTY,
+  SOME_ENUM_PROPERTY,
 };
 
 G_DEFINE_TYPE (GIMarshallingTestsPropertiesObject, gi_marshalling_tests_properties_object, G_TYPE_OBJECT);
@@ -5158,6 +5372,11 @@ gi_marshalling_tests_properties_object_finalize (GObject *obj)
   if (self->some_strv != NULL) {
     g_strfreev (self->some_strv);
     self->some_strv = NULL;
+  }
+
+  if (self->some_gvalue) {
+    g_boxed_free (G_TYPE_VALUE, self->some_gvalue);
+    self->some_gvalue = NULL;
   }
 
   G_OBJECT_CLASS (gi_marshalling_tests_properties_object_parent_class)->finalize (obj);
@@ -5213,11 +5432,20 @@ gi_marshalling_tests_properties_object_get_property (GObject *object,
     case SOME_BOXED_GLIST_PROPERTY:
       g_value_set_boxed (value, self->some_boxed_glist);
       break;
+    case SOME_GVALUE_PROPERTY:
+      g_value_set_boxed (value, self->some_gvalue);
+      break;
     case SOME_VARIANT_PROPERTY:
       g_value_set_variant (value, self->some_variant);
       break;
     case SOME_OBJECT_PROPERTY:
       g_value_set_object (value, self->some_object);
+      break;
+    case SOME_FLAGS_PROPERTY:
+      g_value_set_flags (value, self->some_flags);
+      break;
+    case SOME_ENUM_PROPERTY:
+      g_value_set_enum (value, self->some_enum);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -5278,6 +5506,11 @@ gi_marshalling_tests_properties_object_set_property (GObject *object,
       g_list_free (self->some_boxed_glist);
       self->some_boxed_glist = g_list_copy (g_value_get_boxed (value));
       break;
+    case SOME_GVALUE_PROPERTY:
+      if (self->some_gvalue)
+        g_boxed_free (G_TYPE_VALUE, self->some_gvalue);
+      self->some_gvalue = g_value_dup_boxed (value);
+      break;
     case SOME_VARIANT_PROPERTY:
       if (self->some_variant != NULL)
         g_variant_unref (self->some_variant);
@@ -5289,6 +5522,12 @@ gi_marshalling_tests_properties_object_set_property (GObject *object,
       if (self->some_object != NULL)
         g_object_unref (self->some_object);
       self->some_object = g_value_dup_object (value);
+      break;
+    case SOME_FLAGS_PROPERTY:
+      self->some_flags = g_value_get_flags (value);
+      break;
+    case SOME_ENUM_PROPERTY:
+      self->some_enum = g_value_get_enum (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -5406,6 +5645,13 @@ static void gi_marshalling_tests_properties_object_class_init (GIMarshallingTest
                                                        gi_marshalling_tests_boxed_glist_get_type
                                                        (), G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT));
 
+  g_object_class_install_property (object_class, SOME_GVALUE_PROPERTY,
+                                   g_param_spec_boxed ("some-gvalue",
+                                                       "some-gvalue",
+                                                       "some-gvalue",
+                                                       G_TYPE_VALUE,
+                                                       G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+
   g_object_class_install_property (object_class, SOME_VARIANT_PROPERTY,
                                    g_param_spec_variant ("some-variant",
                                                          "some-variant",
@@ -5420,6 +5666,22 @@ static void gi_marshalling_tests_properties_object_class_init (GIMarshallingTest
                                                         "some-object",
                                                         G_TYPE_OBJECT,
                                                         G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT));
+
+  g_object_class_install_property (object_class, SOME_FLAGS_PROPERTY,
+                                   g_param_spec_flags ("some-flags",
+                                                       "some-flags",
+                                                       "some-flags",
+                                                       GI_MARSHALLING_TESTS_TYPE_FLAGS,
+                                                       GI_MARSHALLING_TESTS_FLAGS_VALUE1,
+                                                       G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT));
+
+  g_object_class_install_property (object_class, SOME_ENUM_PROPERTY,
+                                   g_param_spec_enum ("some-enum",
+                                                      "some-enum",
+                                                      "some-enum",
+                                                      GI_MARSHALLING_TESTS_TYPE_GENUM,
+                                                      GI_MARSHALLING_TESTS_GENUM_VALUE1,
+                                                      G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT));
 }
 
 GIMarshallingTestsPropertiesObject *

@@ -29,7 +29,7 @@ import platform
 import re
 import subprocess
 
-from .utils import get_libtool_command, extract_libtool_shlib
+from .utils import get_libtool_command, extract_libtool_shlib, host_os
 from .ccompiler import CCompiler
 
 
@@ -94,7 +94,7 @@ def _resolve_non_libtool(options, binary, libraries):
         else:
             binary.args[0] = old_argdir
 
-    if os.name == 'nt':
+    if host_os() == 'nt':
         cc = CCompiler()
         shlibs = cc.resolve_windows_libs(libraries, options)
 
@@ -117,6 +117,11 @@ def _resolve_non_libtool(options, binary, libraries):
         shlibs = []
         for line in proc.stdout:
             line = line.decode('ascii')
+            # ldd on *BSD show the argument passed on the first line even if
+            # there is only one argument. We have to ignore it because it is
+            # possible for the name of the binary to match _ldd_library_pattern.
+            if line == binary.args[0] + ':\n':
+                continue
             for library, pattern in patterns.items():
                 m = pattern.search(line)
                 if m:

@@ -376,7 +376,8 @@ typedef enum
   REGRESS_TEST_VALUE1,
   REGRESS_TEST_VALUE2,
   REGRESS_TEST_VALUE3 = -1,
-  REGRESS_TEST_VALUE4 = '0'
+  REGRESS_TEST_VALUE4 = '0',
+  REGRESS_TEST_VALUE5
 } RegressTestEnum;
 
 typedef enum
@@ -421,6 +422,13 @@ typedef enum
   REGRESS_TEST_EVALUE2 = 42,
   REGRESS_TEST_EVALUE3 = '0'
 } RegressTestEnumNoGEnum;
+
+/**
+ * REGRESS_TEST_EVALUE_DEPRECATED:
+ *
+ * Scanner used to replace %REGRESS_TEST_EVALUE1 with %REGRESS_TEST_EVALUE_DEPRECATED.
+ */
+#define REGRESS_TEST_EVALUE_DEPRECATED REGRESS_TEST_EVALUE1
 
 _GI_TEST_EXTERN
 const gchar * regress_test_enum_param(RegressTestEnum e);
@@ -771,6 +779,7 @@ struct _RegressTestObj
   double some_double;
   char* string;
   GType gtype;
+  gint name_conflict;
 
   /* < private > */
   void (*function_ptr) (void);
@@ -940,6 +949,9 @@ void regress_test_obj_not_nullable_element_typed_gpointer_in (RegressTestObj *ob
                                                               gpointer        input,
                                                               guint           count);
 
+_GI_TEST_EXTERN
+void regress_test_obj_name_conflict (RegressTestObj *obj);
+
 /* inheritance */
 #define REGRESS_TEST_TYPE_SUB_OBJ           (regress_test_sub_obj_get_type ())
 #define REGRESS_TEST_SUB_OBJECT(object)     (G_TYPE_CHECK_INSTANCE_CAST ((object), REGRESS_TEST_TYPE_SUB_OBJ, RegressTestSubObj))
@@ -1043,6 +1055,10 @@ GType regress_test_fundamental_sub_object_get_type(void);
 _GI_TEST_EXTERN
 RegressTestFundamentalSubObject *
 regress_test_fundamental_sub_object_new (const char *data);
+
+_GI_TEST_EXTERN
+RegressTestFundamentalObject *
+regress_test_create_fundamental_hidden_class_instance (void);
 
 /* callback */
 typedef void (*RegressTestSimpleCallback) (void);
@@ -1274,6 +1290,9 @@ GValue *regress_test_date_in_gvalue (void);
 _GI_TEST_EXTERN
 GValue *regress_test_strv_in_gvalue (void);
 
+_GI_TEST_EXTERN
+GValue *regress_test_null_strv_in_gvalue (void);
+
 
 _GI_TEST_EXTERN
 GObject * _regress_this_is_a_private_symbol (void);
@@ -1386,7 +1405,7 @@ typedef struct {
 
 _GI_TEST_EXTERN
 void regress_like_xkl_config_item_set_name (RegressLikeXklConfigItem *self,
-                                            const char *name);
+                                            char const *name);
 
 #define REGRESS_UTF8_CONSTANT "const \xe2\x99\xa5 utf8"
 

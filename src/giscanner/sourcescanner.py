@@ -70,6 +70,7 @@ STORAGE_CLASS_EXTERN = 1 << 2
 STORAGE_CLASS_STATIC = 1 << 3
 STORAGE_CLASS_AUTO = 1 << 4
 STORAGE_CLASS_REGISTER = 1 << 5
+STORAGE_CLASS_THREAD_LOCAL = 1 << 6
 
 TYPE_QUALIFIER_NONE = 0
 TYPE_QUALIFIER_CONST = 1 << 1
@@ -290,7 +291,9 @@ class SourceScanner(object):
 
         cc = CCompiler()
 
-        tmp_fd_cpp, tmp_name_cpp = tempfile.mkstemp(prefix='g-ir-cpp-', suffix='.c')
+        tmp_fd_cpp, tmp_name_cpp = tempfile.mkstemp(prefix='g-ir-cpp-',
+                                                    suffix='.c',
+                                                    dir=os.getcwd())
         with os.fdopen(tmp_fd_cpp, 'wb') as fp_cpp:
             self._write_preprocess_src(fp_cpp, defines, undefs, filenames)
 

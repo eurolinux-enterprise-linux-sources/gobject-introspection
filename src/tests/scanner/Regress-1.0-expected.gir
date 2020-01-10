@@ -23,7 +23,7 @@ and/or use gtk-doc annotations.  -->
       <type name="gpointer" c:type="gpointer"/>
     </alias>
     <alias name="FooXEvent" c:type="RegressFooXEvent">
-      <type name="gpointer" c:type="gpointer"/>
+      <type name="none" c:type="void"/>
     </alias>
     <alias name="IntsetAlias" c:type="RegressIntsetAlias" introspectable="0">
       <doc xml:space="preserve">Compatibility typedef, like telepathy-glib's TpIntSet</doc>
@@ -944,6 +944,11 @@ it says it's pointer but it's actually a string.</doc>
               value="should be exposed"
               c:type="REGRESS_FOO_DEFINE_SHOULD_BE_EXPOSED">
       <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="FOO_FLAGS_SECOND_AND_THIRD"
+              value="6"
+              c:type="REGRESS_FOO_FLAGS_SECOND_AND_THIRD">
+      <type name="gint" c:type="gint"/>
     </constant>
     <constant name="FOO_PIE_IS_TASTY"
               value="3.141590"
@@ -2519,6 +2524,11 @@ use it should be.</doc>
               c:identifier="REGRESS_TEST_VALUE4"
               glib:nick="value4">
       </member>
+      <member name="value5"
+              value="49"
+              c:identifier="REGRESS_TEST_VALUE5"
+              glib:nick="value5">
+      </member>
       <function name="param" c:identifier="regress_test_enum_param">
         <return-value transfer-ownership="none">
           <type name="utf8" c:type="const gchar*"/>
@@ -3184,6 +3194,18 @@ case.</doc>
           </instance-parameter>
         </parameters>
       </method>
+      <method name="name_conflict"
+              c:identifier="regress_test_obj_name_conflict">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="obj" transfer-ownership="none">
+            <doc xml:space="preserve">A #RegressTestObj</doc>
+            <type name="TestObj" c:type="RegressTestObj*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
       <method name="not_nullable_element_typed_gpointer_in"
               c:identifier="regress_test_obj_not_nullable_element_typed_gpointer_in">
         <return-value transfer-ownership="none">
@@ -3590,6 +3612,12 @@ raise an error.</doc>
           <type name="utf8"/>
         </type>
       </property>
+      <property name="name-conflict"
+                writable="1"
+                construct="1"
+                transfer-ownership="none">
+        <type name="gint" c:type="gint"/>
+      </property>
       <property name="pptrarray" writable="1" transfer-ownership="none">
         <array name="GLib.PtrArray" c:type="gpointer">
           <type name="utf8"/>
@@ -3632,6 +3660,9 @@ raise an error.</doc>
       </field>
       <field name="gtype">
         <type name="GType" c:type="GType"/>
+      </field>
+      <field name="name_conflict">
+        <type name="gint" c:type="gint"/>
       </field>
       <field name="function_ptr">
         <callback name="function_ptr">
@@ -4476,7 +4507,7 @@ detection, and fixing it via annotations.</doc>
       <parameters>
         <parameter name="fname" transfer-ownership="none">
           <doc xml:space="preserve">Source file</doc>
-          <type name="filename" c:type="char*"/>
+          <type name="filename" c:type="const char*"/>
         </parameter>
       </parameters>
     </function>
@@ -4542,6 +4573,12 @@ detection, and fixing it via annotations.</doc>
         <doc xml:space="preserve">A floating object</doc>
         <type name="GObject.Object" c:type="GObject*"/>
       </return-value>
+      <parameters>
+        <parameter name="object" transfer-ownership="none">
+          <doc xml:space="preserve">an object</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+      </parameters>
     </function>
     <function name="annotation_versioned"
               c:identifier="regress_annotation_versioned"
@@ -5641,6 +5678,13 @@ call and can be released on return.</doc>
         </parameter>
       </parameters>
     </function>
+    <function name="test_create_fundamental_hidden_class_instance"
+              c:identifier="regress_test_create_fundamental_hidden_class_instance">
+      <return-value transfer-ownership="full">
+        <type name="TestFundamentalObject"
+              c:type="RegressTestFundamentalObject*"/>
+      </return-value>
+    </function>
     <function name="test_date_in_gvalue"
               c:identifier="regress_test_date_in_gvalue">
       <return-value transfer-ownership="full">
@@ -6350,6 +6394,12 @@ What we're testing here is that the scanner ignores the @a nested inside XML.</d
           <type name="TestCallbackGError" c:type="RegressTestCallbackGError"/>
         </parameter>
       </parameters>
+    </function>
+    <function name="test_null_strv_in_gvalue"
+              c:identifier="regress_test_null_strv_in_gvalue">
+      <return-value transfer-ownership="full">
+        <type name="GObject.Value" c:type="GValue*"/>
+      </return-value>
     </function>
     <function name="test_owned_gerror_callback"
               c:identifier="regress_test_owned_gerror_callback">

@@ -8,7 +8,7 @@
 <link rel="up" href="ch01.html" title="GIRepository">
 <link rel="prev" href="gi-GIObjectInfo.html" title="GIObjectInfo">
 <link rel="next" href="gi-GIArgInfo.html" title="GIArgInfo">
-<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.28.1 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -191,7 +191,7 @@
 </div>
 <div class="refsect1">
 <a name="gi-GIInterfaceInfo.description"></a><h2>Description</h2>
-<p>GIInterfaceInfo represents a <a href="/home/fmuellner/opt/gnome/share/gtk-doc/html/gobject/GTypeModule.html"><span class="type">GInterface</span></a> type.</p>
+<p>GIInterfaceInfo represents a <a href="/home/rico/jhbuild/install/share/gtk-doc/html/gobject/GTypeModule.html"><span class="type">GInterface</span></a> type.</p>
 <p>A GInterface has methods, fields, properties, signals, interfaces, constants,
 virtual functions and prerequisites.</p>
 <div class="refsect1">
@@ -286,7 +286,7 @@ g_interface_info_get_prerequisite (<em class="parameter"><code><a class="link" h
 </div>
 <div class="refsect3">
 <a name="g-interface-info-get-prerequisite.returns"></a><h4>Returns</h4>
-<p> the prerequisites as a <span class="type">GIBaseInfo</span>. Free the struct by calling
+<p>the prerequisites as a <span class="type">GIBaseInfo</span>. Free the struct by calling
 <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -349,7 +349,7 @@ g_interface_info_get_property (<em class="parameter"><code><a class="link" href=
 </div>
 <div class="refsect3">
 <a name="g-interface-info-get-property.returns"></a><h4>Returns</h4>
-<p> the <a class="link" href="gi-GIPropertyInfo.html#GIPropertyInfo" title="GIPropertyInfo"><span class="type">GIPropertyInfo</span></a>. Free the struct by calling
+<p>the <a class="link" href="gi-GIPropertyInfo.html#GIPropertyInfo" title="GIPropertyInfo"><span class="type">GIPropertyInfo</span></a>. Free the struct by calling
 <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -412,7 +412,7 @@ g_interface_info_get_method (<em class="parameter"><code><a class="link" href="g
 </div>
 <div class="refsect3">
 <a name="g-interface-info-get-method.returns"></a><h4>Returns</h4>
-<p> the <a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunctionInfo"><span class="type">GIFunctionInfo</span></a>. Free the struct by calling
+<p>the <a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunctionInfo"><span class="type">GIFunctionInfo</span></a>. Free the struct by calling
 <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -450,7 +450,7 @@ returned if there's no method available with that name.</p>
 </div>
 <div class="refsect3">
 <a name="g-interface-info-find-method.returns"></a><h4>Returns</h4>
-<p> the <a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunctionInfo"><span class="type">GIFunctionInfo</span></a> or <code class="literal">NULL</code> if none found.
+<p>the <a class="link" href="gi-GIFunctionInfo.html#GIFunctionInfo" title="GIFunctionInfo"><span class="type">GIFunctionInfo</span></a> or <code class="literal">NULL</code> if none found.
 Free the struct by calling <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -513,7 +513,7 @@ g_interface_info_get_signal (<em class="parameter"><code><a class="link" href="g
 </div>
 <div class="refsect3">
 <a name="g-interface-info-get-signal.returns"></a><h4>Returns</h4>
-<p> the <a class="link" href="gi-GISignalInfo.html#GISignalInfo" title="GISignalInfo"><span class="type">GISignalInfo</span></a>. Free the struct by calling
+<p>the <a class="link" href="gi-GISignalInfo.html#GISignalInfo" title="GISignalInfo"><span class="type">GISignalInfo</span></a>. Free the struct by calling
 <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -549,7 +549,7 @@ g_interface_info_find_signal (<em class="parameter"><code><a class="link" href="
 </div>
 <div class="refsect3">
 <a name="g-interface-info-find-signal.returns"></a><h4>Returns</h4>
-<p> Info for the signal with name <em class="parameter"><code>name</code></em>
+<p>Info for the signal with name <em class="parameter"><code>name</code></em>
 in <em class="parameter"><code>info</code></em>
 , or
 <code class="literal">NULL</code> on failure. </p>
@@ -615,7 +615,7 @@ g_interface_info_get_vfunc (<em class="parameter"><code><a class="link" href="gi
 </div>
 <div class="refsect3">
 <a name="g-interface-info-get-vfunc.returns"></a><h4>Returns</h4>
-<p> the <a class="link" href="gi-GIVFuncInfo.html#GIVFuncInfo" title="GIVFuncInfo"><span class="type">GIVFuncInfo</span></a>. Free the struct by calling
+<p>the <a class="link" href="gi-GIVFuncInfo.html#GIVFuncInfo" title="GIVFuncInfo"><span class="type">GIVFuncInfo</span></a>. Free the struct by calling
 <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -653,7 +653,7 @@ for <a class="link" href="gi-GIObjectInfo.html#g-object-info-find-vfunc" title="
 </div>
 <div class="refsect3">
 <a name="g-interface-info-find-vfunc.returns"></a><h4>Returns</h4>
-<p> the <a class="link" href="gi-GIVFuncInfo.html#GIVFuncInfo" title="GIVFuncInfo"><span class="type">GIVFuncInfo</span></a>, or <code class="literal">NULL</code>. Free it with
+<p>the <a class="link" href="gi-GIVFuncInfo.html#GIVFuncInfo" title="GIVFuncInfo"><span class="type">GIVFuncInfo</span></a>, or <code class="literal">NULL</code>. Free it with
 <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -716,7 +716,7 @@ g_interface_info_get_constant (<em class="parameter"><code><a class="link" href=
 </div>
 <div class="refsect3">
 <a name="g-interface-info-get-constant.returns"></a><h4>Returns</h4>
-<p> the <a class="link" href="gi-GIConstantInfo.html#GIConstantInfo" title="GIConstantInfo"><span class="type">GIConstantInfo</span></a>. Free the struct by calling
+<p>the <a class="link" href="gi-GIConstantInfo.html#GIConstantInfo" title="GIConstantInfo"><span class="type">GIConstantInfo</span></a>. Free the struct by calling
 <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -726,7 +726,7 @@ g_interface_info_get_constant (<em class="parameter"><code><a class="link" href=
 <a name="g-interface-info-get-iface-struct"></a><h3>g_interface_info_get_iface_struct ()</h3>
 <pre class="programlisting"><a class="link" href="gi-GIStructInfo.html#GIStructInfo" title="GIStructInfo"><span class="returnvalue">GIStructInfo</span></a> *
 g_interface_info_get_iface_struct (<em class="parameter"><code><a class="link" href="gi-GIInterfaceInfo.html#GIInterfaceInfo" title="GIInterfaceInfo"><span class="type">GIInterfaceInfo</span></a> *info</code></em>);</pre>
-<p>Returns the layout C structure associated with this <a href="/home/fmuellner/opt/gnome/share/gtk-doc/html/gobject/GTypeModule.html"><span class="type">GInterface</span></a>.</p>
+<p>Returns the layout C structure associated with this <a href="/home/rico/jhbuild/install/share/gtk-doc/html/gobject/GTypeModule.html"><span class="type">GInterface</span></a>.</p>
 <div class="refsect3">
 <a name="g-interface-info-get-iface-struct.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table class="informaltable" width="100%" border="0">
@@ -744,7 +744,7 @@ g_interface_info_get_iface_struct (<em class="parameter"><code><a class="link" h
 </div>
 <div class="refsect3">
 <a name="g-interface-info-get-iface-struct.returns"></a><h4>Returns</h4>
-<p> the <a class="link" href="gi-GIStructInfo.html#GIStructInfo" title="GIStructInfo"><span class="type">GIStructInfo</span></a> or <code class="literal">NULL</code>. Free it with
+<p>the <a class="link" href="gi-GIStructInfo.html#GIStructInfo" title="GIStructInfo"><span class="type">GIStructInfo</span></a> or <code class="literal">NULL</code>. Free it with
 <a class="link" href="gi-GIBaseInfo.html#g-base-info-unref" title="g_base_info_unref ()"><code class="function">g_base_info_unref()</code></a> when done. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -761,6 +761,6 @@ g_interface_info_get_iface_struct (<em class="parameter"><code><a class="link" h
 </div>
 </div>
 <div class="footer">
-<hr>Generated by GTK-Doc V1.25.1</div>
+<hr>Generated by GTK-Doc V1.28.1</div>
 </body>
 </html>

@@ -22,6 +22,7 @@
 #include <glib.h>
 #include <girepository.h>
 #include <stdlib.h>
+#include <locale.h>
 
 static void
 print_shlibs (const gchar *namespace)
@@ -76,8 +77,11 @@ main (gint   argc,
     { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_STRING_ARRAY, &namespaces, "The typelib to inspect", "NAMESPACE" },
     { NULL },
   };
+  GOptionContext *context = NULL;
 
-  GOptionContext *context = g_option_context_new ("- Inspect GI typelib");
+  setlocale (LC_ALL, "");
+
+  context = g_option_context_new ("- Inspect GI typelib");
   g_option_context_add_main_entries (context, options, NULL);
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {

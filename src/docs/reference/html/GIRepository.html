@@ -8,7 +8,7 @@
 <link rel="up" href="ch01.html" title="GIRepository">
 <link rel="prev" href="ch01.html" title="GIRepository">
 <link rel="next" href="gi-struct-hierarchy.html" title="Struct hierarchy">
-<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.28.1 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -272,6 +272,14 @@
 <a name="GIRepository.description"></a><h2>Description</h2>
 <p><a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> is used to manage repositories of namespaces. Namespaces
 are represented on disk by type libraries (.typelib files).</p>
+<p>### Discovery of type libraries</p>
+<p><a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> will typically look for a <code class="literal">girepository-1.0</code> directory
+under the library directory used when compiling gobject-introspection.</p>
+<p>It is possible to control the search paths programmatically, using
+<a class="link" href="GIRepository.html#g-irepository-prepend-search-path" title="g_irepository_prepend_search_path ()"><code class="function">g_irepository_prepend_search_path()</code></a>. It is also possible to modify
+the search paths by using the <code class="literal">GI_TYPELIB_PATH</code> environment variable.
+The environment variable takes precedence over the default search path
+and the <a class="link" href="GIRepository.html#g-irepository-prepend-search-path" title="g_irepository_prepend_search_path ()"><code class="function">g_irepository_prepend_search_path()</code></a> calls.</p>
 </div>
 <div class="refsect1">
 <a name="GIRepository.functions_details"></a><h2>Functions</h2>
@@ -290,7 +298,7 @@ parameter to mean this default repository, which is usually more
 convenient for C.</p>
 <div class="refsect3">
 <a name="g-irepository-get-default.returns"></a><h4>Returns</h4>
-<p> The global singleton <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p>
+<p>The global singleton <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p>
 <p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
 </div>
 </div>
@@ -321,7 +329,7 @@ such as <a class="link" href="GIRepository.html#g-irepository-require" title="g_
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -335,7 +343,7 @@ process-global default <a class="link" href="GIRepository.html" title="GIReposit
 </div>
 <div class="refsect3">
 <a name="g-irepository-get-dependencies.returns"></a><h4>Returns</h4>
-<p> Zero-terminated string array of all versioned
+<p>Zero-terminated string array of all versioned
 dependencies. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -367,7 +375,7 @@ such as <a class="link" href="GIRepository.html#g-irepository-require" title="g_
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL may be passed as the value in, out, in-out; or as a return value."><span class="acronym">nullable</span></acronym>]</span></td>
 </tr>
@@ -381,7 +389,7 @@ process-global default <a class="link" href="GIRepository.html" title="GIReposit
 </div>
 <div class="refsect3">
 <a name="g-irepository-get-immediate-dependencies.returns"></a><h4>Returns</h4>
-<p> Zero-terminated string array of immediate versioned
+<p>Zero-terminated string array of immediate versioned
 dependencies. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -403,7 +411,7 @@ g_irepository_get_loaded_namespaces (<em class="parameter"><code><a class="link"
 </colgroup>
 <tbody><tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr></tbody>
@@ -411,7 +419,7 @@ process-global default <a class="link" href="GIRepository.html" title="GIReposit
 </div>
 <div class="refsect3">
 <a name="g-irepository-get-loaded-namespaces.returns"></a><h4>Returns</h4>
-<p> List of namespaces. </p>
+<p>List of namespaces. </p>
 <p><span class="annotation">[<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> utf8][<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
 </div>
@@ -436,7 +444,7 @@ already been loaded before calling this function.</p>
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -477,7 +485,7 @@ entries.</p>
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -496,7 +504,7 @@ process-global default <a class="link" href="GIRepository.html" title="GIReposit
 </div>
 <div class="refsect3">
 <a name="g-irepository-get-info.returns"></a><h4>Returns</h4>
-<p> <span class="type">GIBaseInfo</span> containing metadata. </p>
+<p><span class="type">GIBaseInfo</span> containing metadata. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
 </div>
@@ -508,10 +516,9 @@ g_irepository_get_option_group (<em class="parameter"><code><span class="type">v
 <p>Obtain the option group for girepository, it's used
 by the dumper and for programs that wants to provide
 introspection information</p>
-<p><span class="annotation">[<acronym title="Exposed in C code, not necessarily available in other languages."><span class="acronym">skip</span></acronym>]</span></p>
 <div class="refsect3">
 <a name="g-irepository-get-option-group.returns"></a><h4>Returns</h4>
-<p> the option group. </p>
+<p>the option group. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
 </div>
@@ -536,7 +543,7 @@ available) for <em class="parameter"><code>namespace_</code></em>
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -550,7 +557,7 @@ process-global default <a class="link" href="GIRepository.html" title="GIReposit
 </div>
 <div class="refsect3">
 <a name="g-irepository-enumerate-versions.returns"></a><h4>Returns</h4>
-<p> the array of versions. </p>
+<p>the array of versions. </p>
 <p><span class="annotation">[<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> utf8][<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
 </div>
@@ -581,7 +588,7 @@ See the documentation of your dynamic linker for full details.</p>
 </colgroup>
 <tbody><tr>
 <td class="parameter_name"><p>directory</p></td>
-<td class="parameter_description"><p> a single directory to scan for shared libraries. </p></td>
+<td class="parameter_description"><p>a single directory to scan for shared libraries. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="Override the parsed C type with given type."><span class="acronym">type</span></acronym> filename]</span></td>
 </tr></tbody>
 </table></div>
@@ -594,8 +601,8 @@ See the documentation of your dynamic linker for full details.</p>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_irepository_prepend_search_path (<em class="parameter"><code>const <span class="type">char</span> *directory</code></em>);</pre>
 <p>Prepends <em class="parameter"><code>directory</code></em>
- to the typelib search path.
-See <a class="link" href="GIRepository.html#g-irepository-get-search-path" title="g_irepository_get_search_path ()"><code class="function">g_irepository_get_search_path()</code></a>.</p>
+ to the typelib search path.</p>
+<p>See also: <a class="link" href="GIRepository.html#g-irepository-get-search-path" title="g_irepository_get_search_path ()"><code class="function">g_irepository_get_search_path()</code></a>.</p>
 <div class="refsect3">
 <a name="g-irepository-prepend-search-path.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table class="informaltable" width="100%" border="0">
@@ -606,7 +613,7 @@ See <a class="link" href="GIRepository.html#g-irepository-get-search-path" title
 </colgroup>
 <tbody><tr>
 <td class="parameter_name"><p>directory</p></td>
-<td class="parameter_description"><p> directory name to prepend to the typelib
+<td class="parameter_description"><p>directory name to prepend to the typelib
 search path. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="Override the parsed C type with given type."><span class="acronym">type</span></acronym> filename]</span></td>
 </tr></tbody>
@@ -623,7 +630,7 @@ typelib files. The list is internal to <span class="type">GIRespository</span> a
 be freed, nor should its string elements.</p>
 <div class="refsect3">
 <a name="g-irepository-get-search-path.returns"></a><h4>Returns</h4>
-<p> <span class="type">GSList</span> of strings. </p>
+<p><span class="type">GSList</span> of strings. </p>
 <p><span class="annotation">[<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> filename][<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
 </div>
 </div>
@@ -647,7 +654,7 @@ g_irepository_load_typelib (<em class="parameter"><code><a class="link" href="GI
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -693,7 +700,7 @@ the special string "&lt;builtin&gt;".</p>
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -734,7 +741,7 @@ quickly as this function will if it has already been loaded.</p>
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -745,7 +752,7 @@ process-global default <a class="link" href="GIRepository.html" title="GIReposit
 </tr>
 <tr>
 <td class="parameter_name"><p>version</p></td>
-<td class="parameter_description"><p> Required version, may be <code class="literal">NULL</code> for latest. </p></td>
+<td class="parameter_description"><p>Required version, may be <code class="literal">NULL</code> for latest. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 </tbody>
@@ -785,7 +792,7 @@ not specified, the latest will be used.</p>
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -796,7 +803,7 @@ process-global default <a class="link" href="GIRepository.html" title="GIReposit
 </tr>
 <tr>
 <td class="parameter_name"><p>version</p></td>
-<td class="parameter_description"><p> Version of namespace, may be <code class="literal">NULL</code> for latest. </p></td>
+<td class="parameter_description"><p>Version of namespace, may be <code class="literal">NULL</code> for latest. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 <tr>
@@ -814,7 +821,7 @@ process-global default <a class="link" href="GIRepository.html" title="GIReposit
 </div>
 <div class="refsect3">
 <a name="g-irepository-require.returns"></a><h4>Returns</h4>
-<p> a pointer to the <a class="link" href="gi-gitypelib.html#GITypelib" title="GITypelib"><span class="type">GITypelib</span></a> if successful, <code class="literal">NULL</code> otherwise. </p>
+<p>a pointer to the <a class="link" href="gi-gitypelib.html#GITypelib" title="GITypelib"><span class="type">GITypelib</span></a> if successful, <code class="literal">NULL</code> otherwise. </p>
 <p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
 </div>
 </div>
@@ -848,7 +855,7 @@ not specified, the latest will be used.</p>
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -864,7 +871,7 @@ process-global default <a class="link" href="GIRepository.html" title="GIReposit
 </tr>
 <tr>
 <td class="parameter_name"><p>version</p></td>
-<td class="parameter_description"><p> Version of namespace, may be <code class="literal">NULL</code> for latest. </p></td>
+<td class="parameter_description"><p>Version of namespace, may be <code class="literal">NULL</code> for latest. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 <tr>
@@ -882,7 +889,7 @@ process-global default <a class="link" href="GIRepository.html" title="GIReposit
 </div>
 <div class="refsect3">
 <a name="g-irepository-require-private.returns"></a><h4>Returns</h4>
-<p> a pointer to the <a class="link" href="gi-gitypelib.html#GITypelib" title="GITypelib"><span class="type">GITypelib</span></a> if successful, <code class="literal">NULL</code> otherwise. </p>
+<p>a pointer to the <a class="link" href="gi-gitypelib.html#GITypelib" title="GITypelib"><span class="type">GITypelib</span></a> if successful, <code class="literal">NULL</code> otherwise. </p>
 <p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
 </div>
 </div>
@@ -908,7 +915,7 @@ such as <a class="link" href="GIRepository.html#g-irepository-require" title="g_
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -949,7 +956,7 @@ such as <a class="link" href="GIRepository.html#g-irepository-require" title="g_
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -989,7 +996,7 @@ such as <a class="link" href="GIRepository.html#g-irepository-require" title="g_
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -1029,7 +1036,7 @@ when you know the GType to originate from be from a loaded namespace.</p>
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -1043,7 +1050,7 @@ process-global default <a class="link" href="GIRepository.html" title="GIReposit
 </div>
 <div class="refsect3">
 <a name="g-irepository-find-by-gtype.returns"></a><h4>Returns</h4>
-<p> <span class="type">GIBaseInfo</span> representing metadata about <em class="parameter"><code>type</code></em>
+<p><span class="type">GIBaseInfo</span> representing metadata about <em class="parameter"><code>type</code></em>
 , or <code class="literal">NULL</code>. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -1069,7 +1076,7 @@ otherwise ensure the namespace has already been loaded.</p>
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -1083,7 +1090,7 @@ process-global default <a class="link" href="GIRepository.html" title="GIReposit
 </div>
 <div class="refsect3">
 <a name="g-irepository-find-by-error-domain.returns"></a><h4>Returns</h4>
-<p> <a class="link" href="gi-GIEnumInfo.html#GIEnumInfo" title="GIEnumInfo"><span class="type">GIEnumInfo</span></a> representing metadata about <em class="parameter"><code>domain</code></em>
+<p><a class="link" href="gi-GIEnumInfo.html#GIEnumInfo" title="GIEnumInfo"><span class="type">GIEnumInfo</span></a> representing metadata about <em class="parameter"><code>domain</code></em>
 's
 enum type, or <code class="literal">NULL</code>. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
@@ -1112,7 +1119,7 @@ ensure the namespace has already been loaded.</p>
 <tbody>
 <tr>
 <td class="parameter_name"><p>repository</p></td>
-<td class="parameter_description"><p> A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
+<td class="parameter_description"><p>A <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a> or <code class="literal">NULL</code> for the singleton
 process-global default <a class="link" href="GIRepository.html" title="GIRepository"><span class="type">GIRepository</span></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
@@ -1131,7 +1138,7 @@ process-global default <a class="link" href="GIRepository.html" title="GIReposit
 </div>
 <div class="refsect3">
 <a name="g-irepository-find-by-name.returns"></a><h4>Returns</h4>
-<p> <span class="type">GIBaseInfo</span> representing metadata about <em class="parameter"><code>name</code></em>
+<p><span class="type">GIBaseInfo</span> representing metadata about <em class="parameter"><code>name</code></em>
 , or <code class="literal">NULL</code>. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -1188,6 +1195,7 @@ gi_cclosure_marshal_generic (<em class="parameter"><code><span class="type">GClo
                              <em class="parameter"><code><span class="type">gpointer</span> invocation_hint</code></em>,
                              <em class="parameter"><code><span class="type">gpointer</span> marshal_data</code></em>);</pre>
 <p>TODO</p>
+<p><span class="annotation">[<acronym title="Exposed in C code, not necessarily available in other languages."><span class="acronym">skip</span></acronym>]</span></p>
 <div class="refsect3">
 <a name="gi-cclosure-marshal-generic.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table class="informaltable" width="100%" border="0">
@@ -1323,6 +1331,6 @@ from a <a class="link" href="GIRepository.html" title="GIRepository"><span class
 </div>
 </div>
 <div class="footer">
-<hr>Generated by GTK-Doc V1.25.1</div>
+<hr>Generated by GTK-Doc V1.28.1</div>
 </body>
 </html>

@@ -48,7 +48,6 @@ extern void ctype_free (GISourceType * type);
 
 static int last_enum_value = -1;
 static gboolean is_bitfield;
-static GHashTable *const_table = NULL;
 
 /**
  * parse_c_string_literal:
@@ -206,6 +205,29 @@ toggle_conditional (GISourceScanner *scanner)
     }
 }
 
+static void
+set_or_merge_base_type (GISourceType *type,
+                        GISourceType *base)
+{
+  if (base->type == CTYPE_INVALID)
+    {
+      g_assert (base->base_type == NULL);
+
+      type->storage_class_specifier |= base->storage_class_specifier;
+      type->type_qualifier |= base->type_qualifier;
+      type->function_specifier |= base->function_specifier;
+      type->is_bitfield |= base->is_bitfield;
+
+      ctype_free (base);
+    }
+  else
+    {
+      g_assert (type->base_type == NULL);
+
+      type->base_type = base;
+    }
+}
+
 %}
 
 %error-verbose
@@ -234,8 +256,8 @@ toggle_conditional (GISourceScanner *scanner)
 
 %token AUTO BOOL BREAK CASE CHAR CONST CONTINUE DEFAULT DO DOUBLE ELSE ENUM
 %token EXTENSION EXTERN FLOAT FOR GOTO IF INLINE INT LONG REGISTER RESTRICT
-%token RETURN SHORT SIGNED SIZEOF STATIC STRUCT SWITCH TYPEDEF UNION UNSIGNED
-%token VOID VOLATILE WHILE
+%token RETURN SHORT SIGNED SIZEOF STATIC STRUCT SWITCH THREAD_LOCAL TYPEDEF
+%token UNION UNSIGNED VOID VOLATILE WHILE
 
 %token FUNCTION_MACRO OBJECT_MACRO
 %token IFDEF_GI_SCANNER IFNDEF_GI_SCANNER
@@ -303,7 +325,7 @@ toggle_conditional (GISourceScanner *scanner)
 primary_expression
 	: identifier
 	  {
-		$$ = g_hash_table_lookup (const_table, $1);
+		$$ = g_hash_table_lookup (scanner->const_table, $1);
 		if ($$ == NULL) {
 			$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		} else {
@@ -786,7 +808,7 @@ declaration_specifiers
 			$$->name = name;
 			ctype_free ($2);
 		} else {
-			$$->base_type = $2;
+			set_or_merge_base_type ($1, $2);
 		}
 	  }
 	| type_specifier
@@ -848,6 +870,10 @@ storage_class_specifier
 	| REGISTER
 	  {
 		$$ = STORAGE_CLASS_REGISTER;
+	  }
+	| THREAD_LOCAL
+	  {
+		$$ = STORAGE_CLASS_THREAD_LOCAL;
 	  }
 	;
 
@@ -979,7 +1005,7 @@ specifier_qualifier_list
 	: type_specifier specifier_qualifier_list
 	  {
 		$$ = $1;
-		$$->base_type = $2;
+		set_or_merge_base_type ($1, $2);
 	  }
 	| type_specifier
 	| type_qualifier specifier_qualifier_list
@@ -1093,7 +1119,7 @@ enumerator
 		$$->ident = $1;
 		$$->const_int_set = TRUE;
 		$$->const_int = ++last_enum_value;
-		g_hash_table_insert (const_table, g_strdup ($$->ident), gi_source_symbol_ref ($$));
+		g_hash_table_insert (scanner->const_table, g_strdup ($$->ident), gi_source_symbol_ref ($$));
 	  }
 	| identifier '=' constant_expression
 	  {
@@ -1102,7 +1128,7 @@ enumerator
 		$$->const_int_set = TRUE;
 		$$->const_int = $3->const_int;
 		last_enum_value = $$->const_int;
-		g_hash_table_insert (const_table, g_strdup ($$->ident), gi_source_symbol_ref ($$));
+		g_hash_table_insert (scanner->const_table, g_strdup ($$->ident), gi_source_symbol_ref ($$));
 	  }
 	;
 
@@ -1482,8 +1508,14 @@ object_macro_define
 	: object_macro constant_expression
 	  {
 		if ($2->const_int_set || $2->const_boolean_set || $2->const_double_set || $2->const_string != NULL) {
-			$2->ident = $1;
-			gi_source_scanner_add_symbol (scanner, $2);
+			GISourceSymbol *macro = gi_source_symbol_copy ($2);
+			g_free (macro->ident);
+			macro->ident = $1;
+			gi_source_scanner_add_symbol (scanner, macro);
+			gi_source_symbol_unref (macro);
+			gi_source_symbol_unref ($2);
+		} else {
+			g_free ($1);
 			gi_source_symbol_unref ($2);
 		}
 	  }
@@ -1617,7 +1649,6 @@ gi_source_scanner_parse_macros (GISourceScanner *scanner, GList *filenames)
     fdopen (g_file_open_tmp ("gen-introspect-XXXXXX.h", &tmp_name, &error),
             "w+");
   GList *l;
-  g_unlink (tmp_name);
 
   for (l = filenames; l != NULL; l = l->next)
     {
@@ -1756,6 +1787,8 @@ gi_source_scanner_parse_macros (GISourceScanner *scanner, GList *filenames)
 
   rewind (fmacros);
   gi_source_scanner_parse_file (scanner, fmacros);
+  fclose (fmacros);
+  g_unlink (tmp_name);
 }
 
 gboolean
@@ -1763,16 +1796,9 @@ gi_source_scanner_parse_file (GISourceScanner *scanner, FILE *file)
 {
   g_return_val_if_fail (file != NULL, FALSE);
 
-  const_table = g_hash_table_new_full (g_str_hash, g_str_equal,
-				       g_free, (GDestroyNotify)gi_source_symbol_unref);
-
   lineno = 1;
   yyin = file;
   yyparse (scanner);
-
-  g_hash_table_destroy (const_table);
-  const_table = NULL;
-
   yyin = NULL;
 
   return TRUE;

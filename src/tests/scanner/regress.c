@@ -1549,6 +1549,7 @@ regress_test_enum_get_type (void)
             { REGRESS_TEST_VALUE2, "REGRESS_TEST_VALUE2", "value2" },
             { REGRESS_TEST_VALUE3, "REGRESS_TEST_VALUE3", "value3" },
             { REGRESS_TEST_VALUE4, "REGRESS_TEST_VALUE4", "value4" },
+            { REGRESS_TEST_VALUE5, "REGRESS_TEST_VALUE5", "value5" },
             { 0, NULL, NULL }
         };
         etype = g_enum_register_static (g_intern_static_string ("RegressTestEnum"), values);
@@ -2097,7 +2098,8 @@ enum
   PROP_TEST_OBJ_FLOAT,
   PROP_TEST_OBJ_DOUBLE,
   PROP_TEST_OBJ_STRING,
-  PROP_TEST_OBJ_GTYPE
+  PROP_TEST_OBJ_GTYPE,
+  PROP_TEST_OBJ_NAME_CONFLICT
 };
 
 static void
@@ -2161,6 +2163,10 @@ regress_test_obj_set_property (GObject      *object,
       self->gtype = g_value_get_gtype (value);
       break;
 
+    case PROP_TEST_OBJ_NAME_CONFLICT:
+      self->name_conflict = g_value_get_int (value);
+      break;
+
     default:
       /* We don't have any other property... */
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -2216,6 +2222,10 @@ regress_test_obj_get_property (GObject    *object,
 
     case PROP_TEST_OBJ_GTYPE:
       g_value_set_gtype (value, self->gtype);
+      break;
+
+    case PROP_TEST_OBJ_NAME_CONFLICT:
+      g_value_set_int (value, self->name_conflict);
       break;
 
     default:
@@ -2664,6 +2674,20 @@ regress_test_obj_class_init (RegressTestObjClass *klass)
                                    PROP_TEST_OBJ_GTYPE,
                                    pspec);
 
+  /**
+   * TestObj:name-conflict:
+   */
+  pspec = g_param_spec_int ("name-conflict",
+                            "name-conflict property",
+                            "A property name that conflicts with a method",
+                            G_MININT,
+                            G_MAXINT,
+                            42,
+                            G_PARAM_CONSTRUCT | G_PARAM_READWRITE);
+  g_object_class_install_property (gobject_class,
+                                   PROP_TEST_OBJ_NAME_CONFLICT,
+                                   pspec);
+
   klass->matrix = regress_test_obj_default_matrix;
 }
 
@@ -3095,6 +3119,15 @@ regress_test_obj_not_nullable_element_typed_gpointer_in (RegressTestObj *obj,
 }
 
 /**
+ * regress_test_obj_name_conflict:
+ * @obj: A #RegressTestObj
+ */
+void
+regress_test_obj_name_conflict (RegressTestObj *obj)
+{
+}
+
+/**
  * regress_test_array_fixed_out_objects:
  * @objs: (out) (array fixed-size=2) (transfer full): An array of #RegressTestObj
  */
@@ -3441,6 +3474,43 @@ regress_test_fundamental_sub_object_new (const char * data)
   object->data = g_strdup(data);
   return object;
 }
+
+/**/
+
+#define regress_test_fundamental_hidden_sub_object_get_type \
+  _regress_test_fundamental_hidden_sub_object_get_type
+
+typedef struct _RegressTestFundamentalHiddenSubObject RegressTestFundamentalHiddenSubObject;
+typedef struct _GObjectClass                   RegressTestFundamentalHiddenSubObjectClass;
+struct _RegressTestFundamentalHiddenSubObject {
+  RegressTestFundamentalObject parent_instance;
+};
+
+G_DEFINE_TYPE (RegressTestFundamentalHiddenSubObject,
+               regress_test_fundamental_hidden_sub_object,
+               REGRESS_TEST_TYPE_FUNDAMENTAL_OBJECT);
+
+static void
+regress_test_fundamental_hidden_sub_object_init (RegressTestFundamentalHiddenSubObject *object)
+{
+}
+
+static void
+regress_test_fundamental_hidden_sub_object_class_init (RegressTestFundamentalHiddenSubObjectClass *klass)
+{
+}
+
+/**
+ * regress_test_create_fundamental_hidden_class_instance:
+ *
+ * Return value: (transfer full):
+ */
+RegressTestFundamentalObject *
+regress_test_create_fundamental_hidden_class_instance (void)
+{
+  return (RegressTestFundamentalObject *) g_type_create_instance (_regress_test_fundamental_hidden_sub_object_get_type());
+}
+
 
 
 /**
@@ -4085,6 +4155,23 @@ regress_test_strv_in_gvalue (void)
 }
 
 /**
+ * regress_test_null_strv_in_gvalue:
+ *
+ * Returns: (transfer full):
+ */
+GValue *
+regress_test_null_strv_in_gvalue (void)
+{
+  GValue *value = g_new0 (GValue, 1);
+  const char **strv = NULL;
+
+  g_value_init (value, G_TYPE_STRV);
+  g_value_set_boxed (value, strv);
+
+  return value;
+}
+
+/**
  * regress_test_multiline_doc_comments:
  *
  * This is a function.
@@ -4207,7 +4294,7 @@ regress_test_versioning (void)
 
 void
 regress_like_xkl_config_item_set_name (RegressLikeXklConfigItem *self,
-                                       const char *name)
+                                       char const *name)
 {
   strncpy (self->name, name, sizeof (self->name) - 1);
   self->name[sizeof(self->name)-1] = '\0';
