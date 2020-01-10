@@ -1,4 +1,4 @@
-prefix=/usr/local
+prefix=/home/mclasen/gnome
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 bindir=${exec_prefix}/bin
@@ -20,4 +20,4 @@ Libs.private:
 
 Name: gobject-introspection
 Description: GObject Introspection
-Version: 1.36.0
+Version: 1.42.0

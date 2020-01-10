@@ -6,7 +6,6 @@
       xmlns:api="http://projectmallard.org/experimental/api/"
       xmlns:ui="http://projectmallard.org/1.0/ui/">
   <info>
-    
     <link xref="Regress.TestBoxedC" group="constructor" type="guide"/>
     <api:function>
       <api:returns>
@@ -14,22 +13,15 @@
       </api:returns>
       <api:name>regress_test_boxed_c_new</api:name>
     </api:function>
-
   </info>
   <title>Regress.TestBoxedC.new</title>
-  
-<synopsis><code mime="text/x-gjs">
-function new():Regress.TestBoxedC {
+  <synopsis><code mime="text/x-gjs">
+function new(): <link xref="Regress.TestBoxedC">Regress.TestBoxedC</link> {
     // Gjs wrapper for regress_test_boxed_c_new()
 }
-</code></synopsis>
+  </code></synopsis>
 
-  
-    
-  
-  
-  
-  
+
 <terms>
 <item>
 <title><code>Returns</code></title>
@@ -37,6 +29,4 @@ function new():Regress.TestBoxedC {
 </item>
 </terms>
 
-  
-  
 </page>

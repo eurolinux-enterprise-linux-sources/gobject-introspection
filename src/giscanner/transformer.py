@@ -20,6 +20,7 @@
 
 import os
 import sys
+import subprocess
 
 from . import ast
 from . import message
@@ -33,6 +34,7 @@ from .sourcescanner import (
     CSYMBOL_TYPE_ENUM, CSYMBOL_TYPE_UNION, CSYMBOL_TYPE_OBJECT,
     CSYMBOL_TYPE_MEMBER, CSYMBOL_TYPE_ELLIPSIS, CSYMBOL_TYPE_CONST,
     TYPE_QUALIFIER_CONST, TYPE_QUALIFIER_VOLATILE)
+
 
 class TransformerException(Exception):
     pass
@@ -48,16 +50,21 @@ if os.name != 'nt':
 class Transformer(object):
     namespace = property(lambda self: self._namespace)
 
-    def __init__(self, namespace, accept_unprefixed=False):
+    def __init__(self, namespace, accept_unprefixed=False, identifier_filter_cmd=''):
         self._cachestore = CacheStore()
         self._accept_unprefixed = accept_unprefixed
         self._namespace = namespace
         self._pkg_config_packages = set()
         self._typedefs_ns = {}
-        self._parsed_includes = {} # <string namespace -> Namespace>
+        self._parsed_includes = {}  # <string namespace -> Namespace>
         self._includepaths = []
         self._passthrough_mode = False
-        self._annotations = {}
+        self._identifier_filter_cmd = identifier_filter_cmd
+
+        # Cache a list of struct/unions in C's "tag namespace". This helps
+        # manage various orderings of typedefs and structs. See:
+        # https://bugzilla.gnome.org/show_bug.cgi?id=581525
+        self._tag_ns = {}
 
     def get_pkgconfig_packages(self):
         return self._pkg_config_packages
@@ -68,9 +75,6 @@ class Transformer(object):
     def set_passthrough_mode(self):
         self._passthrough_mode = True
 
-    def set_annotations(self, annotations):
-        self._annotations = annotations
-
     def _append_new_node(self, node):
         original = self._namespace.get(node.name)
         # Special case constants here; we allow duplication to sort-of
@@ -78,6 +82,12 @@ class Transformer(object):
         # file.  So far this has only come up scanning glib - in theory, other
         # modules will just depend on that.
         if isinstance(original, ast.Constant) and isinstance(node, ast.Constant):
+            pass
+        elif original is node:
+            # Ignore attempts to add the same node to the namespace. This can
+            # happen when parsing typedefs and structs in particular orderings:
+            #   typedef struct _Foo Foo;
+            #   struct _Foo {...};
             pass
         elif original:
             positions = set()
@@ -94,28 +104,30 @@ class Transformer(object):
             # https://bugzilla.gnome.org/show_bug.cgi?id=550616
             if symbol.ident in ['gst_g_error_get_type']:
                 continue
-            node = self._traverse_one(symbol)
-            if node:
-                self._append_new_node(node)
 
-        # Now look through the namespace for things like
-        # typedef struct _Foo Foo;
-        # where we've never seen the struct _Foo.  Just create
-        # an empty structure for these as "disguised"
-        # If we do have a class/interface, merge fields
-        for typedef, compound in self._typedefs_ns.iteritems():
-            ns_compound = self._namespace.get(compound.name)
-            if not ns_compound:
-                ns_compound = self._namespace.get('_' + compound.name)
-            if (not ns_compound and isinstance(compound, (ast.Record, ast.Union))
-                and len(compound.fields) == 0):
-                disguised = ast.Record(compound.name, typedef, disguised=True)
-                self._namespace.append(disguised)
-            elif not ns_compound:
-                self._namespace.append(compound)
-            elif isinstance(ns_compound, (ast.Record, ast.Union)) and len(ns_compound.fields) == 0:
-                ns_compound.fields = compound.fields
-        self._typedefs_ns = None
+            try:
+                node = self._traverse_one(symbol)
+            except TransformerException as e:
+                message.warn_symbol(symbol, e)
+                continue
+
+            if node and node.name:
+                self._append_new_node(node)
+            if isinstance(node, ast.Compound) and node.tag_name and \
+                    node.tag_name not in self._tag_ns:
+                self._tag_ns[node.tag_name] = node
+
+        # Run through the tag namespace looking for structs that have not been
+        # promoted into the main namespace. In this case we simply promote them
+        # with their struct tag.
+        for tag_name, struct in self._tag_ns.iteritems():
+            if not struct.name:
+                try:
+                    name = self.strip_identifier(tag_name)
+                    struct.name = name
+                    self._append_new_node(struct)
+                except TransformerException as e:
+                    message.warn_node(node, e)
 
     def set_include_paths(self, paths):
         self._includepaths = list(paths)
@@ -130,8 +142,8 @@ class Transformer(object):
     def register_include_uninstalled(self, include_path):
         basename = os.path.basename(include_path)
         if not basename.endswith('.gir'):
-            raise SystemExit(
-"Include path %r must be a filename path ending in .gir" % (include_path, ))
+            raise SystemExit("Include path %r must be a filename path "
+                             "ending in .gir" % (include_path, ))
         girname = basename[:-4]
         include = ast.Include.from_string(girname)
         if include in self._namespace.includes:
@@ -179,8 +191,7 @@ None."""
             path = os.path.join(d, girname)
             if os.path.exists(path):
                 return path
-        sys.stderr.write("Couldn't find include %r (search path: %r)\n"\
-                         % (girname, searchdirs))
+        sys.stderr.write("Couldn't find include %r (search path: %r)\n" % (girname, searchdirs))
         sys.exit(1)
 
     @classmethod
@@ -232,7 +243,7 @@ currently-scanned namespace is first."""
 
     def _split_c_string_for_namespace_matches(self, name, is_identifier=False):
         matches = []  # Namespaces which might contain this name
-        unprefixed_namespaces = [] # Namespaces with no prefix, last resort
+        unprefixed_namespaces = []  # Namespaces with no prefix, last resort
         for ns in self._iter_namespaces():
             if is_identifier:
                 prefixes = ns.identifier_prefixes
@@ -284,12 +295,23 @@ raise ValueError."""
         return matches[-1]
 
     def strip_identifier(self, ident):
+        if self._identifier_filter_cmd:
+            proc = subprocess.Popen(self._identifier_filter_cmd,
+                                    stdin=subprocess.PIPE,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE,
+                                    shell=True)
+            ident, err = proc.communicate(ident)
+            if proc.returncode:
+                raise ValueError('filter: "%s" exited: %d with error: %s' %
+                                 (self._identifier_filter_cmd, proc.returncode, err))
+
         hidden = ident.startswith('_')
         if hidden:
             ident = ident[1:]
         try:
             matches = self.split_ctype_namespaces(ident)
-        except ValueError, e:
+        except ValueError as e:
             raise TransformerException(str(e))
         for ns, name in matches:
             if ns is self._namespace:
@@ -298,8 +320,7 @@ raise ValueError."""
                 return name
         (ns, name) = matches[-1]
         raise TransformerException(
-            "Skipping foreign identifier %r from namespace %s" % (
-            ident, ns.name, ))
+            "Skipping foreign identifier %r from namespace %s" % (ident, ns.name, ))
         return None
 
     def _strip_symbol(self, symbol):
@@ -309,7 +330,7 @@ raise ValueError."""
             ident = ident[1:]
         try:
             (ns, name) = self.split_csymbol(ident)
-        except ValueError, e:
+        except ValueError as e:
             raise TransformerException(str(e))
         if ns != self._namespace:
             raise TransformerException(
@@ -328,13 +349,13 @@ raise ValueError."""
         elif stype == CSYMBOL_TYPE_TYPEDEF:
             return self._create_typedef(symbol)
         elif stype == CSYMBOL_TYPE_STRUCT:
-            return self._create_struct(symbol)
+            return self._create_tag_ns_compound(ast.Record, symbol)
         elif stype == CSYMBOL_TYPE_ENUM:
             return self._create_enum(symbol)
         elif stype == CSYMBOL_TYPE_MEMBER:
             return self._create_member(symbol, parent_symbol)
         elif stype == CSYMBOL_TYPE_UNION:
-            return self._create_union(symbol)
+            return self._create_tag_ns_compound(ast.Union, symbol)
         elif stype == CSYMBOL_TYPE_CONST:
             return self._create_const(symbol)
         # Ignore variable declarations in the header
@@ -381,21 +402,13 @@ raise ValueError."""
                 # Ok, the enum members don't have a consistent prefix
                 # among them, so let's just remove the global namespace
                 # prefix.
-                try:
-                    name = self._strip_symbol(child)
-                except TransformerException, e:
-                    message.warn_symbol(symbol, e)
-                    return None
+                name = self._strip_symbol(child)
             members.append(ast.Member(name.lower(),
                                       child.const_int,
                                       child.ident,
                                       None))
 
-        try:
-            enum_name = self.strip_identifier(symbol.ident)
-        except TransformerException, e:
-            message.warn_symbol(symbol, e)
-            return None
+        enum_name = self.strip_identifier(symbol.ident)
         if symbol.base_type.is_bitfield:
             klass = ast.Bitfield
         else:
@@ -410,11 +423,7 @@ raise ValueError."""
             return None
         parameters = list(self._create_parameters(symbol, symbol.base_type))
         return_ = self._create_return(symbol.base_type.base_type)
-        try:
-            name = self._strip_symbol(symbol)
-        except TransformerException, e:
-            message.warn_symbol(symbol, e)
-            return None
+        name = self._strip_symbol(symbol)
         func = ast.Function(name, return_, parameters, False, symbol.ident)
         func.add_symbol_reference(symbol)
         return func
@@ -506,13 +515,13 @@ raise ValueError."""
 
     def _create_member(self, symbol, parent_symbol=None):
         source_type = symbol.base_type
-        if (source_type.type == CTYPE_POINTER and
-            symbol.base_type.base_type.type == CTYPE_FUNCTION):
+        if (source_type.type == CTYPE_POINTER
+        and symbol.base_type.base_type.type == CTYPE_FUNCTION):
             node = self._create_callback(symbol, member=True)
         elif source_type.type == CTYPE_STRUCT and source_type.name is None:
-            node = self._create_struct(symbol, anonymous=True)
+            node = self._create_member_compound(ast.Record, symbol)
         elif source_type.type == CTYPE_UNION and source_type.name is None:
-            node = self._create_union(symbol, anonymous=True)
+            node = self._create_member_compound(ast.Union, symbol)
         else:
             # Special handling for fields; we don't have annotations on them
             # to apply later, yet.
@@ -523,8 +532,8 @@ raise ValueError."""
                 # to be able to properly calculate the size of the compound
                 # type (e.g. GValue) that contains this array, see
                 # <https://bugzilla.gnome.org/show_bug.cgi?id=657040>.
-                if (source_type.base_type.type == CTYPE_UNION and
-                    source_type.base_type.name is None):
+                if (source_type.base_type.type == CTYPE_UNION
+                and source_type.base_type.name is None):
                     synthesized_type = self._synthesize_union_type(symbol, parent_symbol)
                     ftype = ast.Array(None, synthesized_type, complete_ctype=complete_ctype)
                 else:
@@ -562,27 +571,21 @@ raise ValueError."""
 
     def _create_typedef(self, symbol):
         ctype = symbol.base_type.type
-        if (ctype == CTYPE_POINTER and
-            symbol.base_type.base_type.type == CTYPE_FUNCTION):
+        if (ctype == CTYPE_POINTER and symbol.base_type.base_type.type == CTYPE_FUNCTION):
             node = self._create_typedef_callback(symbol)
-        elif (ctype == CTYPE_POINTER and
-            symbol.base_type.base_type.type == CTYPE_STRUCT):
-            node = self._create_typedef_struct(symbol, disguised=True)
+        elif (ctype == CTYPE_POINTER and symbol.base_type.base_type.type == CTYPE_STRUCT):
+            node = self._create_typedef_compound(ast.Record, symbol, disguised=True)
         elif ctype == CTYPE_STRUCT:
-            node = self._create_typedef_struct(symbol)
+            node = self._create_typedef_compound(ast.Record, symbol)
         elif ctype == CTYPE_UNION:
-            node = self._create_typedef_union(symbol)
+            node = self._create_typedef_compound(ast.Union, symbol)
         elif ctype == CTYPE_ENUM:
             return self._create_enum(symbol)
         elif ctype in (CTYPE_TYPEDEF,
                        CTYPE_POINTER,
                        CTYPE_BASIC_TYPE,
                        CTYPE_VOID):
-            try:
-                name = self.strip_identifier(symbol.ident)
-            except TransformerException, e:
-                message.warn(e)
-                return None
+            name = self.strip_identifier(symbol.ident)
             if symbol.base_type.name:
                 complete_ctype = self._create_complete_source_type(symbol.base_type)
                 target = self.create_type_from_ctype_string(symbol.base_type.name,
@@ -621,21 +624,6 @@ raise ValueError."""
         canonical = canonical_base + '*'
 
         return canonical
-
-    def parse_ctype(self, ctype, is_member=False):
-        canonical = self._canonicalize_ctype(ctype)
-
-        # Remove all pointers - we require standard calling
-        # conventions.  For example, an 'int' is always passed by
-        # value (unless it's out or inout).
-        derefed_typename = canonical.replace('*', '')
-
-        # Preserve "pointerness" of struct/union members
-        if (is_member and canonical.endswith('*') and
-            derefed_typename in ast.basic_type_names):
-            return 'gpointer'
-        else:
-            return derefed_typename
 
     def _create_type_from_base(self, source_type, is_parameter=False, is_return=False):
         ctype = self._create_source_type(source_type)
@@ -695,18 +683,18 @@ raise ValueError."""
 
     def _create_parameter(self, parent_symbol, index, symbol):
         if symbol.type == CSYMBOL_TYPE_ELLIPSIS:
-            ptype = ast.Varargs()
+            return ast.Parameter('...', ast.Varargs())
         else:
             ptype = self._create_type_from_base(symbol.base_type, is_parameter=True)
 
-        if symbol.ident is None:
-            if symbol.base_type and symbol.base_type.type != CTYPE_VOID:
-                message.warn_symbol(parent_symbol, "missing parameter name; undocumentable")
-            ident = 'arg%d' % (index, )
-        else:
-            ident = symbol.ident
+            if symbol.ident is None:
+                if symbol.base_type and symbol.base_type.type != CTYPE_VOID:
+                    message.warn_symbol(parent_symbol, "missing parameter name; undocumentable")
+                ident = 'arg%d' % (index, )
+            else:
+                ident = symbol.ident
 
-        return ast.Parameter(ident, ptype)
+            return ast.Parameter(ident, ptype)
 
     def _create_return(self, source_type):
         typeval = self._create_type_from_base(source_type, is_return=True)
@@ -718,14 +706,9 @@ raise ValueError."""
 
         # Don't create constants for non-public things
         # http://bugzilla.gnome.org/show_bug.cgi?id=572790
-        if (symbol.source_filename is None or
-            not symbol.source_filename.endswith('.h')):
+        if (symbol.source_filename is None or not symbol.source_filename.endswith('.h')):
             return None
-        try:
-            name = self._strip_symbol(symbol)
-        except TransformerException, e:
-            message.warn_symbol(symbol, e)
-            return None
+        name = self._strip_symbol(symbol)
         if symbol.const_string is not None:
             typeval = ast.TYPE_STRING
             value = unicode(symbol.const_string, 'utf-8')
@@ -742,15 +725,18 @@ raise ValueError."""
                 if isinstance(target, ast.Type):
                     unaliased = target
             if unaliased == ast.TYPE_UINT64:
-                value = str(symbol.const_int % 2**64)
+                value = str(symbol.const_int % 2 ** 64)
             elif unaliased == ast.TYPE_UINT32:
-                value = str(symbol.const_int % 2**32)
+                value = str(symbol.const_int % 2 ** 32)
             elif unaliased == ast.TYPE_UINT16:
-                value = str(symbol.const_int % 2**16)
+                value = str(symbol.const_int % 2 ** 16)
             elif unaliased == ast.TYPE_UINT8:
-                value = str(symbol.const_int % 2**16)
+                value = str(symbol.const_int % 2 ** 16)
             else:
                 value = str(symbol.const_int)
+        elif symbol.const_boolean is not None:
+            typeval = ast.TYPE_BOOLEAN
+            value = "true" if symbol.const_boolean else "false"
         elif symbol.const_double is not None:
             typeval = ast.TYPE_DOUBLE
             value = '%f' % (symbol.const_double, )
@@ -762,35 +748,88 @@ raise ValueError."""
         const.add_symbol_reference(symbol)
         return const
 
-    def _create_typedef_struct(self, symbol, disguised=False):
-        try:
-            name = self.strip_identifier(symbol.ident)
-        except TransformerException, e:
-            message.warn_symbol(symbol, e)
-            return None
-        struct = ast.Record(name, symbol.ident, disguised=disguised)
-        self._parse_fields(symbol, struct)
-        struct.add_symbol_reference(symbol)
-        self._typedefs_ns[symbol.ident] = struct
-        return None
+    def _create_typedef_compound(self, compound_class, symbol, disguised=False):
+        name = self.strip_identifier(symbol.ident)
+        assert symbol.base_type
+        if symbol.base_type.name:
+            tag_name = symbol.base_type.name
+        else:
+            tag_name = None
 
-    def _create_typedef_union(self, symbol):
-        try:
-            name = self.strip_identifier(symbol.ident)
-        except TransformerException, e:
-            message.warn(e)
-            return None
-        union = ast.Union(name, symbol.ident)
-        self._parse_fields(symbol, union)
-        union.add_symbol_reference(symbol)
-        self._typedefs_ns[symbol.ident] = union
-        return None
+        # If the struct already exists in the tag namespace, use it.
+        if tag_name in self._tag_ns:
+            compound = self._tag_ns[tag_name]
+            if compound.name:
+                # If the struct name is set it means the struct has already been
+                # promoted from the tag namespace to the main namespace by a
+                # prior typedef struct. If we get here it means this is another
+                # typedef of that struct. Instead of creating an alias to the
+                # primary typedef that has been promoted, we create a new Record
+                # with shared fields. This handles the case where we want to
+                # give structs like GInitiallyUnowned its own Record:
+                #    typedef struct _GObject GObject;
+                #    typedef struct _GObject GInitiallyUnowned;
+                # See: http://bugzilla.gnome.org/show_bug.cgi?id=569408
+                new_compound = compound_class(name, symbol.ident, tag_name=tag_name)
+                new_compound.fields = compound.fields
+                new_compound.add_symbol_reference(symbol)
+                return new_compound
+            else:
+                # If the struct does not have its name set, it exists only in
+                # the tag namespace. Set it here and return it which will
+                # promote it to the main namespace. Essentially the first
+                # typedef for a struct clobbers its name and ctype which is what
+                # will be visible to GI.
+                compound.name = name
+                compound.ctype = symbol.ident
+        else:
+            # Create a new struct with a typedef name and tag name when available.
+            # Structs with a typedef name are promoted into the main namespace
+            # by it being returned to the "parse" function and are also added to
+            # the tag namespace if it has a tag_name set.
+            compound = compound_class(name, symbol.ident, disguised=disguised, tag_name=tag_name)
+            if tag_name:
+                # Force the struct as disguised for now since we do not yet know
+                # if it has fields that will be parsed. Note that this is using
+                # an erroneous definition of disguised and we should eventually
+                # only look at the field count when needed.
+                compound.disguised = True
+            else:
+                # Case where we have an anonymous struct which is typedef'd:
+                #   typedef struct {...} Struct;
+                # we need to parse the fields because we never get a struct
+                # in the tag namespace which is normally where fields are parsed.
+                self._parse_fields(symbol, compound)
+
+        compound.add_symbol_reference(symbol)
+        return compound
+
+    def _create_tag_ns_compound(self, compound_class, symbol):
+        # Get or create a struct from C's tag namespace
+        if symbol.ident in self._tag_ns:
+            compound = self._tag_ns[symbol.ident]
+        else:
+            compound = compound_class(None, symbol.ident, tag_name=symbol.ident)
+
+        # Make sure disguised is False as we are now about to parse the
+        # fields of the real struct.
+        compound.disguised = False
+        # Fields may need to be parsed in either of the above cases because the
+        # Record can be created with a typedef prior to the struct definition.
+        self._parse_fields(symbol, compound)
+        compound.add_symbol_reference(symbol)
+        return compound
+
+    def _create_member_compound(self, compound_class, symbol):
+        compound = compound_class(symbol.ident, symbol.ident)
+        self._parse_fields(symbol, compound)
+        compound.add_symbol_reference(symbol)
+        return compound
 
     def _create_typedef_callback(self, symbol):
         callback = self._create_callback(symbol)
         if not callback:
             return None
-        self._typedefs_ns[callback.name] = callback
         return callback
 
     def _parse_fields(self, symbol, compound):
@@ -805,65 +844,21 @@ raise ValueError."""
                               anonymous_node=child_node)
             compound.fields.append(field)
 
-    def _create_compound(self, klass, symbol, anonymous):
-        if symbol.ident is None:
-            # the compound is an anonymous member of another union or a struct
-            assert anonymous
-            compound = klass(None, None)
-        else:
-            compound = self._typedefs_ns.get(symbol.ident, None)
-
-        if compound is None:
-            # This is a bit of a hack; really we should try
-            # to resolve through the typedefs to find the real
-            # name
-            if symbol.ident.startswith('_'):
-                compound = self._typedefs_ns.get(symbol.ident[1:], None)
-            if compound is None:
-                if anonymous:
-                    name = symbol.ident
-                else:
-                    try:
-                        name = self.strip_identifier(symbol.ident)
-                    except TransformerException, e:
-                        message.warn(e)
-                        return None
-                compound = klass(name, symbol.ident)
-
-        self._parse_fields(symbol, compound)
-        compound.add_symbol_reference(symbol)
-        return compound
-
-    def _create_struct(self, symbol, anonymous=False):
-        return self._create_compound(ast.Record, symbol, anonymous)
-
-    def _create_union(self, symbol, anonymous=False):
-        return self._create_compound(ast.Union, symbol, anonymous)
-
     def _create_callback(self, symbol, member=False):
         parameters = list(self._create_parameters(symbol, symbol.base_type.base_type))
         retval = self._create_return(symbol.base_type.base_type.base_type)
 
         # Mark the 'user_data' arguments
         for i, param in enumerate(parameters):
-            if (param.type.target_fundamental == 'gpointer' and
-                param.argname == 'user_data'):
+            if (param.type.target_fundamental == 'gpointer' and param.argname == 'user_data'):
                 param.closure_name = param.argname
 
         if member:
             name = symbol.ident
         elif symbol.ident.find('_') > 0:
-            try:
-                name = self._strip_symbol(symbol)
-            except TransformerException, e:
-                message.warn_symbol(symbol, e)
-                return None
+            name = self._strip_symbol(symbol)
         else:
-            try:
-                name = self.strip_identifier(symbol.ident)
-            except TransformerException, e:
-                message.warn(e)
-                return None
+            name = self.strip_identifier(symbol.ident)
         callback = ast.Callback(name, retval, parameters, False,
                                 ctype=symbol.ident)
         callback.add_symbol_reference(symbol)
@@ -961,29 +956,6 @@ Note that type resolution may not succeed."""
             typeval.target_giname = None
 
         return typeval.resolved
-
-    def _typepair_to_str(self, item):
-        nsname, item = item
-        if nsname is None:
-            return item.name
-        return '%s.%s' % (nsname, item.name)
-
-    def gtypename_to_giname(self, gtname, names):
-        resolved = names.type_names.get(gtname)
-        if resolved:
-            return self._typepair_to_str(resolved)
-        resolved = self._names.type_names.get(gtname)
-        if resolved:
-            return self._typepair_to_str(resolved)
-        raise KeyError("Failed to resolve GType name: %r" % (gtname, ))
-
-    def ctype_of(self, obj):
-        if hasattr(obj, 'ctype'):
-            return obj.ctype
-        elif hasattr(obj, 'symbol'):
-            return obj.symbol
-        else:
-            return None
 
     def resolve_aliases(self, typenode):
         """Removes all aliases from typenode, returns first non-alias

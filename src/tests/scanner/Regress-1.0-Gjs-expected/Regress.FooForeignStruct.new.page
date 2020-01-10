@@ -6,7 +6,6 @@
       xmlns:api="http://projectmallard.org/experimental/api/"
       xmlns:ui="http://projectmallard.org/1.0/ui/">
   <info>
-    
     <link xref="Regress.FooForeignStruct" group="constructor" type="guide"/>
     <api:function>
       <api:returns>
@@ -14,22 +13,15 @@
       </api:returns>
       <api:name>regress_foo_foreign_struct_new</api:name>
     </api:function>
-
   </info>
   <title>Regress.FooForeignStruct.new</title>
-  
-<synopsis><code mime="text/x-gjs">
-function new():Regress.FooForeignStruct {
+  <synopsis><code mime="text/x-gjs">
+function new(): <link xref="Regress.FooForeignStruct">Regress.FooForeignStruct</link> {
     // Gjs wrapper for regress_foo_foreign_struct_new()
 }
-</code></synopsis>
+  </code></synopsis>
 
-  
-    
-  
-  
-  
-  
+
 <terms>
 <item>
 <title><code>Returns</code></title>
@@ -37,6 +29,4 @@ function new():Regress.FooForeignStruct {
 </item>
 </terms>
 
-  
-  
 </page>

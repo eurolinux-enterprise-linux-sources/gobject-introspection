@@ -1,19 +1,19 @@
-/* A Bison parser, made by GNU Bison 2.6.1.  */
+/* A Bison parser, made by GNU Bison 3.0.2.  */
 
 /* Bison interface for Yacc-like parsers in C
-   
-      Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
-   
+
+   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
@@ -26,13 +26,13 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_SCANNERPARSER_H
-# define YY_SCANNERPARSER_H
-/* Enabling traces.  */
+#ifndef YY_YY_SCANNERPARSER_H_INCLUDED
+# define YY_YY_SCANNERPARSER_H_INCLUDED
+/* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 1
 #endif
@@ -40,159 +40,175 @@
 extern int yydebug;
 #endif
 
-/* Tokens.  */
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     IDENTIFIER = 258,
-     TYPEDEF_NAME = 259,
-     INTEGER = 260,
-     FLOATING = 261,
-     CHARACTER = 262,
-     STRING = 263,
-     INTL_CONST = 264,
-     INTUL_CONST = 265,
-     ELLIPSIS = 266,
-     ADDEQ = 267,
-     SUBEQ = 268,
-     MULEQ = 269,
-     DIVEQ = 270,
-     MODEQ = 271,
-     XOREQ = 272,
-     ANDEQ = 273,
-     OREQ = 274,
-     SL = 275,
-     SR = 276,
-     SLEQ = 277,
-     SREQ = 278,
-     EQ = 279,
-     NOTEQ = 280,
-     LTEQ = 281,
-     GTEQ = 282,
-     ANDAND = 283,
-     OROR = 284,
-     PLUSPLUS = 285,
-     MINUSMINUS = 286,
-     ARROW = 287,
-     AUTO = 288,
-     BOOL = 289,
-     BREAK = 290,
-     CASE = 291,
-     CHAR = 292,
-     CONST = 293,
-     CONTINUE = 294,
-     DEFAULT = 295,
-     DO = 296,
-     DOUBLE = 297,
-     ELSE = 298,
-     ENUM = 299,
-     EXTENSION = 300,
-     EXTERN = 301,
-     FLOAT = 302,
-     FOR = 303,
-     GOTO = 304,
-     IF = 305,
-     INLINE = 306,
-     INT = 307,
-     LONG = 308,
-     REGISTER = 309,
-     RESTRICT = 310,
-     RETURN = 311,
-     SHORT = 312,
-     SIGNED = 313,
-     SIZEOF = 314,
-     STATIC = 315,
-     STRUCT = 316,
-     SWITCH = 317,
-     TYPEDEF = 318,
-     UNION = 319,
-     UNSIGNED = 320,
-     VOID = 321,
-     VOLATILE = 322,
-     WHILE = 323,
-     FUNCTION_MACRO = 324,
-     OBJECT_MACRO = 325
-   };
+  enum yytokentype
+  {
+    IDENTIFIER = 258,
+    TYPEDEF_NAME = 259,
+    INTEGER = 260,
+    FLOATING = 261,
+    BOOLEAN = 262,
+    CHARACTER = 263,
+    STRING = 264,
+    INTL_CONST = 265,
+    INTUL_CONST = 266,
+    ELLIPSIS = 267,
+    ADDEQ = 268,
+    SUBEQ = 269,
+    MULEQ = 270,
+    DIVEQ = 271,
+    MODEQ = 272,
+    XOREQ = 273,
+    ANDEQ = 274,
+    OREQ = 275,
+    SL = 276,
+    SR = 277,
+    SLEQ = 278,
+    SREQ = 279,
+    EQ = 280,
+    NOTEQ = 281,
+    LTEQ = 282,
+    GTEQ = 283,
+    ANDAND = 284,
+    OROR = 285,
+    PLUSPLUS = 286,
+    MINUSMINUS = 287,
+    ARROW = 288,
+    AUTO = 289,
+    BOOL = 290,
+    BREAK = 291,
+    CASE = 292,
+    CHAR = 293,
+    CONST = 294,
+    CONTINUE = 295,
+    DEFAULT = 296,
+    DO = 297,
+    DOUBLE = 298,
+    ELSE = 299,
+    ENUM = 300,
+    EXTENSION = 301,
+    EXTERN = 302,
+    FLOAT = 303,
+    FOR = 304,
+    GOTO = 305,
+    IF = 306,
+    INLINE = 307,
+    INT = 308,
+    LONG = 309,
+    REGISTER = 310,
+    RESTRICT = 311,
+    RETURN = 312,
+    SHORT = 313,
+    SIGNED = 314,
+    SIZEOF = 315,
+    STATIC = 316,
+    STRUCT = 317,
+    SWITCH = 318,
+    TYPEDEF = 319,
+    UNION = 320,
+    UNSIGNED = 321,
+    VOID = 322,
+    VOLATILE = 323,
+    WHILE = 324,
+    FUNCTION_MACRO = 325,
+    OBJECT_MACRO = 326,
+    IFDEF_GI_SCANNER = 327,
+    IFNDEF_GI_SCANNER = 328,
+    IFDEF_COND = 329,
+    IFNDEF_COND = 330,
+    IF_COND = 331,
+    ELIF_COND = 332,
+    ELSE_COND = 333,
+    ENDIF_COND = 334
+  };
 #endif
 /* Tokens.  */
 #define IDENTIFIER 258
 #define TYPEDEF_NAME 259
 #define INTEGER 260
 #define FLOATING 261
-#define CHARACTER 262
-#define STRING 263
-#define INTL_CONST 264
-#define INTUL_CONST 265
-#define ELLIPSIS 266
-#define ADDEQ 267
-#define SUBEQ 268
-#define MULEQ 269
-#define DIVEQ 270
-#define MODEQ 271
-#define XOREQ 272
-#define ANDEQ 273
-#define OREQ 274
-#define SL 275
-#define SR 276
-#define SLEQ 277
-#define SREQ 278
-#define EQ 279
-#define NOTEQ 280
-#define LTEQ 281
-#define GTEQ 282
-#define ANDAND 283
-#define OROR 284
-#define PLUSPLUS 285
-#define MINUSMINUS 286
-#define ARROW 287
-#define AUTO 288
-#define BOOL 289
-#define BREAK 290
-#define CASE 291
-#define CHAR 292
-#define CONST 293
-#define CONTINUE 294
-#define DEFAULT 295
-#define DO 296
-#define DOUBLE 297
-#define ELSE 298
-#define ENUM 299
-#define EXTENSION 300
-#define EXTERN 301
-#define FLOAT 302
-#define FOR 303
-#define GOTO 304
-#define IF 305
-#define INLINE 306
-#define INT 307
-#define LONG 308
-#define REGISTER 309
-#define RESTRICT 310
-#define RETURN 311
-#define SHORT 312
-#define SIGNED 313
-#define SIZEOF 314
-#define STATIC 315
-#define STRUCT 316
-#define SWITCH 317
-#define TYPEDEF 318
-#define UNION 319
-#define UNSIGNED 320
-#define VOID 321
-#define VOLATILE 322
-#define WHILE 323
-#define FUNCTION_MACRO 324
-#define OBJECT_MACRO 325
+#define BOOLEAN 262
+#define CHARACTER 263
+#define STRING 264
+#define INTL_CONST 265
+#define INTUL_CONST 266
+#define ELLIPSIS 267
+#define ADDEQ 268
+#define SUBEQ 269
+#define MULEQ 270
+#define DIVEQ 271
+#define MODEQ 272
+#define XOREQ 273
+#define ANDEQ 274
+#define OREQ 275
+#define SL 276
+#define SR 277
+#define SLEQ 278
+#define SREQ 279
+#define EQ 280
+#define NOTEQ 281
+#define LTEQ 282
+#define GTEQ 283
+#define ANDAND 284
+#define OROR 285
+#define PLUSPLUS 286
+#define MINUSMINUS 287
+#define ARROW 288
+#define AUTO 289
+#define BOOL 290
+#define BREAK 291
+#define CASE 292
+#define CHAR 293
+#define CONST 294
+#define CONTINUE 295
+#define DEFAULT 296
+#define DO 297
+#define DOUBLE 298
+#define ELSE 299
+#define ENUM 300
+#define EXTENSION 301
+#define EXTERN 302
+#define FLOAT 303
+#define FOR 304
+#define GOTO 305
+#define IF 306
+#define INLINE 307
+#define INT 308
+#define LONG 309
+#define REGISTER 310
+#define RESTRICT 311
+#define RETURN 312
+#define SHORT 313
+#define SIGNED 314
+#define SIZEOF 315
+#define STATIC 316
+#define STRUCT 317
+#define SWITCH 318
+#define TYPEDEF 319
+#define UNION 320
+#define UNSIGNED 321
+#define VOID 322
+#define VOLATILE 323
+#define WHILE 324
+#define FUNCTION_MACRO 325
+#define OBJECT_MACRO 326
+#define IFDEF_GI_SCANNER 327
+#define IFNDEF_GI_SCANNER 328
+#define IFDEF_COND 329
+#define IFNDEF_COND 330
+#define IF_COND 331
+#define ELIF_COND 332
+#define ELSE_COND 333
+#define ENDIF_COND 334
 
-
-
+/* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
+typedef union YYSTYPE YYSTYPE;
+union YYSTYPE
 {
-/* Line 2049 of yacc.c  */
-#line 134 "giscanner/scannerparser.y"
+#line 212 "giscanner/scannerparser.y" /* yacc.c:1909  */
 
   char *str;
   GList *list;
@@ -203,29 +219,15 @@ typedef union YYSTYPE
   FunctionSpecifier function_specifier;
   UnaryOperator unary_operator;
 
-
-/* Line 2049 of yacc.c  */
-#line 209 "scannerparser.h"
-} YYSTYPE;
+#line 223 "scannerparser.h" /* yacc.c:1909  */
+};
 # define YYSTYPE_IS_TRIVIAL 1
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
+
 extern YYSTYPE yylval;
 
-#ifdef YYPARSE_PARAM
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void *YYPARSE_PARAM);
-#else
-int yyparse ();
-#endif
-#else /* ! YYPARSE_PARAM */
-#if defined __STDC__ || defined __cplusplus
 int yyparse (GISourceScanner* scanner);
-#else
-int yyparse ();
-#endif
-#endif /* ! YYPARSE_PARAM */
 
-#endif /* !YY_SCANNERPARSER_H  */
+#endif /* !YY_YY_SCANNERPARSER_H_INCLUDED  */

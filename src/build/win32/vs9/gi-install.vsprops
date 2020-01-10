@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+ ProjectType="Visual C++"
+ Version="8.00"
+ Name="giinstallprops"
+ InheritedPropertySheets=".\gi-build-defines.vsprops"
+ >
+ <UserMacro
+  Name="GIDoInstall"
+  Value="
+mkdir $(CopyDir)&#x0D;&#x0A;
+mkdir $(CopyDir)\bin&#x0D;&#x0A;
+copy $(SolutionDir)$(ConfigurationName)\$(PlatformName)\bin\$(LibGIDllPrefix)girepository$(LibGIDllSuffix).dll $(CopyDir)\bin&#x0D;&#x0A;
+copy $(SolutionDir)$(ConfigurationName)\$(PlatformName)\bin\g-ir-compiler.exe $(CopyDir)\bin&#x0D;&#x0A;
+copy $(SolutionDir)$(ConfigurationName)\$(PlatformName)\bin\g-ir-generate.exe $(CopyDir)\bin&#x0D;&#x0A;
+copy ..\..\..\tools\g-ir-annotation-tool $(CopyDir)\bin&#x0D;&#x0A;
+copy ..\..\..\tools\g-ir-doc-tool $(CopyDir)\bin&#x0D;&#x0A;
+copy ..\..\..\tools\g-ir-scanner $(CopyDir)\bin&#x0D;&#x0A;
+copy $(SolutionDir)$(ConfigurationName)\$(PlatformName)\bin\glib-print.exe $(CopyDir)\bin&#x0D;&#x0A;
+mkdir $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\giarginfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\gibaseinfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\gicallableinfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\giconstantinfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\gienuminfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\gifieldinfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\gifunctioninfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\giinterfaceinfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\giobjectinfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\gipropertyinfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\giregisteredtypeinfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\girepository.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\girffi.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\gisignalinfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\gistructinfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\gitypeinfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\gitypelib.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\gitypes.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\giunioninfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\giversionmacros.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+copy ..\..\..\girepository\givfuncinfo.h $(CopyDir)\include\gobject-introspection-$(ApiVersion)\girepository&#x0D;&#x0A;
+mkdir $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+mkdir $(CopyDir)\lib\gobject-introspection\giscanner\collections&#x0D;&#x0A;
+mkdir $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates&#x0D;&#x0A;
+mkdir $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+mkdir $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+mkdir $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\__init__.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\annotationmain.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\annotationparser.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\ast.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\cachestore.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\ccompiler.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\codegen.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\docmain.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\docwriter.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\dumper.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\introspectablepass.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\girparser.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\girwriter.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\gdumpparser.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\libtoolimporter.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\maintransformer.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\message.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\shlibs.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\scannermain.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\sectionparser.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\sourcescanner.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\testcodegen.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\transformer.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\utils.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\xmlwriter.py $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+copy ..\..\..\giscanner\collections\__init__.py $(CopyDir)\lib\gobject-introspection\giscanner\collections&#x0D;&#x0A;
+copy ..\..\..\giscanner\collections\counter.py $(CopyDir)\lib\gobject-introspection\giscanner\collections&#x0D;&#x0A;
+copy ..\..\..\giscanner\collections\ordereddict.py $(CopyDir)\lib\gobject-introspection\giscanner\collections&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\base.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\class.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\namespace.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\C\callback.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\C\class.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\C\constructor.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\C\default.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\C\enum.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\C\function.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\C\field.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\C\interface.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\C\method.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\C\namespace.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\C\property.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\C\record.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\C\signal.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\C\vfunc.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Python\callback.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Python\class.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Python\constructor.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Python\default.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Python\enum.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Python\function.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Python\field.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Python\interface.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Python\method.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Python\namespace.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Python\property.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Python\record.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Python\signal.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Python\vfunc.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Gjs\callback.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Gjs\class.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Gjs\constructor.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Gjs\default.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Gjs\enum.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Gjs\function.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Gjs\field.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Gjs\interface.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Gjs\method.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Gjs\namespace.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Gjs\property.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Gjs\record.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Gjs\signal.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+copy ..\..\..\giscanner\doctemplates\Gjs\vfunc.tmpl $(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;
+copy $(SolutionDir)$(ConfigurationName)\$(PlatformName)\bin\_giscanner.pyd $(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;
+mkdir $(CopyDir)\share\gir-$(ApiVersion)&#x0D;&#x0A;
+mkdir $(CopyDir)\share\gobject-introspection-$(ApiVersion)&#x0D;&#x0A;
+copy ..\..\..\girepository\gdump.c $(CopyDir)\share\gobject-introspection-$(ApiVersion)&#x0D;&#x0A;
+mkdir $(CopyDir)\lib&#x0D;&#x0A;
+copy $(SolutionDir)$(ConfigurationName)\$(PlatformName)\bin\girepository-$(ApiVersion).lib $(CopyDir)\lib&#x0D;&#x0A;
+echo Please note that building GObject-Introspection with Visual Studio is now a 2-step process&#x0D;&#x0A;
+echo Please open the appropriate Visual Studio (or Windows SDK) command prompt and use the NMake Makefile&#x0D;&#x0A;
+echo in SRC_ROOT\build\gi-introspection-msvc.mak to build the introspection files&#x0D;&#x0A;
+  "
+ />
+</VisualStudioPropertySheet>

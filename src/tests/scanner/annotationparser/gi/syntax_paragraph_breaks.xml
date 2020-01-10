@@ -1,27 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<tests>
+<tests xmlns="http://schemas.gnome.org/gobject-introspection/2013/test">
 
 <test>
   <!--
   All lines (outside program- listings and CDATA sections) just containing
   a ' *' (blank-asterisk) are converted to paragraph breaks.
   -->
-  <commentblock>/**
+  <input>/**
  * SECTION:test
  *
  * The following line is ' *' (blank-asterisk).
  *
  * So this is considered a new paragraph.
- */</commentblock>
-  <docblock>
-    <identifier>
-      <name>SECTION:test</name>
-    </identifier>
-    <description>The following line is ' *' (blank-asterisk).
+ */</input>
+  <parser>
+    <docblock>
+      <identifier>
+        <name>SECTION:test</name>
+      </identifier>
+      <description>The following line is ' *' (blank-asterisk).
 
 So this is considered a new paragraph.</description>
-  </docblock>
+    </docblock>
+  </parser>
+  <output>/**
+ * SECTION:test
+ *
+ * The following line is ' *' (blank-asterisk).
+ *
+ * So this is considered a new paragraph.
+ */</output>
 </test>
 
 <test>
@@ -29,63 +38,100 @@ So this is considered a new paragraph.</description>
   Description: tag, all lines (outside program- listings and CDATA sections) just containing
   a ' *' (blank-asterisk) are converted to paragraph breaks.
   -->
-  <commentblock>/**
+  <input>/**
  * SECTION:test
  *
  * Description: The following line is ' *' (blank-asterisk).
  *
  * So this is considered a new paragraph.
- */</commentblock>
-  <docblock>
-    <identifier>
-      <name>SECTION:test</name>
-    </identifier>
-    <description>The following line is ' *' (blank-asterisk).
+ */</input>
+  <parser>
+    <docblock>
+      <identifier>
+        <name>SECTION:test</name>
+      </identifier>
+      <description>The following line is ' *' (blank-asterisk).
 
 So this is considered a new paragraph.</description>
-  </docblock>
+    </docblock>
+    <messages>
+      <message>4: Warning: Test: GTK-Doc tag "Description:" has been deprecated:
+ * Description: The following line is ' *' (blank-asterisk).
+   ^</message>
+    </messages>
+  </parser>
+  <output>/**
+ * SECTION:test
+ *
+ * The following line is ' *' (blank-asterisk).
+ *
+ * So this is considered a new paragraph.
+ */</output>
 </test>
 
 <test>
   <!--
   ' * ' (blank-asterisk-blank) are also converted to paragraph breaks.
   -->
-  <commentblock>/**
+  <input>/**
  * SECTION:test
  *
  * The following line is ' * ' (blank-asterisk-blank).
  * 
  * So this is considered a new paragraph.
- */</commentblock>
-  <docblock>
-    <identifier>
-      <name>SECTION:test</name>
-    </identifier>
-    <description>The following line is ' * ' (blank-asterisk-blank).
+ */</input>
+  <parser>
+    <docblock>
+      <identifier>
+        <name>SECTION:test</name>
+      </identifier>
+      <description>The following line is ' * ' (blank-asterisk-blank).
 
 So this is considered a new paragraph.</description>
-  </docblock>
+    </docblock>
+  </parser>
+  <output>/**
+ * SECTION:test
+ *
+ * The following line is ' * ' (blank-asterisk-blank).
+ *
+ * So this is considered a new paragraph.
+ */</output>
 </test>
 
 <test>
   <!--
   Description: tag, ' * ' (blank-asterisk-blank) are also converted to paragraph breaks.
   -->
-  <commentblock>/**
+  <input>/**
  * SECTION:test
  *
  * Description: The following line is ' * ' (blank-asterisk-blank).
  * 
  * So this is considered a new paragraph.
- */</commentblock>
-  <docblock>
-    <identifier>
-      <name>SECTION:test</name>
-    </identifier>
-    <description>The following line is ' * ' (blank-asterisk-blank).
+ */</input>
+  <parser>
+    <docblock>
+      <identifier>
+        <name>SECTION:test</name>
+      </identifier>
+      <description>The following line is ' * ' (blank-asterisk-blank).
 
 So this is considered a new paragraph.</description>
-  </docblock>
+    </docblock>
+    <messages>
+      <message>4: Warning: Test: GTK-Doc tag "Description:" has been deprecated:
+ * Description: The following line is ' * ' (blank-asterisk-blank).
+   ^</message>
+    </messages>
+  </parser>
+  <output>/**
+ * SECTION:test
+ *
+ * The following line is ' * ' (blank-asterisk-blank).
+ *
+ * So this is considered a new paragraph.
+ */</output>
 </test>
 
 <test>
@@ -94,21 +140,30 @@ So this is considered a new paragraph.</description>
   (blank-asterisk-blank-blank). The "empty line" can be easily recognized in the
   output as it contains a single space character.
   -->
-  <commentblock>/**
+  <input>/**
  * SECTION:test
  *
  * The following line is (blank-asterisk-blank-blank).
  *  
  * So this is preceded by an empty line and is not considered a new paragraph.
- */</commentblock>
-  <docblock>
-    <identifier>
-      <name>SECTION:test</name>
-    </identifier>
-    <description>The following line is (blank-asterisk-blank-blank).
+ */</input>
+  <parser>
+    <docblock>
+      <identifier>
+        <name>SECTION:test</name>
+      </identifier>
+      <description>The following line is (blank-asterisk-blank-blank).
  
 So this is preceded by an empty line and is not considered a new paragraph.</description>
-  </docblock>
+    </docblock>
+  </parser>
+  <output>/**
+ * SECTION:test
+ *
+ * The following line is (blank-asterisk-blank-blank).
+ *  
+ * So this is preceded by an empty line and is not considered a new paragraph.
+ */</output>
 </test>
 
 <test>
@@ -117,21 +172,35 @@ So this is preceded by an empty line and is not considered a new paragraph.</des
   (blank-asterisk-blank-blank). The "empty line" can be easily recognized in the
   output as it contains a single space character.
   -->
-  <commentblock>/**
+  <input>/**
  * SECTION:test
  *
  * Description: The following line is (blank-asterisk-blank-blank).
  *  
  * So this is preceded by an empty line and is not considered a new paragraph.
- */</commentblock>
-  <docblock>
-    <identifier>
-      <name>SECTION:test</name>
-    </identifier>
-    <description>The following line is (blank-asterisk-blank-blank).
+ */</input>
+  <parser>
+    <docblock>
+      <identifier>
+        <name>SECTION:test</name>
+      </identifier>
+      <description>The following line is (blank-asterisk-blank-blank).
  
 So this is preceded by an empty line and is not considered a new paragraph.</description>
-  </docblock>
+    </docblock>
+    <messages>
+      <message>4: Warning: Test: GTK-Doc tag "Description:" has been deprecated:
+ * Description: The following line is (blank-asterisk-blank-blank).
+   ^</message>
+    </messages>
+  </parser>
+  <output>/**
+ * SECTION:test
+ *
+ * The following line is (blank-asterisk-blank-blank).
+ *  
+ * So this is preceded by an empty line and is not considered a new paragraph.
+ */</output>
 </test>
 
 <test>
@@ -140,7 +209,7 @@ So this is preceded by an empty line and is not considered a new paragraph.</des
   (blank-asterisk-blank-blank). The "empty line" can be easily recognized in the
   output as it contains a single space character.
   -->
-  <commentblock><![CDATA[/**
+  <input><![CDATA[/**
  * SECTION:test
  *
  * <example>
@@ -160,12 +229,13 @@ So this is preceded by an empty line and is not considered a new paragraph.</des
  * }
  * </programlisting>
  * </example>
- */]]></commentblock>
-  <docblock>
-    <identifier>
-      <name>SECTION:test</name>
-    </identifier>
-    <description><![CDATA[<example>
+ */]]></input>
+  <parser>
+    <docblock>
+      <identifier>
+        <name>SECTION:test</name>
+      </identifier>
+      <description><![CDATA[<example>
 <title>Iterating over attributes</title>
 <programlisting>
 void
@@ -182,7 +252,29 @@ print_attributes (GIBaseInfo *info)
 }
 </programlisting>
 </example>]]></description>
-  </docblock>
+    </docblock>
+  </parser>
+  <output><![CDATA[/**
+ * SECTION:test
+ *
+ * <example>
+ * <title>Iterating over attributes</title>
+ * <programlisting>
+ * void
+ * print_attributes (GIBaseInfo *info)
+ * {
+ *   GIAttributeIter iter = { 0, };
+ *   char *name;
+ *   char *value;
+ *  
+ *   while (g_base_info_iterate_attributes (info, &iter, &name, &value))
+ *     {
+ *       g_print ("attribute name: %s value: %s", name, value);
+ *     }
+ * }
+ * </programlisting>
+ * </example>
+ */]]></output>
 </test>
 
 <test>
@@ -191,7 +283,7 @@ print_attributes (GIBaseInfo *info)
   (blank-asterisk-blank-blank). The "empty line" can be easily recognized in the
   output as it contains a single space character.
   -->
-  <commentblock><![CDATA[/**
+  <input><![CDATA[/**
  * SECTION:test
  *
  * Description: <example>
@@ -211,12 +303,13 @@ print_attributes (GIBaseInfo *info)
  * }
  * </programlisting>
  * </example>
- */]]></commentblock>
-  <docblock>
-    <identifier>
-      <name>SECTION:test</name>
-    </identifier>
-    <description><![CDATA[<example>
+ */]]></input>
+  <parser>
+    <docblock>
+      <identifier>
+        <name>SECTION:test</name>
+      </identifier>
+      <description><![CDATA[<example>
 <title>Iterating over attributes</title>
 <programlisting>
 void
@@ -233,7 +326,34 @@ print_attributes (GIBaseInfo *info)
 }
 </programlisting>
 </example>]]></description>
-  </docblock>
+    </docblock>
+    <messages>
+      <message><![CDATA[4: Warning: Test: GTK-Doc tag "Description:" has been deprecated:
+ * Description: <example>
+   ^]]></message>
+    </messages>
+  </parser>
+  <output><![CDATA[/**
+ * SECTION:test
+ *
+ * <example>
+ * <title>Iterating over attributes</title>
+ * <programlisting>
+ * void
+ * print_attributes (GIBaseInfo *info)
+ * {
+ *   GIAttributeIter iter = { 0, };
+ *   char *name;
+ *   char *value;
+ *  
+ *   while (g_base_info_iterate_attributes (info, &iter, &name, &value))
+ *     {
+ *       g_print ("attribute name: %s value: %s", name, value);
+ *     }
+ * }
+ * </programlisting>
+ * </example>
+ */]]></output>
 </test>
 
 </tests>

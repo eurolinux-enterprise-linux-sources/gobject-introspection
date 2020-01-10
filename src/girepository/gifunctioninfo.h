@@ -31,15 +31,36 @@
 
 G_BEGIN_DECLS
 
+/**
+ * GI_IS_FUNCTION_INFO
+ * @info: an info structure
+ *
+ * Checks if @info is a #GIFunctionInfo.
+ */
 #define GI_IS_FUNCTION_INFO(info) \
     (g_base_info_get_type((GIBaseInfo*)info) ==  GI_INFO_TYPE_FUNCTION)
 
+
+GI_AVAILABLE_IN_ALL
 const gchar *           g_function_info_get_symbol     (GIFunctionInfo *info);
+
+GI_AVAILABLE_IN_ALL
 GIFunctionInfoFlags     g_function_info_get_flags      (GIFunctionInfo *info);
+
+GI_AVAILABLE_IN_ALL
 GIPropertyInfo *        g_function_info_get_property   (GIFunctionInfo *info);
+
+GI_AVAILABLE_IN_ALL
 GIVFuncInfo *           g_function_info_get_vfunc      (GIFunctionInfo *info);
 
+/**
+ * G_INVOKE_ERROR:
+ *
+ * TODO
+ */
 #define G_INVOKE_ERROR (g_invoke_error_quark ())
+
+GI_AVAILABLE_IN_ALL
 GQuark g_invoke_error_quark (void);
 
 /**
@@ -61,6 +82,8 @@ typedef enum
   G_INVOKE_ERROR_ARGUMENT_MISMATCH
 } GInvokeError;
 
+
+GI_AVAILABLE_IN_ALL
 gboolean              g_function_info_invoke         (GIFunctionInfo *info,
 						      const GIArgument  *in_args,
 						      int               n_in_args,

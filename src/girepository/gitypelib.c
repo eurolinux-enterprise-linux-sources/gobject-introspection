@@ -20,14 +20,14 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <string.h>
 
 #include <glib.h>
 
-#include "config.h"
 #include "gitypelib-internal.h"
-#include "glib-compat.h"
 
 typedef struct {
   GITypelib *typelib;
@@ -131,6 +131,15 @@ get_type_blob (GITypelib *typelib,
   return (InterfaceTypeBlob*) get_blob (typelib, simple->offset, error);
 }
 
+/**
+ * g_typelib_get_dir_entry:
+ * @typelib: TODO
+ * @index: TODO
+ *
+ * TODO
+ *
+ * Returns: TODO
+ */
 DirEntry *
 g_typelib_get_dir_entry (GITypelib *typelib,
 			  guint16    index)
@@ -160,6 +169,15 @@ get_section_by_id (GITypelib   *typelib,
   return NULL;
 }
 
+/**
+ * g_typelib_get_dir_entry_by_name:
+ * @typelib: TODO
+ * @name: TODO
+ *
+ * TODO
+ *
+ * Returns: TODO
+ */
 DirEntry *
 g_typelib_get_dir_entry_by_name (GITypelib *typelib,
 				 const char *name)
@@ -197,56 +215,27 @@ g_typelib_get_dir_entry_by_name (GITypelib *typelib,
     }
 }
 
+/**
+ * g_typelib_get_dir_entry_by_gtype_name:
+ * @typelib: TODO
+ * @gtype_name: TODO
+ *
+ * TODO
+ *
+ * Returns: TODO
+ */
 DirEntry *
-g_typelib_get_dir_entry_by_gtype (GITypelib *typelib,
-				  gboolean   fastpass,
-				  GType      gtype)
+g_typelib_get_dir_entry_by_gtype_name (GITypelib *typelib,
+				       const gchar *gtype_name)
 {
   Header *header = (Header *)typelib->data;
-  guint n_entries = header->n_local_entries;
-  const char *gtype_name = g_type_name (gtype);
-  DirEntry *entry;
   guint i;
-  const char *c_prefix;
 
-  /* There is a corner case regarding GdkRectangle.  GdkRectangle is a
-     boxed type, but it is just an alias to boxed struct
-     CairoRectangleInt.  Scanner automatically converts all references
-     to GdkRectangle to CairoRectangleInt, so GdkRectangle does not
-     appear in the typelibs at all, although user code might query it.
-     So if we get such query, we also change it to lookup of
-     CairoRectangleInt.
-     https://bugzilla.gnome.org/show_bug.cgi?id=655423 */
-  if (!fastpass && !strcmp (gtype_name, "GdkRectangle"))
-    gtype_name = "CairoRectangleInt";
-
-  /* Inside each typelib, we include the "C prefix" which acts as
-   * a namespace mechanism.  For GtkTreeView, the C prefix is Gtk.
-   * Given the assumption that GTypes for a library also use the
-   * C prefix, we know we can skip examining a typelib if our
-   * target type does not have this typelib's C prefix.
-   *
-   * However, not every class library necessarily conforms to this,
-   * e.g. Clutter has Cogl inside it.  So, we split this into two
-   * passes.  First we try a lookup, skipping things which don't
-   * have the prefix.  If that fails then we try a global lookup,
-   * ignoring the prefix.
-   *
-   * See http://bugzilla.gnome.org/show_bug.cgi?id=564016
-   */
-  c_prefix = g_typelib_get_string (typelib, header->c_prefix);
-  if (fastpass && c_prefix != NULL)
-    {
-      if (g_ascii_strncasecmp (c_prefix, gtype_name, strlen (c_prefix)) != 0)
-	return NULL;
-    }
-
-  for (i = 1; i <= n_entries; i++)
+  for (i = 1; i <= header->n_local_entries; i++)
     {
       RegisteredTypeBlob *blob;
       const char *type;
-
-      entry = g_typelib_get_dir_entry (typelib, i);
+      DirEntry *entry = g_typelib_get_dir_entry (typelib, i);
       if (!BLOB_IS_REGISTERED_TYPE (entry))
 	continue;
 
@@ -261,6 +250,128 @@ g_typelib_get_dir_entry_by_gtype (GITypelib *typelib,
   return NULL;
 }
 
+typedef struct {
+  const char *s;
+  const char *separator;
+  gsize sep_len;
+  GString buf;
+} StrSplitIter;
+
+static void
+strsplit_iter_init (StrSplitIter  *iter,
+                    const char    *s,
+                    const char    *separator)
+{
+  iter->s = s;
+  iter->separator = separator;
+  iter->sep_len = strlen (separator);
+  iter->buf.str = NULL;
+  iter->buf.len = 0;
+  iter->buf.allocated_len = 0;
+}
+
+static gboolean
+strsplit_iter_next (StrSplitIter  *iter,
+                    char         **out_val)
+{
+  const char *s = iter->s;
+  const char *next;
+  gsize len;
+
+  if (!s)
+    return FALSE;
+  next = strstr (s, iter->separator);
+  if (next)
+    {
+      iter->s = next + iter->sep_len;
+      len = next - s;
+    }
+  else
+    {
+      iter->s = NULL;
+      len = strlen (s);
+    }
+  if (len == 0)
+    {
+      *out_val = "";
+    }
+  else
+    {
+      g_string_overwrite_len (&iter->buf, 0, s, (gssize)len);
+      *out_val = iter->buf.str;
+    }
+  return TRUE;
+}
+
+static void
+strsplit_iter_clear (StrSplitIter  *iter)
+{
+  g_free (iter->buf.str);
+}
+
+/**
+ * g_typelib_matches_gtype_name_prefix:
+ * @typelib: TODO
+ * @gtype_name: TODO
+ *
+ * TODO
+ *
+ * Returns: TODO
+ */
+gboolean
+g_typelib_matches_gtype_name_prefix (GITypelib *typelib,
+				     const gchar *gtype_name)
+{
+  Header *header = (Header *)typelib->data;
+  const char *c_prefix;
+  gchar *prefix;
+  gboolean ret = FALSE;
+  StrSplitIter split_iter;
+  gsize gtype_name_len;
+
+  c_prefix = g_typelib_get_string (typelib, header->c_prefix);
+  if (c_prefix == NULL || strlen (c_prefix) == 0)
+    return FALSE;
+
+  gtype_name_len = strlen (gtype_name);
+
+  /* c_prefix is a comma separated string of supported prefixes
+   * in the typelib.
+   * We match the specified gtype_name if the gtype_name starts
+   * with the prefix, and is followed by a capital letter.
+   * For example, a typelib offering the 'Gdk' prefix does match
+   * GdkX11Cursor, however a typelib offering the 'G' prefix does not.
+   */
+  strsplit_iter_init (&split_iter, c_prefix, ",");
+  while (strsplit_iter_next (&split_iter, &prefix))
+    {
+      size_t len = strlen (prefix);
+
+      if (gtype_name_len < len)
+        continue;
+
+      if (strncmp (prefix, gtype_name, len) != 0)
+        continue;
+
+      if (g_ascii_isupper (gtype_name[len]))
+        {
+          ret = TRUE;
+          break;
+        }
+    }
+  strsplit_iter_clear (&split_iter);
+  return ret;
+}
+
+/**
+ * g_typelib_get_dir_entry_by_error_domain:
+ * @typelib: TODO
+ * @error_domain: TODO
+ *
+ * TODO
+ *
+ * Returns: TODO
+ */
 DirEntry *
 g_typelib_get_dir_entry_by_error_domain (GITypelib *typelib,
 					 GQuark     error_domain)
@@ -291,6 +402,11 @@ g_typelib_get_dir_entry_by_error_domain (GITypelib *typelib,
   return NULL;
 }
 
+/**
+ * g_typelib_check_sanity:
+ *
+ * TODO
+ */
 void
 g_typelib_check_sanity (void)
 {
@@ -1658,10 +1774,17 @@ validate_object_blob (ValidateContext *ctx,
 
   push_context (ctx, get_string_nofail (typelib, blob->name));
 
-  for (i = 0; i < blob->n_fields; i++, offset2 += sizeof (FieldBlob))
+  for (i = 0; i < blob->n_fields; i++)
     {
+      FieldBlob *blob = (FieldBlob*) &typelib->data[offset2];
+
       if (!validate_field_blob (ctx, offset2, error))
 	return FALSE;
+
+      offset2 += sizeof (FieldBlob);
+      /* Special case fields which are callbacks. */
+      if (blob->has_embedded_type)
+        offset2 += sizeof (CallbackBlob);
     }
 
   for (i = 0; i < blob->n_properties; i++, offset2 += sizeof (PropertyBlob))
@@ -2024,6 +2147,15 @@ prefix_with_context (GError **error,
   g_free (buf);
 }
 
+/**
+ * g_typelib_validate:
+ * @typelib: TODO
+ * @error: TODO
+ *
+ * TODO
+ *
+ * Returns: TODO
+ */
 gboolean
 g_typelib_validate (GITypelib     *typelib,
 		     GError       **error)
@@ -2053,6 +2185,13 @@ g_typelib_validate (GITypelib     *typelib,
   return TRUE;
 }
 
+/**
+ * g_typelib_error_quark:
+ *
+ * TODO
+ *
+ * Returns: TODO
+ */
 GQuark
 g_typelib_error_quark (void)
 {
@@ -2206,8 +2345,8 @@ _g_typelib_ensure_open (GITypelib *typelib)
  * pointed to by @typelib will be automatically g_free()d when the
  * repository is destroyed.
  *
- * Return value: the new #GITypelib
- **/
+ * Returns: the new #GITypelib
+ */
 GITypelib *
 g_typelib_new_from_memory (guint8  *memory, 
 			   gsize    len,
@@ -2235,8 +2374,8 @@ g_typelib_new_from_memory (guint8  *memory,
  *
  * Creates a new #GITypelib from a memory location.
  *
- * Return value: the new #GITypelib
- **/
+ * Returns: the new #GITypelib
+ */
 GITypelib *
 g_typelib_new_from_const_memory (const guchar *memory, 
 				 gsize         len,
@@ -2263,8 +2402,8 @@ g_typelib_new_from_const_memory (const guchar *memory,
  *
  * Creates a new #GITypelib from a #GMappedFile.
  *
- * Return value: the new #GITypelib
- **/
+ * Returns: the new #GITypelib
+ */
 GITypelib *
 g_typelib_new_from_mapped_file (GMappedFile  *mfile,
 				GError      **error)
@@ -2290,7 +2429,7 @@ g_typelib_new_from_mapped_file (GMappedFile  *mfile,
  * @typelib: a #GITypelib
  *
  * Free a #GITypelib.
- **/
+ */
 void
 g_typelib_free (GITypelib *typelib)
 {
@@ -2307,6 +2446,14 @@ g_typelib_free (GITypelib *typelib)
   g_slice_free (GITypelib, typelib);
 }
 
+/**
+ * g_typelib_get_namespace:
+ * @typelib: TODO
+ *
+ * TODO
+ *
+ * Returns: TODO
+ */
 const gchar *
 g_typelib_get_namespace (GITypelib *typelib)
 {
@@ -2321,8 +2468,8 @@ g_typelib_get_namespace (GITypelib *typelib)
  *
  * Loads a symbol from #GITypelib.
  *
- * Return value: #TRUE on success
- **/
+ * Returns: #TRUE on success
+ */
 gboolean
 g_typelib_symbol (GITypelib *typelib, const char *symbol_name, gpointer *symbol)
 {

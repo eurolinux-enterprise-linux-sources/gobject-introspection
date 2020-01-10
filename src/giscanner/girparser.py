@@ -69,9 +69,6 @@ class GIRParser(object):
     def get_namespace(self):
         return self._namespace
 
-    def get_c_prefix(self):
-        return self._c_prefix
-
     # Private
 
     def _find_first_child(self, node, name_or_names):
@@ -101,9 +98,8 @@ class GIRParser(object):
         assert root.tag == _corens('repository')
         version = root.attrib['version']
         if version != COMPATIBLE_GIR_VERSION:
-            raise SystemExit("%s: Incompatible version %s (supported: %s)" \
-                             % (self._get_current_file(),
-                                version, COMPATIBLE_GIR_VERSION))
+            raise SystemExit("%s: Incompatible version %s (supported: %s)" %
+                             (self._get_current_file(), version, COMPATIBLE_GIR_VERSION))
 
         for node in root.getchildren():
             if node.tag == _corens('include'):
@@ -122,9 +118,9 @@ class GIRParser(object):
         if symbol_prefixes:
             symbol_prefixes = symbol_prefixes.split(',')
         self._namespace = ast.Namespace(ns.attrib['name'],
-                                    ns.attrib['version'],
-                                    identifier_prefixes=identifier_prefixes,
-                                    symbol_prefixes=symbol_prefixes)
+                                        ns.attrib['version'],
+                                        identifier_prefixes=identifier_prefixes,
+                                        symbol_prefixes=symbol_prefixes)
         if 'shared-library' in ns.attrib:
             self._namespace.shared_libraries = ns.attrib['shared-library'].split(',')
         self._namespace.includes = self._includes
@@ -140,8 +136,7 @@ class GIRParser(object):
             _corens('interface'): self._parse_object_interface,
             _corens('record'): self._parse_record,
             _corens('union'): self._parse_union,
-            _glibns('boxed'): self._parse_boxed,
-            }
+            _glibns('boxed'): self._parse_boxed}
 
         if not self._types_only:
             parser_methods[_corens('constant')] = self._parse_constant
@@ -153,8 +148,7 @@ class GIRParser(object):
                 method(node)
 
     def _parse_include(self, node):
-        include = ast.Include(node.attrib['name'],
-                          node.attrib['version'])
+        include = ast.Include(node.attrib['name'], node.attrib['version'])
         self._includes.add(include)
 
     def _parse_pkgconfig_package(self, node):
@@ -165,9 +159,7 @@ class GIRParser(object):
 
     def _parse_alias(self, node):
         typeval = self._parse_type(node)
-        alias = ast.Alias(node.attrib['name'],
-                      typeval,
-                      node.attrib.get(_cns('type')))
+        alias = ast.Alias(node.attrib['name'], typeval, node.attrib.get(_cns('type')))
         self._parse_generic_attribs(node, alias)
         self._namespace.append(alias)
 
@@ -185,12 +177,24 @@ class GIRParser(object):
         version = node.attrib.get('version')
         if version:
             obj.version = version
-        deprecated = node.attrib.get('deprecated')
+        version_doc = node.find(_corens('doc-version'))
+        if version_doc is not None:
+            if version_doc.text:
+                obj.version_doc = version_doc.text
+        deprecated = node.attrib.get('deprecated-version')
         if deprecated:
             obj.deprecated = deprecated
-        deprecated_version = node.attrib.get('deprecated-version')
-        if deprecated_version:
-            obj.deprecated_version = deprecated_version
+        deprecated_doc = node.find(_corens('doc-deprecated'))
+        if deprecated_doc is not None:
+            if deprecated_doc.text:
+                obj.deprecated_doc = deprecated_doc.text
+        stability = node.attrib.get('stability')
+        if stability:
+            obj.stability = stability
+        stability_doc = node.find(_corens('doc-stability'))
+        if stability_doc is not None:
+            if stability_doc.text:
+                obj.stability_doc = stability_doc.text
 
     def _parse_object_interface(self, node):
         parent = node.attrib.get('parent')
@@ -276,6 +280,8 @@ class GIRParser(object):
                               typeval,
                               node.attrib.get('direction') or ast.PARAM_DIRECTION_IN,
                               node.attrib.get('transfer-ownership'),
+                              node.attrib.get('nullable') == '1',
+                              node.attrib.get('optional') == '1',
                               node.attrib.get('allow-none') == '1',
                               node.attrib.get('scope'),
                               node.attrib.get('caller-allocates') == '1')
@@ -288,7 +294,8 @@ class GIRParser(object):
         if not returnnode:
             raise ValueError('node %r has no return-value' % (name, ))
         transfer = returnnode.attrib.get('transfer-ownership')
-        retval = ast.Return(self._parse_type(returnnode), transfer)
+        nullable = returnnode.attrib.get('nullable') == '1'
+        retval = ast.Return(self._parse_type(returnnode), nullable, transfer)
         self._parse_generic_attribs(returnnode, retval)
         parameters = []
 
@@ -327,7 +334,7 @@ class GIRParser(object):
             for i, paramnode in enumerate(self._find_children(parameters_node,
                                                               _corens('parameter'))):
                 param = parameters[i]
-                self._parse_type_second_pass(func, paramnode, param.type)
+                self._parse_type_array_length(parameters, paramnode, param.type)
                 closure = paramnode.attrib.get('closure')
                 if closure:
                     idx = int(closure)
@@ -339,7 +346,7 @@ class GIRParser(object):
                     assert idx < len(parameters), "%d >= %d" % (idx, len(parameters))
                     param.destroy_name = parameters[idx].argname
 
-        self._parse_type_second_pass(func, returnnode, retval.type)
+        self._parse_type_array_length(parameters, returnnode, retval.type)
 
         self._parse_generic_attribs(node, func)
 
@@ -371,6 +378,9 @@ class GIRParser(object):
                 func = self._parse_function_common(method, ast.Function, compound)
                 func.is_method = True
                 compound.methods.append(func)
+            for i, fieldnode in enumerate(self._find_children(node, _corens('field'))):
+                field = compound.fields[i]
+                self._parse_type_array_length(compound.fields, fieldnode, field.type)
             for func in self._find_children(node, _corens('function')):
                 compound.static_methods.append(
                     self._parse_function_common(func, ast.Function, compound))
@@ -427,7 +437,8 @@ class GIRParser(object):
                 return ast.Type(ctype=ctype)
             elif name in ['GLib.List', 'GLib.SList']:
                 subchild = self._find_first_child(typenode,
-                               map(_corens, ('callback', 'array', 'varargs', 'type')))
+                                                  map(_corens, ('callback', 'array',
+                                                                'varargs', 'type')))
                 if subchild is not None:
                     element_type = self._parse_type(typenode)
                 else:
@@ -438,9 +449,7 @@ class GIRParser(object):
                 subchildren_types = map(self._parse_type_simple, subchildren)
                 while len(subchildren_types) < 2:
                     subchildren_types.append(ast.TYPE_ANY)
-                return ast.Map(subchildren_types[0],
-                           subchildren_types[1],
-                           ctype=ctype)
+                return ast.Map(subchildren_types[0], subchildren_types[1], ctype=ctype)
             else:
                 return self._namespace.type_from_name(name, ctype)
         else:
@@ -453,8 +462,8 @@ class GIRParser(object):
                 return self._parse_type_simple(typenode)
         assert False, "Failed to parse toplevel type"
 
-    def _parse_type_second_pass(self, parent, node, typeval):
-        """A hack necessary to handle the integer parameter indexes on
+    def _parse_type_array_length(self, siblings, node, typeval):
+        """A hack necessary to handle the integer parameter/field indexes on
            array types."""
         typenode = node.find(_corens('array'))
         if typenode is None:
@@ -462,9 +471,11 @@ class GIRParser(object):
         lenidx = typenode.attrib.get('length')
         if lenidx is not None:
             idx = int(lenidx)
-            assert idx < len(parent.parameters), "%r %d >= %d" \
-                      % (parent, idx, len(parent.parameters))
-            typeval.length_param_name = parent.parameters[idx].argname
+            assert idx < len(siblings), "%r %d >= %d" % (parent, idx, len(siblings))
+            if isinstance(siblings[idx], ast.Field):
+                typeval.length_param_name = siblings[idx].name
+            else:
+                typeval.length_param_name = siblings[idx].argname
 
     def _parse_boxed(self, node):
         obj = ast.Boxed(node.attrib[_glibns('name')],
@@ -509,11 +520,11 @@ class GIRParser(object):
             assert node.tag == _corens('field'), node.tag
             type_node = self._parse_type(node)
         field = ast.Field(node.attrib.get('name'),
-                      type_node,
-                      node.attrib.get('readable') != '0',
-                      node.attrib.get('writable') == '1',
-                      node.attrib.get('bits'),
-                      anonymous_node=anonymous_node)
+                          type_node,
+                          node.attrib.get('readable') != '0',
+                          node.attrib.get('writable') == '1',
+                          node.attrib.get('bits'),
+                          anonymous_node=anonymous_node)
         field.private = node.attrib.get('private') == '1'
         field.parent = parent
         self._parse_generic_attribs(node, field)
@@ -521,12 +532,12 @@ class GIRParser(object):
 
     def _parse_property(self, node, parent):
         prop = ast.Property(node.attrib['name'],
-                        self._parse_type(node),
-                        node.attrib.get('readable') != '0',
-                        node.attrib.get('writable') == '1',
-                        node.attrib.get('construct') == '1',
-                        node.attrib.get('construct-only') == '1',
-                        node.attrib.get('transfer-ownership'))
+                            self._parse_type(node),
+                            node.attrib.get('readable') != '0',
+                            node.attrib.get('writable') == '1',
+                            node.attrib.get('construct') == '1',
+                            node.attrib.get('construct-only') == '1',
+                            node.attrib.get('transfer-ownership'))
         self._parse_generic_attribs(node, prop)
         prop.parent = parent
         return prop
@@ -577,5 +588,6 @@ class GIRParser(object):
             members.append(member)
         for func_node in self._find_children(node, _corens('function')):
             func = self._parse_function_common(func_node, ast.Function)
+            func.parent = obj
             obj.static_methods.append(func)
         self._namespace.append(obj)

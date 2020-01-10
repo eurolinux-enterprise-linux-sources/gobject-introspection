@@ -20,6 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -29,7 +31,6 @@
 #include "girmodule.h"
 #include "girnode.h"
 #include "gitypelib-internal.h"
-#include "config.h"
 
 /* This is a "major" version in the sense that it's only bumped
  * for incompatible changes.
@@ -62,37 +63,38 @@ struct _GIrParser
 
 typedef enum
 {
+  STATE_NONE = 0,
   STATE_START,
   STATE_END,
   STATE_REPOSITORY,
   STATE_INCLUDE,
-  STATE_C_INCLUDE,
-  STATE_PACKAGE,  /* 5 */
+  STATE_C_INCLUDE,     /* 5 */
+  STATE_PACKAGE,
   STATE_NAMESPACE,
   STATE_ENUM,
   STATE_BITFIELD,
-  STATE_FUNCTION,
-  STATE_FUNCTION_RETURN,  /* 10 */
+  STATE_FUNCTION,      /* 10 */
+  STATE_FUNCTION_RETURN,
   STATE_FUNCTION_PARAMETERS,
   STATE_FUNCTION_PARAMETER,
   STATE_CLASS,
-  STATE_CLASS_FIELD,
-  STATE_CLASS_PROPERTY,  /* 15 */
+  STATE_CLASS_FIELD,   /* 15 */
+  STATE_CLASS_PROPERTY,
   STATE_INTERFACE,
   STATE_INTERFACE_PROPERTY,
   STATE_INTERFACE_FIELD,
-  STATE_IMPLEMENTS,
-  STATE_PREREQUISITE,    /* 20 */
+  STATE_IMPLEMENTS,    /* 20 */
+  STATE_PREREQUISITE,
   STATE_BOXED,
   STATE_BOXED_FIELD,
   STATE_STRUCT,
-  STATE_STRUCT_FIELD,
-  STATE_UNION,           /* 25 */
+  STATE_STRUCT_FIELD,  /* 25 */
+  STATE_UNION,
   STATE_UNION_FIELD,
   STATE_NAMESPACE_CONSTANT,
   STATE_CLASS_CONSTANT,
-  STATE_INTERFACE_CONSTANT,
-  STATE_ALIAS,           /* 30 */
+  STATE_INTERFACE_CONSTANT,  /* 30 */
+  STATE_ALIAS,
   STATE_TYPE,
   STATE_ATTRIBUTE,
   STATE_PASSTHROUGH
@@ -123,7 +125,7 @@ struct _ParseContext
   GList *type_stack;
   GList *type_parameters;
   int type_depth;
-  gboolean in_embedded_type;
+  ParseState in_embedded_state;
 };
 #define CURRENT_NODE(ctx) ((GIrNode *)((ctx)->node_stack->data))
 
@@ -807,7 +809,7 @@ start_function (GMarkupParseContext *context,
   const gchar *throws;
   GIrNodeFunction *function;
   gboolean found = FALSE;
-  gboolean in_embedded_type;
+  ParseState in_embedded_state = STATE_NONE;
 
   switch (ctx->state)
     {
@@ -830,8 +832,10 @@ start_function (GMarkupParseContext *context,
     case STATE_ENUM:
       found = strcmp (element_name, "function") == 0;
       break;
+    case STATE_CLASS_FIELD:
     case STATE_STRUCT_FIELD:
       found = (found || strcmp (element_name, "callback") == 0);
+      in_embedded_state = ctx->state;
       break;
     default:
       break;
@@ -840,12 +844,10 @@ start_function (GMarkupParseContext *context,
   if (!found)
     return FALSE;
 
-  in_embedded_type = ctx->state == STATE_STRUCT_FIELD;
-
   if (!introspectable_prelude (context, attribute_names, attribute_values, ctx, STATE_FUNCTION))
     return TRUE;
 
-  ctx->in_embedded_type = in_embedded_type;
+  ctx->in_embedded_state = in_embedded_state;
 
   name = find_attribute ("name", attribute_names, attribute_values);
   shadows = find_attribute ("shadows", attribute_names, attribute_values);
@@ -1046,6 +1048,71 @@ parse_param_transfer (GIrNodeParam *param, const gchar *transfer, const gchar *n
 }
 
 static gboolean
+start_instance_parameter (GMarkupParseContext *context,
+                          const gchar         *element_name,
+                          const gchar        **attribute_names,
+                          const gchar        **attribute_values,
+                          ParseContext        *ctx,
+                          GError             **error)
+{
+  const gchar *transfer;
+  gboolean transfer_full;
+
+  if (!(strcmp (element_name, "instance-parameter") == 0 &&
+	ctx->state == STATE_FUNCTION_PARAMETERS))
+    return FALSE;
+
+  transfer = find_attribute ("transfer-ownership", attribute_names, attribute_values);
+
+  state_switch (ctx, STATE_PASSTHROUGH);
+
+  if (strcmp (transfer, "full") == 0)
+    transfer_full = TRUE;
+  else if (strcmp (transfer, "none") == 0)
+    transfer_full = FALSE;
+  else
+    {
+      g_set_error (error, G_MARKUP_ERROR,
+		   G_MARKUP_ERROR_INVALID_CONTENT,
+		   "invalid value for 'transfer-ownership' for instance parameter: %s", transfer);
+      return FALSE;
+    }
+
+  switch (CURRENT_NODE (ctx)->type)
+    {
+    case G_IR_NODE_FUNCTION:
+    case G_IR_NODE_CALLBACK:
+      {
+	GIrNodeFunction *func;
+
+	func = (GIrNodeFunction *)CURRENT_NODE (ctx);
+        func->instance_transfer_full = transfer_full;
+      }
+      break;
+    case G_IR_NODE_SIGNAL:
+      {
+	GIrNodeSignal *signal;
+
+	signal = (GIrNodeSignal *)CURRENT_NODE (ctx);
+        signal->instance_transfer_full = transfer_full;
+      }
+      break;
+    case G_IR_NODE_VFUNC:
+      {
+	GIrNodeVFunc *vfunc;
+
+	vfunc = (GIrNodeVFunc *)CURRENT_NODE (ctx);
+        vfunc->instance_transfer_full = transfer_full;
+      }
+      break;
+    default:
+      g_assert_not_reached ();
+    }
+
+  return TRUE;
+}
+
+static gboolean
 start_parameter (GMarkupParseContext *context,
 		 const gchar         *element_name,
 		 const gchar        **attribute_names,
@@ -1064,6 +1131,7 @@ start_parameter (GMarkupParseContext *context,
   const gchar *closure;
   const gchar *destroy;
   const gchar *skip;
+  const gchar *nullable;
   GIrNodeParam *param;
 
   if (!(strcmp (element_name, "parameter") == 0 &&
@@ -1081,6 +1149,7 @@ start_parameter (GMarkupParseContext *context,
   closure = find_attribute ("closure", attribute_names, attribute_values);
   destroy = find_attribute ("destroy", attribute_names, attribute_values);
   skip = find_attribute ("skip", attribute_names, attribute_values);
+  nullable = find_attribute ("nullable", attribute_names, attribute_values);
 
   if (name == NULL)
     name = "unknown";
@@ -1125,10 +1194,18 @@ start_parameter (GMarkupParseContext *context,
   else
     param->optional = FALSE;
 
-  if (allow_none && strcmp (allow_none, "1") == 0)
-    param->allow_none = TRUE;
+  if (nullable && strcmp (nullable, "1") == 0)
+    param->nullable = TRUE;
   else
-    param->allow_none = FALSE;
+    param->nullable = FALSE;
+
+  if (allow_none && strcmp (allow_none, "1") == 0)
+    {
+      if (param->out)
+        param->optional = TRUE;
+      else
+        param->nullable = TRUE;
+    }
 
   if (skip && strcmp (skip, "1") == 0)
     param->skip = TRUE;
@@ -2171,6 +2248,7 @@ start_return_value (GMarkupParseContext *context,
   GIrNodeParam *param;
   const gchar  *transfer;
   const gchar  *skip;
+  const gchar  *nullable;
 
   if (!(strcmp (element_name, "return-value") == 0 &&
 	ctx->state == STATE_FUNCTION))
@@ -2195,6 +2273,10 @@ start_return_value (GMarkupParseContext *context,
   transfer = find_attribute ("transfer-ownership", attribute_names, attribute_values);
   if (!parse_param_transfer (param, transfer, NULL, error))
     return FALSE;
+
+  nullable = find_attribute ("nullable", attribute_names, attribute_values);
+  if (nullable && g_str_equal (nullable, "1"))
+    param->nullable = TRUE;
 
   switch (CURRENT_NODE (ctx)->type)
     {
@@ -2301,9 +2383,9 @@ start_glib_signal (GMarkupParseContext *context,
   signal->run_first = FALSE;
   signal->run_last = FALSE;
   signal->run_cleanup = FALSE;
-  if (when == NULL || strcmp (when, "LAST") == 0)
+  if (when == NULL || g_ascii_strcasecmp (when, "LAST") == 0)
     signal->run_last = TRUE;
-  else if (strcmp (when, "FIRST") == 0)
+  else if (g_ascii_strcasecmp (when, "FIRST") == 0)
     signal->run_first = TRUE;
   else
     signal->run_cleanup = TRUE;
@@ -2748,7 +2830,8 @@ start_element_handler (GMarkupParseContext *context,
 			       attribute_names, attribute_values,
 			       ctx, error))
 	goto out;
-      if (strcmp (element_name, "doc") == 0)
+      if (strcmp ("doc", element_name) == 0 || strcmp ("doc-deprecated", element_name) == 0 ||
+          strcmp ("doc-stability", element_name) == 0 || strcmp ("doc-version", element_name) == 0)
         {
           state_switch (ctx, STATE_PASSTHROUGH);
           goto out;
@@ -2831,11 +2914,10 @@ start_element_handler (GMarkupParseContext *context,
 				 attribute_names, attribute_values,
 				 ctx, error))
 	goto out;
-      else if (strcmp (element_name, "instance-parameter") == 0)
-        {
-          state_switch (ctx, STATE_PASSTHROUGH);
-          goto out;
-        }
+      else if (start_instance_parameter (context, element_name,
+				attribute_names, attribute_values,
+				ctx, error))
+	goto out;
       else if (strcmp (element_name, "c:include") == 0)
 	{
 	  state_switch (ctx, STATE_C_INCLUDE);
@@ -2872,6 +2954,9 @@ start_element_handler (GMarkupParseContext *context,
 	  version = find_attribute ("version", attribute_names, attribute_values);
 	  shared_library = find_attribute ("shared-library", attribute_names, attribute_values);
 	  cprefix = find_attribute ("c:identifier-prefixes", attribute_names, attribute_values);
+          /* Backwards compatibility; vala currently still generates this */
+          if (cprefix == NULL)
+            cprefix = find_attribute ("c:prefix", attribute_names, attribute_values);
 
 	  if (name == NULL)
 	    MISSING_ATTRIBUTE (context, error, element_name, "name");
@@ -3206,10 +3291,10 @@ end_element_handler (GMarkupParseContext *context,
 	else
 	  {
             g_debug("case STATE_FUNCTION %d", CURRENT_NODE (ctx)->type);
-            if (ctx->in_embedded_type)
+            if (ctx->in_embedded_state != STATE_NONE)
               {
-                ctx->in_embedded_type = FALSE;
-                state_switch (ctx, STATE_STRUCT_FIELD);
+                state_switch (ctx, ctx->in_embedded_state);
+                ctx->in_embedded_state = STATE_NONE;
               }
 	    else if (CURRENT_NODE (ctx)->type == G_IR_NODE_INTERFACE)
 	      state_switch (ctx, STATE_INTERFACE);

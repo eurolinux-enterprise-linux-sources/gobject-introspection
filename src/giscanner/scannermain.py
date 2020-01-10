@@ -27,9 +27,10 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import platform
 
 from giscanner import message
-from giscanner.annotationparser import AnnotationParser
+from giscanner.annotationparser import GtkDocCommentBlockParser
 from giscanner.ast import Include, Namespace
 from giscanner.dumper import compile_introspection_binary
 from giscanner.gdumpparser import GDumpParser, IntrospectionBinary
@@ -38,17 +39,29 @@ from giscanner.girparser import GIRParser
 from giscanner.girwriter import GIRWriter
 from giscanner.maintransformer import MainTransformer
 from giscanner.shlibs import resolve_shlibs
-from giscanner.sourcescanner import SourceScanner
+from giscanner.sourcescanner import SourceScanner, ALL_EXTS
 from giscanner.transformer import Transformer
 from . import utils
+
 
 def process_cflags_begin(option, opt, value, parser):
     cflags = getattr(parser.values, option.dest)
     while len(parser.rargs) > 0 and parser.rargs[0] != '--cflags-end':
-        cflags.append(parser.rargs.pop(0))
+        arg = parser.rargs.pop(0)
+        if arg == "-I" and parser.rargs and parser.rargs[0] != '--cflags-end':
+            # This is a special case where there's a space between -I and the path.
+            arg += parser.rargs.pop(0)
+        cflags.append(utils.cflag_real_include_path(arg))
+
 
 def process_cflags_end(option, opt, value, parser):
     pass
+
+
+def process_cpp_includes(option, opt, value, parser):
+    cpp_includes = getattr(parser.values, option.dest)
+    cpp_includes.append(os.path.realpath(value))
+
 
 def get_preprocessor_option_group(parser):
     group = optparse.OptionGroup(parser, "Preprocessor options")
@@ -60,8 +73,8 @@ def get_preprocessor_option_group(parser):
                      help="End preprocessor/compiler flags",
                      action="callback", callback=process_cflags_end)
     group.add_option("-I", help="Pre-processor include file",
-                     action="append", dest="cpp_includes",
-                     default=[])
+                     dest="cpp_includes", default=[], type="string",
+                     action="callback", callback=process_cpp_includes)
     group.add_option("-D", help="Pre-processor define",
                      action="append", dest="cpp_defines",
                      default=[])
@@ -71,6 +84,7 @@ def get_preprocessor_option_group(parser):
     group.add_option("-p", dest="", help="Ignored")
     return group
 
+
 def get_windows_option_group(parser):
     group = optparse.OptionGroup(parser, "Machine Dependent Options")
     group.add_option("-m", help="some machine dependent option",
@@ -79,13 +93,13 @@ def get_windows_option_group(parser):
 
     return group
 
+
 def _get_option_parser():
     parser = optparse.OptionParser('%prog [options] sources')
     parser.add_option('', "--quiet",
                       action="store_true", dest="quiet",
                       default=False,
-                      help="If passed, do not print details of normal" \
-                          + " operation")
+                      help="If passed, do not print details of normal operation")
     parser.add_option("", "--format",
                       action="store", dest="format",
                       default="gir",
@@ -142,6 +156,11 @@ and --symbol-prefix.""")
                       help="""Remove this prefix from C identifiers (structure typedefs, etc.).
 May be specified multiple times.  This is also used as the default for --symbol-prefix if
 the latter is not specified.""")
+    parser.add_option("", "--identifier-filter-cmd",
+                      action="store", dest="identifier_filter_cmd", default='',
+                      help='Filter identifiers (struct and union typedefs) through the given '
+                           'shell command which will receive the identifier name as input '
+                           'to stdin and is expected to output the filtered results to stdout.')
     parser.add_option("", "--symbol-prefix",
                       action="append", dest="symbol_prefixes", default=[],
                       help="Remove this prefix from C symbols (function names)")
@@ -180,7 +199,8 @@ match the namespace prefix.""")
     group = get_preprocessor_option_group(parser)
     parser.add_option_group(group)
 
-    if os.environ.get('MSYSTEM') == 'MINGW32':
+    msystemenv = os.environ.get('MSYSTEM')
+    if msystemenv and msystemenv.startswith('MINGW'):
         group = get_windows_option_group(parser)
         parser.add_option_group(group)
 
@@ -197,12 +217,28 @@ match the namespace prefix.""")
     parser.add_option("", "--typelib-xml",
                       action="store_true", dest="typelib_xml",
                       help=optparse.SUPPRESS_HELP)
+    parser.add_option("", "--function-decoration",
+                      action="append", dest="function_decoration", default=[],
+                      help="Macro to decorate functions in generated code")
+    parser.add_option("", "--include-first-in-header",
+                      action="append", dest="include_first_header", default=[],
+                      help="Header to include first in generated header")
+    parser.add_option("", "--include-last-in-header",
+                      action="append", dest="include_last_header", default=[],
+                      help="Header to include after the other headers in generated header")
+    parser.add_option("", "--include-first-in-src",
+                      action="append", dest="include_first_src", default=[],
+                      help="Header to include first in generated sources")
+    parser.add_option("", "--include-last-in-src",
+                      action="append", dest="include_last_src", default=[],
+                      help="Header to include after the other headers in generated sources")
 
     return parser
 
 
 def _error(msg):
     raise SystemExit('ERROR: %s' % (msg, ))
+
 
 def passthrough_gir(path, f):
     parser = GIRParser()
@@ -211,15 +247,28 @@ def passthrough_gir(path, f):
     writer = GIRWriter(parser.get_namespace())
     f.write(writer.get_xml())
 
-def test_codegen(optstring):
+
+def test_codegen(optstring,
+                 function_decoration,
+                 include_first_header,
+                 include_last_header,
+                 include_first_src,
+                 include_last_src):
     (namespace, out_h_filename, out_c_filename) = optstring.split(',')
     if namespace == 'Everything':
         from .testcodegen import EverythingCodeGenerator
-        gen = EverythingCodeGenerator(out_h_filename, out_c_filename)
+        gen = EverythingCodeGenerator(out_h_filename,
+                                      out_c_filename,
+                                      function_decoration,
+                                      include_first_header,
+                                      include_last_header,
+                                      include_first_src,
+                                      include_last_src)
         gen.write()
     else:
         _error("Invaild namespace %r" % (namespace, ))
     return 0
+
 
 def process_options(output, allowed_flags):
     for option in output.split():
@@ -228,6 +277,7 @@ def process_options(output, allowed_flags):
                 continue
             yield option
             break
+
 
 def process_packages(options, packages):
     args = ['pkg-config', '--cflags']
@@ -244,25 +294,24 @@ def process_packages(options, packages):
     filtered_output = list(process_options(output, options_whitelist))
     parser = _get_option_parser()
     pkg_options, unused = parser.parse_args(filtered_output)
-    options.cpp_includes.extend(pkg_options.cpp_includes)
+    options.cpp_includes.extend([os.path.realpath(f) for f in pkg_options.cpp_includes])
     options.cpp_defines.extend(pkg_options.cpp_defines)
     options.cpp_undefines.extend(pkg_options.cpp_undefines)
+
 
 def extract_filenames(args):
     filenames = []
     for arg in args:
         # We don't support real C++ parsing yet, but we should be able
         # to understand C API implemented in C++ files.
-        if (arg.endswith('.c') or arg.endswith('.cpp') or
-            arg.endswith('.cc') or arg.endswith('.cxx') or
-            arg.endswith('.h') or arg.endswith('.hpp') or
-            arg.endswith('.hxx')):
+        if os.path.splitext(arg)[1] in ALL_EXTS:
             if not os.path.exists(arg):
                 _error('%s: no such a file or directory' % (arg, ))
             # Make absolute, because we do comparisons inside scannerparser.c
             # against the absolute path that cpp will give us
-            filenames.append(os.path.abspath(arg))
+            filenames.append(arg)
     return filenames
+
 
 def extract_filelist(options):
     filenames = []
@@ -274,16 +323,17 @@ def extract_filelist(options):
         # We don't support real C++ parsing yet, but we should be able
         # to understand C API implemented in C++ files.
         filename = line.strip()
-        if (filename.endswith('.c') or filename.endswith('.cpp') or
-            filename.endswith('.cc') or filename.endswith('.cxx') or
-            filename.endswith('.h') or filename.endswith('.hpp') or
-            filename.endswith('.hxx')):
+        if (filename.endswith('.c') or filename.endswith('.cpp')
+        or filename.endswith('.cc') or filename.endswith('.cxx')
+        or filename.endswith('.h') or filename.endswith('.hpp')
+        or filename.endswith('.hxx')):
             if not os.path.exists(filename):
                 _error('%s: Invalid filelist entry-no such file or directory' % (line, ))
             # Make absolute, because we do comparisons inside scannerparser.c
             # against the absolute path that cpp will give us
-            filenames.append(os.path.abspath(filename))
+            filenames.append(filename)
     return filenames
+
 
 def create_namespace(options):
     if options.strip_prefix:
@@ -313,9 +363,11 @@ see --identifier-prefix and --symbol-prefix."""
                      identifier_prefixes=identifier_prefixes,
                      symbol_prefixes=symbol_prefixes)
 
+
 def create_transformer(namespace, options):
     transformer = Transformer(namespace,
-                              accept_unprefixed=options.accept_unprefixed)
+                              accept_unprefixed=options.accept_unprefixed,
+                              identifier_filter_cmd=options.identifier_filter_cmd)
     transformer.set_include_paths(options.include_paths)
     if options.passthrough_gir:
         transformer.disable_cache()
@@ -334,6 +386,7 @@ def create_transformer(namespace, options):
 
     return transformer
 
+
 def create_binary(transformer, options, args):
     # Transform the C AST nodes into higher level
     # GLib/GObject nodes
@@ -344,7 +397,7 @@ def create_binary(transformer, options, args):
     gdump_parser.init_parse()
 
     if options.program:
-        args=[options.program]
+        args = [options.program]
         args.extend(options.program_args)
         binary = IntrospectionBinary(args)
     else:
@@ -357,11 +410,15 @@ def create_binary(transformer, options, args):
     gdump_parser.parse()
     return shlibs
 
+
 def create_source_scanner(options, args):
     if hasattr(options, 'filelist') and options.filelist:
         filenames = extract_filelist(options)
     else:
         filenames = extract_filenames(args)
+
+    if platform.system() == 'Darwin':
+        options.cpp_undefines.append('__BLOCKS__')
 
     # Run the preprocessor, tokenize and construct simple
     # objects representing the raw C symbols
@@ -373,6 +430,7 @@ def create_source_scanner(options, args):
     ss.parse_files(filenames)
     ss.parse_macros(filenames)
     return ss
+
 
 def write_output(data, options):
     if options.output == "-":
@@ -393,7 +451,7 @@ def write_output(data, options):
         os.unlink(temp_f_name)
         try:
             shutil.move(main_f_name, options.output)
-        except OSError, e:
+        except OSError as e:
             if e.errno == errno.EPERM:
                 os.unlink(main_f_name)
                 return 0
@@ -402,13 +460,14 @@ def write_output(data, options):
     else:
         try:
             output = open(options.output, "w")
-        except IOError, e:
+        except IOError as e:
             _error("opening output for writing: %s" % (e.strerror, ))
 
     try:
         output.write(data)
-    except IOError, e:
+    except IOError as e:
         _error("while writing output: %s" % (e.strerror, ))
+
 
 def scanner_main(args):
     parser = _get_option_parser()
@@ -417,7 +476,12 @@ def scanner_main(args):
     if options.passthrough_gir:
         passthrough_gir(options.passthrough_gir, sys.stdout)
     if options.test_codegen:
-        return test_codegen(options.test_codegen)
+        return test_codegen(options.test_codegen,
+                            options.function_decoration,
+                            options.include_first_header,
+                            options.include_last_header,
+                            options.include_first_src,
+                            options.include_last_src)
 
     if hasattr(options, 'filelist') and not options.filelist:
         if len(args) <= 1:
@@ -439,7 +503,8 @@ def scanner_main(args):
     namespace = create_namespace(options)
     logger = message.MessageLogger.get(namespace=namespace)
     if options.warn_all:
-        logger.enable_warnings(True)
+        logger.enable_warnings((message.WARNING, message.ERROR, message.FATAL))
+
     transformer = create_transformer(namespace, options)
 
     packages = set(options.packages)
@@ -451,11 +516,10 @@ def scanner_main(args):
 
     ss = create_source_scanner(options, args)
 
-    ap = AnnotationParser()
-    blocks = ap.parse(ss.get_comments())
+    cbp = GtkDocCommentBlockParser()
+    blocks = cbp.parse_comment_blocks(ss.get_comments())
 
     # Transform the C symbols into AST nodes
-    transformer.set_annotations(blocks)
     transformer.parse(ss.get_symbols())
 
     if not options.header_only:

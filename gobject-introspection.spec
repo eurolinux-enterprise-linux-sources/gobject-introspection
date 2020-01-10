@@ -1,14 +1,13 @@
 Name:           gobject-introspection
-Version:        1.36.0
-Release:        4%{?dist}
+Version:        1.42.0
+Release:        1%{?dist}
 Summary:        Introspection system for GObject-based libraries
 
 Group:      Development/Libraries
 License:        GPLv2+, LGPLv2+, MIT
 URL:            http://live.gnome.org/GObjectIntrospection
 #VCS:           git:git://git.gnome.org/gobject-introspection
-Source0:        http://download.gnome.org/sources/gobject-introspection/1.36/%{name}-%{version}.tar.xz
-Patch0:		0001-scanner-dont-barf-on-anonymous-unions.patch
+Source0:        http://download.gnome.org/sources/gobject-introspection/1.42/%{name}-%{version}.tar.xz
 
 Obsoletes:      gir-repository
 
@@ -42,7 +41,7 @@ things.
 %package devel
 Summary: Libraries and headers for gobject-introspection
 Group: Development/Libraries
-Requires: %name = %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
 # Not always, but whatever, it's a tiny dep to pull in
 Requires: libtool
 # For g-ir-doctool
@@ -54,7 +53,6 @@ Libraries and headers for gobject-introspection
 
 %prep
 %setup -q
-%patch0 -p0
 
 %build
 (if ! test -x configure; then NOCONFIGURE=1 ./autogen.sh; fi;)
@@ -96,6 +94,10 @@ find $RPM_BUILD_ROOT -type f -name "*.a" -exec rm -f {} ';'
 %{_datadir}/gtk-doc/html/gi/*
 
 %changelog
+* Tue Apr 28 2015 Matthias Clasen <mclasen@redhat.com> - 1.42.0-1
+- Update to 1.42.0
+- Resolves: #1174439
+
 * Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 1.36.0-4
 - Mass rebuild 2014-01-24
 

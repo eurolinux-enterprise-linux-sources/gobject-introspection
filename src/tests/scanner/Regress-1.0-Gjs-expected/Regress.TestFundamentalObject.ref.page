@@ -6,7 +6,6 @@
       xmlns:api="http://projectmallard.org/experimental/api/"
       xmlns:ui="http://projectmallard.org/1.0/ui/">
   <info>
-    
     <link xref="Regress.TestFundamentalObject" group="method" type="guide"/>
     <api:function>
       <api:returns>
@@ -14,29 +13,20 @@
       </api:returns>
       <api:name>regress_test_fundamental_object_ref</api:name>
     </api:function>
-
   </info>
   <title>Regress.TestFundamentalObject.prototype.ref</title>
-  
-<synopsis><code mime="text/x-gjs">
-function ref():Regress.TestFundamentalObject {
+  <synopsis><code mime="text/x-gjs">
+function ref(): <link xref="Regress.TestFundamentalObject">Regress.TestFundamentalObject</link> {
     // Gjs wrapper for regress_test_fundamental_object_ref()
 }
-</code></synopsis>
+  </code></synopsis>
 
-  
-    
-  
-  
-  
-  
+
 <terms>
 <item>
 <title><code>Returns</code></title>
-<p>A new <link xref="Regress.TestFundamentalObject"/></p>
+  <p>A new <link xref="Regress.TestFundamentalObject"/></p>
 </item>
 </terms>
 
-  
-  
 </page>

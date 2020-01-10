@@ -25,11 +25,11 @@
 #include <gio/gio.h>
 
 GISourceSymbol *
-gi_source_symbol_new (GISourceSymbolType type, const gchar *filename, int line)
+gi_source_symbol_new (GISourceSymbolType type, GFile *file, int line)
 {
   GISourceSymbol *s = g_slice_new0 (GISourceSymbol);
   s->ref_count = 1;
-  s->source_filename = g_strdup (filename);
+  s->source_filename = g_file_get_parse_name (file);
   s->type = type;
   s->line = line;
   return s;
@@ -47,8 +47,9 @@ ctype_free (GISourceType * type)
 GISourceSymbol *
 gi_source_symbol_copy (GISourceSymbol * symbol)
 {
+  GFile *source_file = g_file_new_for_path (symbol->source_filename);
   GISourceSymbol *new_symbol = gi_source_symbol_new (symbol->type,
-                                                     symbol->source_filename,
+                                                     source_file,
                                                      symbol->line);
   new_symbol->ident = g_strdup (symbol->ident);
 
@@ -59,6 +60,9 @@ gi_source_symbol_copy (GISourceSymbol * symbol)
     new_symbol->const_int = symbol->const_int;
     new_symbol->const_int_is_unsigned = symbol->const_int_is_unsigned;
     new_symbol->const_int_set = TRUE;
+  } else if (symbol->const_boolean_set) {
+    new_symbol->const_boolean = symbol->const_boolean;
+    new_symbol->const_boolean_set = TRUE;
   } else if (symbol->const_double_set) {
     new_symbol->const_double = symbol->const_double;
     new_symbol->const_double_set = TRUE;
@@ -213,11 +217,10 @@ gi_source_scanner_new (void)
 
   scanner = g_slice_new0 (GISourceScanner);
   scanner->typedef_table = g_hash_table_new_full (g_str_hash, g_str_equal,
-						  g_free, NULL);
-  scanner->struct_or_union_or_enum_table =
-    g_hash_table_new_full (g_str_hash, g_str_equal,
-			   g_free, (GDestroyNotify)gi_source_symbol_unref);
-
+                                                  g_free, NULL);
+  scanner->files = g_hash_table_new_full (g_file_hash, (GEqualFunc)g_file_equal,
+                                          g_object_unref, NULL);
+  g_queue_init (&scanner->conditionals);
   return scanner;
 }
 
@@ -232,19 +235,18 @@ gi_source_comment_free (GISourceComment *comment)
 void
 gi_source_scanner_free (GISourceScanner *scanner)
 {
-  g_free (scanner->current_filename);
+  g_object_unref (scanner->current_file);
 
   g_hash_table_destroy (scanner->typedef_table);
-  g_hash_table_destroy (scanner->struct_or_union_or_enum_table);
 
   g_slist_foreach (scanner->comments, (GFunc)gi_source_comment_free, NULL);
   g_slist_free (scanner->comments);
   g_slist_foreach (scanner->symbols, (GFunc)gi_source_symbol_unref, NULL);
   g_slist_free (scanner->symbols);
 
-  g_list_foreach (scanner->filenames, (GFunc)g_free, NULL);
-  g_list_free (scanner->filenames);
+  g_hash_table_unref (scanner->files);
 
+  g_queue_clear (&scanner->conditionals);
 }
 
 gboolean
@@ -266,29 +268,18 @@ void
 gi_source_scanner_add_symbol (GISourceScanner  *scanner,
 			      GISourceSymbol   *symbol)
 {
-  gboolean found_filename = FALSE;
-  GList *l;
-  GFile *current_file;
-
-  g_assert (scanner->current_filename);
-  current_file = g_file_new_for_path (scanner->current_filename);
-
-  for (l = scanner->filenames; l != NULL; l = l->next)
+  if (scanner->skipping)
     {
-      GFile *file = g_file_new_for_path (l->data);
-
-      if (g_file_equal (file, current_file))
-	{
-	  found_filename = TRUE;
-          g_object_unref (file);
-	  break;
-	}
-      g_object_unref (file);
+      g_debug ("skipping symbol due to __GI_SCANNER__ cond: %s", symbol->ident);
+      return;
     }
 
-  if (found_filename || scanner->macro_scan)
+  g_assert (scanner->current_file);
+
+  if (scanner->macro_scan || g_hash_table_contains (scanner->files, scanner->current_file))
     scanner->symbols = g_slist_prepend (scanner->symbols,
-					gi_source_symbol_ref (symbol));
+                                        gi_source_symbol_ref (symbol));
+
   g_assert (symbol->source_filename != NULL);
 
   switch (symbol->type)
@@ -298,28 +289,48 @@ gi_source_scanner_add_symbol (GISourceScanner  *scanner,
 			   g_strdup (symbol->ident),
 			   GINT_TO_POINTER (TRUE));
       break;
-    case CSYMBOL_TYPE_STRUCT:
-    case CSYMBOL_TYPE_UNION:
-    case CSYMBOL_TYPE_ENUM:
-      g_hash_table_insert (scanner->struct_or_union_or_enum_table,
-			   g_strdup (symbol->ident),
-			   gi_source_symbol_ref (symbol));
-      break;
     default:
       break;
     }
-
-    g_object_unref (current_file);
 }
 
+void
+gi_source_scanner_take_comment (GISourceScanner *scanner,
+                                GISourceComment *comment)
+{
+  if (scanner->skipping)
+    {
+      g_debug ("skipping comment due to __GI_SCANNER__ cond");
+      gi_source_comment_free (comment);
+      return;
+    }
+
+  scanner->comments = g_slist_prepend (scanner->comments,
+                                       comment);
+}
+
+/**
+ * gi_source_scanner_get_symbols:
+ * @scanner: scanner instance
+ *
+ * Returns: (transfer container): List of GISourceSymbol.
+ *   Free resulting list with g_slist_free().
+ */
 GSList *
 gi_source_scanner_get_symbols (GISourceScanner  *scanner)
 {
-  return g_slist_reverse (scanner->symbols);
+  return g_slist_reverse (g_slist_copy (scanner->symbols));
 }
 
+/**
+ * gi_source_scanner_get_comments:
+ * @scanner: scanner instance
+ *
+ * Returns: (transfer container): List of GISourceComment.
+ *   Free resulting list with g_slist_free().
+ */
 GSList *
 gi_source_scanner_get_comments(GISourceScanner  *scanner)
 {
-  return g_slist_reverse (scanner->comments);
+  return g_slist_reverse (g_slist_copy (scanner->comments));
 }

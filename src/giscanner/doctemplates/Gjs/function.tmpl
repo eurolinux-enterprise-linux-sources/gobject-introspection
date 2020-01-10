@@ -6,7 +6,7 @@
         <api:type>${formatter.format_type(node.retval.type) | x}</api:type>
       </api:returns>
       <api:name>${node.symbol}</api:name>
-% for arg in formatter.get_parameters(node):
+% for arg in formatter.get_in_parameters(node):
 % if arg.type.ctype == '<varargs>':
       <api:varargs/>
 % else:
@@ -19,30 +19,29 @@
     </api:function>
 </%block>
 <%block name="synopsis">
-<synopsis><code mime="text/x-gjs">
+  <synopsis><code mime="text/x-gjs">
 function \
-${node.name}(\
-${', '.join('%s:%s' % (arg.argname, formatter.format_type(arg.type)) for arg in formatter.get_parameters(node))}\
-):${formatter.format_type(node.retval.type)} {
+${node.name if node.shadows is None else node.shadows}(\
+${', '.join('%s: %s' % (arg.argname, formatter.format_type(arg.type, True)) for arg in formatter.get_in_parameters(node))}\
+): ${formatter.format_out_parameters(node)} {
     // Gjs wrapper for ${node.symbol}()
 }
-</code></synopsis>
-</%block>
+  </code></synopsis></%block>
 <%block name="details">
-% if formatter.get_parameters(node) or node.retval:
+% if formatter.has_any_parameters(node):
 <terms>
-% for arg in formatter.get_parameters(node):
+% for arg in formatter.get_in_parameters(node):
 <item>
 <title><code>${arg.argname}</code></title>
 ${formatter.format(node, arg.doc)}
 </item>
 % endfor
-% if node.retval and node.retval.type.ctype != 'void':
+% for arg in formatter.get_out_parameters(node):
 <item>
-<title><code>Returns</code></title>
-${formatter.format(node, node.retval.doc)}
+<title><code>${(arg.argname + ' (out)') if arg.direction == 'inout' else arg.argname}</code></title>
+${formatter.format(node, arg.doc)}
 </item>
-% endif
+% endfor
 </terms>
 % endif
 </%block>

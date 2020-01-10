@@ -3,7 +3,7 @@
 
 dnl the gi version number
 m4_define(gi_major_version, 1)
-m4_define(gi_minor_version, 36)
+m4_define(gi_minor_version, 42)
 m4_define(gi_micro_version, 0)
 m4_define(gi_version, gi_major_version.gi_minor_version.gi_micro_version)
 
@@ -17,10 +17,14 @@ AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([build-aux])
 
-AM_INIT_AUTOMAKE([1.11 tar-ustar dist-xz no-dist-gzip foreign -Wno-portability])
+AM_INIT_AUTOMAKE([1.11 tar-ustar dist-xz no-dist-gzip foreign -Wno-portability parallel-tests])
 AM_MAINTAINER_MODE([enable])
 
 AM_SILENT_RULES([yes])
+
+# Used in docs/reference/version.xml
+GI_VERSION=gi_version
+AC_SUBST(GI_VERSION)
 
 # Check for Win32
 AC_CANONICAL_HOST
@@ -167,7 +171,7 @@ AC_SUBST(CAIRO_GIR_PACKAGE)
 PKG_CHECK_MODULES(SCANNER, [gobject-2.0 gio-2.0])
 
 dnl libffi
-PKG_CHECK_MODULES(FFI, libffi, have_ffi_pkgconfig=yes, have_ffi_pkgconfig=no)
+PKG_CHECK_MODULES(FFI, [libffi >= 3.0.0 ], have_ffi_pkgconfig=yes, have_ffi_pkgconfig=no)
 FFI_PC_CFLAGS=""
 FFI_PC_LIBS=""
 FFI_PC_PACKAGES=""
@@ -229,7 +233,7 @@ GIREPO_CFLAGS="$GIREPO_CFLAGS $GCOV_CFLAGS"
 # gtkdocize greps for ^GTK_DOC_CHECK and parses it, so you need to have
 # it on it's own line.
 m4_ifdef([GTK_DOC_CHECK], [
-GTK_DOC_CHECK([1.15], [--flavour no-tmpl])
+GTK_DOC_CHECK([1.19], [--flavour no-tmpl])
 ],[
 AM_CONDITIONAL([ENABLE_GTK_DOC],[false])
 ])
@@ -247,7 +251,7 @@ AC_CHECK_FUNCS([memchr strchr strspn strstr strtol strtoull])
 AC_CHECK_FUNCS([backtrace backtrace_symbols])
 
 # Python
-AM_PATH_PYTHON([2.5])
+AM_PATH_PYTHON([2.6])
 case "$host" in
 *-*-mingw*)
 	# Change backslashes to forward slashes in pyexecdir to avoid
@@ -288,6 +292,39 @@ AC_SUBST(GLIBSRC)
 AC_MSG_RESULT([$GLIBSRC])
 
 dnl
+dnl Check for -fvisibility=hidden to determine if we can do GNU-style
+dnl visibility attributes for symbol export control
+dnl
+GI_HIDDEN_VISIBILITY_CFLAGS=""
+case "$host" in
+  *-*-mingw*)
+    dnl on mingw32 we do -fvisibility=hidden and __declspec(dllexport)
+    AC_DEFINE([_GI_EXTERN], [__attribute__((visibility("default"))) __declspec(dllexport) extern],
+              [defines how to decorate public symbols while building])
+    CFLAGS="${CFLAGS} -fvisibility=hidden"
+    ;;
+  *)
+    dnl on other compilers, check if we can do -fvisibility=hidden
+    SAVED_CFLAGS="${CFLAGS}"
+    CFLAGS="-fvisibility=hidden"
+    AC_MSG_CHECKING([for -fvisibility=hidden compiler flag])
+    AC_TRY_COMPILE([], [int main (void) { return 0; }],
+                   AC_MSG_RESULT(yes)
+                   enable_fvisibility_hidden=yes,
+                   AC_MSG_RESULT(no)
+                   enable_fvisibility_hidden=no)
+    CFLAGS="${SAVED_CFLAGS}"
+
+    AS_IF([test "${enable_fvisibility_hidden}" = "yes"], [
+      AC_DEFINE([_GI_EXTERN], [__attribute__((visibility("default"))) extern],
+                [defines how to decorate public symbols while building])
+      GI_HIDDEN_VISIBILITY_CFLAGS="-fvisibility=hidden"
+    ])
+    ;;
+esac
+AC_SUBST(GI_HIDDEN_VISIBILITY_CFLAGS)
+
+dnl
 dnl Check for -Bsymbolic-functions linker flag used to avoid
 dnl intra-library PLT jumps, if available.
 dnl
@@ -297,11 +334,11 @@ AC_ARG_ENABLE(Bsymbolic,
               [SAVED_LDFLAGS="${LDFLAGS}"
                AC_MSG_CHECKING([for -Bsymbolic-functions linker flag])
                LDFLAGS=-Wl,-Bsymbolic-functions
-               AC_TRY_LINK([], [int main (void) { return 0; }],
-                           AC_MSG_RESULT(yes)
-                           enable_Bsymbolic=yes,
-                           AC_MSG_RESULT(no)
-                           enable_Bsymbolic=no)
+               AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[int main (void) { return 0; }]])],
+                              [AC_MSG_RESULT(yes)
+                               enable_Bsymbolic=yes],
+                              [AC_MSG_RESULT(no)
+                               enable_Bsymbolic=no])
                LDFLAGS="${SAVED_LDFLAGS}"])
 
 if test "x${enable_Bsymbolic}" = "xyes"; then
@@ -312,26 +349,22 @@ AC_SUBST(EXTRA_LINK_FLAGS)
 
 AC_CONFIG_FILES([
 Makefile
-m4/Makefile
 tests/Makefile
 tests/offsets/Makefile
 tests/scanner/Makefile
+tests/scanner/annotationparser/Makefile
 tests/repository/Makefile
 tests/warn/Makefile
 docs/Makefile
 docs/reference/Makefile
+docs/reference/version.xml
 gobject-introspection-1.0.pc
 gobject-introspection-no-export-1.0.pc
 config.h.win32
 build/Makefile
 build/win32/Makefile
 build/win32/vs9/Makefile
-build/win32/vs10/Makefile])
+build/win32/vs10/Makefile
+build/win32/vs11/Makefile
+build/win32/vs12/Makefile])
 AC_OUTPUT
-
-echo "
-    gobject-introspection $VERSION
-    ===============
-
-    tests: ${enable_tests}
-"

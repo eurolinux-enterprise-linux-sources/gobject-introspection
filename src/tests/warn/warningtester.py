@@ -10,11 +10,11 @@ sys.path.insert(0, path)
 # Not correct, but enough to get the tests going uninstalled
 __builtin__.__dict__['DATADIR'] = path
 
-from giscanner.annotationparser import AnnotationParser
+from giscanner.annotationparser import GtkDocCommentBlockParser
 from giscanner.ast import Include, Namespace
 from giscanner.introspectablepass import IntrospectablePass
 from giscanner.maintransformer import MainTransformer
-from giscanner.message import MessageLogger
+from giscanner.message import MessageLogger, WARNING, ERROR, FATAL
 from giscanner.sourcescanner import SourceScanner
 from giscanner.transformer import Transformer
 from giscanner.scannermain import process_packages
@@ -60,23 +60,21 @@ def _diff(a, b):
             if tag == 'equal':
                 for line in a[i1:i2]:
                     for l in line.split('\n'):
-                        if l != '':
-                            retval +=  ' ' + l + '\n'
+                        retval += ' ' + l + '\n'
                 continue
 
             if tag in ('replace', 'delete'):
                 for line in a[i1:i2]:
                     for l in line.split('\n'):
-                        if l != '':
-                            retval +=  '-' + l + '\n'
+                        retval += '-' + l + '\n'
 
             if tag in ('replace', 'insert'):
                 for line in b[j1:j2]:
                     for l in line.split('\n'):
-                        if l != '':
-                            retval +=  '+' + l + '\n'
+                        retval += '+' + l + '\n'
 
     return retval
+
 
 def _extract_expected(filename):
     fd = open(filename, 'rU')
@@ -92,13 +90,14 @@ def _extract_expected(filename):
 
     return retval
 
+
 def check(args):
     filename = args[0]
 
     output = ChunkedIO()
     namespace = Namespace('Test', '1.0')
     logger = MessageLogger.get(namespace=namespace, output=output)
-    logger.enable_warnings(True)
+    logger.enable_warnings((WARNING, ERROR, FATAL))
 
     transformer = Transformer(namespace)
     transformer.set_include_paths([os.path.join(top_srcdir, 'gir'), top_builddir])
@@ -115,8 +114,8 @@ def check(args):
     ss.parse_macros([filename])
     transformer.parse(ss.get_symbols())
 
-    ap = AnnotationParser()
-    blocks = ap.parse(ss.get_comments())
+    cbp = GtkDocCommentBlockParser()
+    blocks = cbp.parse_comment_blocks(ss.get_comments())
 
     main = MainTransformer(transformer, blocks)
     main.transform()
@@ -128,15 +127,16 @@ def check(args):
 
     expected_warnings = _extract_expected(filename)
 
-    expected_warnings.sort()
-    emitted_warnings.sort()
+    sortkey = lambda x: int(x.split(':')[0])
+    expected_warnings.sort(key=sortkey)
+    emitted_warnings.sort(key=sortkey)
 
     if len(expected_warnings) != len(emitted_warnings):
         raise SystemExit('ERROR in %r: %d warnings were emitted, '
-                         'expected %d:\n%s' %(os.path.basename(filename),
-                                              len(emitted_warnings),
-                                              len(expected_warnings),
-                                              _diff(expected_warnings, emitted_warnings)))
+                         'expected %d:\n%s' % (os.path.basename(filename),
+                                               len(emitted_warnings),
+                                               len(expected_warnings),
+                                               _diff(expected_warnings, emitted_warnings)))
 
     for emitted_warning, expected_warning in zip(emitted_warnings, expected_warnings):
         if expected_warning != emitted_warning:

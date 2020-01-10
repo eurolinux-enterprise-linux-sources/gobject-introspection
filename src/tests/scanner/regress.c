@@ -1,4 +1,6 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+#include "config.h"
+
 #include <string.h>
 #include <stdlib.h>
 #include <glib-object.h>
@@ -1872,6 +1874,16 @@ regress_test_boxed_equals (RegressTestBoxed *boxed,
 	  regress_test_simple_boxed_a_equals(&other->nested_a, &boxed->nested_a));
 }
 
+void
+regress_test_boxeds_not_a_method (RegressTestBoxed *boxed)
+{
+}
+
+void
+regress_test_boxeds_not_a_static (void)
+{
+}
+
 static void
 regress_test_boxed_free (RegressTestBoxed *boxed)
 {
@@ -2009,6 +2021,7 @@ enum
   PROP_TEST_OBJ_BOXED,
   PROP_TEST_OBJ_HASH_TABLE,
   PROP_TEST_OBJ_LIST,
+  PROP_TEST_OBJ_PPTRARRAY,
   PROP_TEST_OBJ_HASH_TABLE_OLD,
   PROP_TEST_OBJ_LIST_OLD,
   PROP_TEST_OBJ_INT,
@@ -2455,10 +2468,7 @@ regress_test_obj_class_init (RegressTestObjClass *klass)
                                    pspec);
 
   /**
-   * RegressTestObj:hash-table:
-   *
-   * Type: GLib.HashTable(utf8,gint8)
-   * Transfer: container
+   * RegressTestObj:hash-table: (type GLib.HashTable(utf8,gint8)) (transfer container)
    */
   pspec = g_param_spec_boxed ("hash-table",
                               "GHashTable property",
@@ -2470,10 +2480,7 @@ regress_test_obj_class_init (RegressTestObjClass *klass)
                                    pspec);
 
   /**
-   * RegressTestObj:list:
-   *
-   * Type: GLib.List(utf8)
-   * Transfer: none
+   * RegressTestObj:list: (type GLib.List(utf8)) (transfer none)
    */
   pspec = g_param_spec_pointer ("list",
                                 "GList property",
@@ -2484,10 +2491,18 @@ regress_test_obj_class_init (RegressTestObjClass *klass)
                                    pspec);
 
   /**
-   * RegressTestObj:hash-table-old:
-   *
-   * Type: GLib.HashTable<utf8,gint8>
-   * Transfer: container
+   * RegressTestObj:pptrarray: (type GLib.PtrArray(utf8)) (transfer none)
+   */
+  pspec = g_param_spec_pointer ("pptrarray",
+                                "PtrArray property as a pointer",
+                                "Test annotating with GLib.PtrArray",
+                                G_PARAM_READWRITE);
+  g_object_class_install_property (gobject_class,
+                                   PROP_TEST_OBJ_PPTRARRAY,
+                                   pspec);
+
+  /**
+   * RegressTestObj:hash-table-old: (type GLib.HashTable<utf8,gint8>) (transfer container)
    */
   pspec = g_param_spec_boxed ("hash-table-old",
                               "GHashTable property with <>",
@@ -2499,10 +2514,7 @@ regress_test_obj_class_init (RegressTestObjClass *klass)
                                    pspec);
 
   /**
-   * RegressTestObj:list-old:
-   *
-   * Type: GLib.List<utf8>
-   * Transfer: none
+   * RegressTestObj:list-old: (type GLib.List<utf8>) (transfer none)
    */
   pspec = g_param_spec_pointer ("list-old",
                                 "GList property with ()",
@@ -2679,6 +2691,17 @@ int
 regress_test_obj_instance_method (RegressTestObj *obj)
 {
     return -1;
+}
+
+/**
+ * regress_test_obj_instance_method_full:
+ * @obj: (transfer full):
+ *
+ */
+void
+regress_test_obj_instance_method_full (RegressTestObj *obj)
+{
+  g_object_unref (obj);
 }
 
 double
@@ -2923,15 +2946,13 @@ regress_test_obj_skip_inout_param (RegressTestObj *obj,
 }
 
 /**
- * regress_test_obj_do_matrix:
+ * regress_test_obj_do_matrix: (virtual matrix)
  * @obj: A #RegressTestObj
  * @somestr: Meaningless string
  *
  * This method is virtual.  Notably its name differs from the virtual
  * slot name, which makes it useful for testing bindings handle this
  * case.
- *
- * Virtual: matrix
  */
 int
 regress_test_obj_do_matrix (RegressTestObj *obj, const char *somestr)
@@ -3181,12 +3202,7 @@ regress_test_fundamental_object_init (GTypeInstance * instance, gpointer klass)
 }
 
 /**
- * RegressTestFundamentalObject:
- *
- * Ref Func: regress_test_fundamental_object_ref
- * Unref Func: regress_test_fundamental_object_unref
- * Set Value Func: regress_test_value_set_fundamental_object
- * Get Value Func: regress_test_value_get_fundamental_object
+ * RegressTestFundamentalObject: (ref-func regress_test_fundamental_object_ref) (unref-func regress_test_fundamental_object_unref) (set-value-func regress_test_value_set_fundamental_object) (get-value-func regress_test_value_get_fundamental_object)
  */
 
 GType
@@ -3358,6 +3374,37 @@ int regress_test_array_callback (RegressTestCallbackArray callback)
   sum += callback(ints, 4, strings, 3);
 
   return sum;
+}
+
+/**
+ * regress_test_array_inout_callback:
+ * @callback: (scope call):
+ *
+ */
+int
+regress_test_array_inout_callback (RegressTestCallbackArrayInOut callback)
+{
+  int *ints;
+  int length;
+
+  ints = g_new (int, 5);
+  for (length = 0; length < 5; ++length)
+    ints[length] = length - 2;
+
+  callback (&ints, &length);
+
+  g_assert_cmpint (length, ==, 4);
+  for (length = 0; length < 4; ++length)
+    g_assert_cmpint (ints[length], ==, length - 1);
+
+  callback (&ints, &length);
+
+  g_assert_cmpint (length, ==, 3);
+  for (length = 0; length < 3; ++length)
+    g_assert_cmpint (ints[length], ==, length);
+
+  g_free (ints);
+  return length;
 }
 
 /**
@@ -3853,6 +3900,7 @@ regress_test_torture_signature_2 (int                   x,
   *y = x;
   *z = x * 2;
   *q = g_utf8_strlen (foo, -1) + m;
+  callback(user_data);
   notify (user_data);
 }
 
@@ -3999,11 +4047,22 @@ regress_has_parameter_named_attrs (int        foo,
 /**
  * regress_test_versioning:
  *
- * Since: 1.32.1
- * Deprecated: 1.33.3: Use foobar instead
- * Stability: Unstable
+ * Since: 1.32.1: Actually, this function was introduced earlier
+ *   than this, but it didn't do anything before this version.
+ * Deprecated: 1.33.3: This function has been deprecated,
+ *   because it sucks. Use foobar instead.
+ * Stability: Unstable: Maybe someday we will find the time
+ *   to stabilize this function. Who knows?
  */
 void
 regress_test_versioning (void)
 {
+}
+
+void
+regress_like_xkl_config_item_set_name (RegressLikeXklConfigItem *self,
+                                       const char *name)
+{
+  strncpy (self->name, name, sizeof (self->name) - 1);
+  self->name[sizeof(self->name)-1] = '\0';
 }

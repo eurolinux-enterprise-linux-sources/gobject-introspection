@@ -1010,10 +1010,10 @@ parse_float_value (const gchar *str)
 static gboolean
 parse_boolean_value (const gchar *str)
 {
-  if (strcmp (str, "TRUE") == 0)
+  if (g_ascii_strcasecmp (str, "TRUE") == 0)
     return TRUE;
 
-  if (strcmp (str, "FALSE") == 0)
+  if (g_ascii_strcasecmp (str, "FALSE") == 0)
     return FALSE;
 
   return parse_int_value (str) ? TRUE : FALSE;
@@ -1151,6 +1151,10 @@ _g_ir_find_node (GIrTypelibBuild  *build,
       target_name = names[1];
     }
 
+  /* find_namespace() may return NULL. */
+  if (target_module == NULL)
+      goto done;
+
   for (l = target_module->entries; l; l = l->next)
     {
       GIrNode *node = (GIrNode *)l->data;
@@ -1162,6 +1166,7 @@ _g_ir_find_node (GIrTypelibBuild  *build,
 	}
     }
 
+done:
   g_strfreev (names);
 
   return return_node;
@@ -1655,10 +1660,11 @@ _g_ir_node_build_typelib (GIrNode         *node,
         _g_ir_node_build_typelib ((GIrNode *)function->result->type,
 				 node, build, &signature, offset2);
 
-	blob2->may_return_null = function->result->allow_none;
+	blob2->may_return_null = function->result->nullable;
 	blob2->caller_owns_return_value = function->result->transfer;
 	blob2->caller_owns_return_container = function->result->shallow_transfer;
 	blob2->skip_return = function->result->skip;
+        blob2->instance_transfer_ownership = function->instance_transfer_full;
 	blob2->reserved = 0;
 	blob2->n_arguments = n;
 
@@ -1697,7 +1703,7 @@ _g_ir_node_build_typelib (GIrNode         *node,
         _g_ir_node_build_typelib ((GIrNode *)function->result->type,
 				 node, build, &signature, offset2);
 
-	blob2->may_return_null = function->result->allow_none;
+	blob2->may_return_null = function->result->nullable;
 	blob2->caller_owns_return_value = function->result->transfer;
 	blob2->caller_owns_return_container = function->result->shallow_transfer;
 	blob2->reserved = 0;
@@ -1754,9 +1760,10 @@ _g_ir_node_build_typelib (GIrNode         *node,
         _g_ir_node_build_typelib ((GIrNode *)signal->result->type,
 				 node, build, &signature, offset2);
 
-	blob2->may_return_null = signal->result->allow_none;
+	blob2->may_return_null = signal->result->nullable;
 	blob2->caller_owns_return_value = signal->result->transfer;
 	blob2->caller_owns_return_container = signal->result->shallow_transfer;
+        blob2->instance_transfer_ownership = signal->instance_transfer_full;
 	blob2->reserved = 0;
 	blob2->n_arguments = n;
 
@@ -1812,9 +1819,10 @@ _g_ir_node_build_typelib (GIrNode         *node,
         _g_ir_node_build_typelib ((GIrNode *)vfunc->result->type,
 				 node, build, &signature, offset2);
 
-	blob2->may_return_null = vfunc->result->allow_none;
+	blob2->may_return_null = vfunc->result->nullable;
 	blob2->caller_owns_return_value = vfunc->result->transfer;
 	blob2->caller_owns_return_container = vfunc->result->shallow_transfer;
+        blob2->instance_transfer_ownership = vfunc->instance_transfer_full;
 	blob2->reserved = 0;
 	blob2->n_arguments = n;
 
@@ -1843,7 +1851,7 @@ _g_ir_node_build_typelib (GIrNode         *node,
 	blob->in = param->in;
 	blob->out = param->out;
 	blob->caller_allocates = param->caller_allocates;
-	blob->allow_none = param->allow_none;
+	blob->nullable = param->nullable;
 	blob->skip = param->skip;
 	blob->optional = param->optional;
 	blob->transfer_ownership = param->transfer;

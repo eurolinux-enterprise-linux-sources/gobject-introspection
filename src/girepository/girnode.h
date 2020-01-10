@@ -100,6 +100,7 @@ struct _GIrNodeFunction
   gboolean is_constructor;
   gboolean wraps_vfunc;
   gboolean throws;
+  gboolean instance_transfer_full;
 
   gchar *symbol;
 
@@ -146,7 +147,7 @@ struct _GIrNodeParam
   gboolean caller_allocates;
   gboolean optional;
   gboolean retval;
-  gboolean allow_none;
+  gboolean nullable;
   gboolean skip;
   gboolean transfer;
   gboolean shallow_transfer;
@@ -188,6 +189,7 @@ struct _GIrNodeSignal
   gboolean detailed;
   gboolean action;
   gboolean no_hooks;
+  gboolean instance_transfer_full;
 
   gboolean has_class_closure;
   gboolean true_stops_emit;
@@ -208,6 +210,7 @@ struct _GIrNodeVFunc
   gboolean must_not_be_implemented;
   gboolean is_class_closure;
   gboolean throws;
+  gboolean instance_transfer_full;
 
   char *invoker;
 

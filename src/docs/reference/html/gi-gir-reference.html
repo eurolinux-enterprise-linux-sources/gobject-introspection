@@ -2,39 +2,45 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>The GIR XML format</title>
+<title>GObject Introspection Reference Manual: The GIR XML format</title>
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
 <link rel="home" href="index.html" title="GObject Introspection Reference Manual">
-<link rel="up" href="gi-gir.html" title="Part II. GIR markup format">
-<link rel="prev" href="gi-gir.html" title="Part II. GIR markup format">
-<link rel="next" href="gi-typelib.html" title="Typelib binary format">
-<meta name="generator" content="GTK-Doc V1.18.1 (XML mode)">
+<link rel="up" href="ch03.html" title="TODO">
+<link rel="prev" href="gi-girffi.html" title="girffi">
+<link rel="next" href="api-index-full.html" title="Index">
+<meta name="generator" content="GTK-Doc V1.21.1 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
-<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2"><tr valign="middle">
-<td><a accesskey="p" href="gi-gir.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
-<td><a accesskey="u" href="gi-gir.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
-<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
-<th width="100%" align="center">GObject Introspection Reference Manual</th>
-<td><a accesskey="n" href="gi-typelib.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts"></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="ch03.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="gi-girffi.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="api-index-full.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
 </tr></table>
-<div class="chapter">
-<div class="titlepage"><div><div><h2 class="title">
-<a name="gi-gir-reference"></a>The GIR XML format</h2></div></div></div>
+<div class="refentry">
+<a name="gi-gir-reference"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle"><a name="gi-gir-reference.top_of_page"></a>The GIR XML format</span></h2>
+<p>The GIR XML format — The GIR XML format</p>
+</td>
+<td class="gallery_image" valign="top" align="right"></td>
+</tr></table></div>
 <p>
     This chapter describes the GIR XML markup format.
   </p>
 <div class="refsect2">
-<a name="gi-gir-api"></a><h3>
+<a name="gi-gir-api-node"></a><h3>
 <span class="emphasis"><em>api</em></span> node</h3>
 
-     The root node of all GIR documents is the api node.
+    The root node of all GIR documents is the api node.
 
-     Possible children: <a href="gi-gir-reference.html#gi-gir-namespace">namespace</a>.
+    Possible children: <a class="link" href="gi-gir-reference.html#gi-gir-namespace" title="namespace node">namespace</a>.
 
-     <div class="example">
-<a name="id-1.4.2.3.3"></a><p class="title"><b>Example 4. A GIR fragment showing an api node</b></p>
+    <div class="example">
+<a name="id-1.4.4.3.4.3"></a><p class="title"><b>Example 4. A GIR fragment showing an api node</b></p>
 <div class="example-contents">
   <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
     <tbody>
@@ -58,14 +64,14 @@
 <a name="gi-gir-namespace"></a><h3>
 <span class="emphasis"><em>namespace</em></span> node</h3>
 
-     Parent node: <a href="gi-gir-reference.html#gi-gir-api">api</a>.
-     Possible children: callback,
-     <a href="gi-gir-reference.html#gi-gir-class">class</a>,
-     <a href="gi-gir-reference.html#gi-gir-function">function</a>.
-     <a href="gi-gir-reference.html#gi-gir-interface">interface</a>.
+    Parent node: api.
+    Possible children: callback,
+    <a class="link" href="gi-gir-reference.html#gi-gir-class" title="class node">class</a>,
+    <a class="link" href="gi-gir-reference.html#gi-gir-function" title="function node">function</a>.
+    <a class="link" href="gi-gir-reference.html#gi-gir-interface" title="interface node">interface</a>.
 
-     <div class="example">
-<a name="id-1.4.2.4.7"></a><p class="title"><b>Example 5. A GIR fragment showing an namespace node</b></p>
+    <div class="example">
+<a name="id-1.4.4.3.5.7"></a><p class="title"><b>Example 5. A GIR fragment showing an namespace node</b></p>
 <div class="example-contents">
   <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
     <tbody>
@@ -95,13 +101,13 @@
 <a name="gi-gir-class"></a><h3>
 <span class="emphasis"><em>class</em></span> node</h3>
 
-     Parent node: <a href="gi-gir-reference.html#gi-gir-namespace">namespace</a>.
-     Possible children: <a href="gi-gir-reference.html#gi-gir-class">constructor</a>,
-     field,
-     method,
-     property.
-     <div class="example">
-<a name="id-1.4.2.5.7"></a><p class="title"><b>Example 6. A GIR fragment showing an class node</b></p>
+    Parent node: <a class="link" href="gi-gir-reference.html#gi-gir-namespace" title="namespace node">namespace</a>.
+    Possible children: <a class="link" href="gi-gir-reference.html#gi-gir-class" title="class node">constructor</a>,
+    field,
+    method,
+    property.
+    <div class="example">
+<a name="id-1.4.4.3.6.7"></a><p class="title"><b>Example 6. A GIR fragment showing an class node</b></p>
 <div class="example-contents">
   <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
     <tbody>
@@ -139,12 +145,12 @@
 <a name="gi-gir-interface"></a><h3>
 <span class="emphasis"><em>interface</em></span> node</h3>
 
-     Parent node: <a href="gi-gir-reference.html#gi-gir-namespace">namespace</a>.
-     Possible children: field,
-     method,
-     property.
-     <div class="example">
-<a name="id-1.4.2.6.6"></a><p class="title"><b>Example 7. A GIR fragment showing an interface node</b></p>
+    Parent node: <a class="link" href="gi-gir-reference.html#gi-gir-namespace" title="namespace node">namespace</a>.
+    Possible children: field,
+    method,
+    property.
+    <div class="example">
+<a name="id-1.4.4.3.7.6"></a><p class="title"><b>Example 7. A GIR fragment showing an interface node</b></p>
 <div class="example-contents">
   <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
     <tbody>
@@ -180,9 +186,9 @@
 <a name="gi-gir-function"></a><h3>
 <span class="emphasis"><em>function</em></span> node</h3>
 
-     Parent node: <a href="gi-gir-reference.html#gi-gir-namespace">namespace</a>.
-     <div class="example">
-<a name="id-1.4.2.7.3"></a><p class="title"><b>Example 8. A GIR fragment showing an function node</b></p>
+    Parent node: <a class="link" href="gi-gir-reference.html#gi-gir-namespace" title="namespace node">namespace</a>.
+    <div class="example">
+<a name="id-1.4.4.3.8.3"></a><p class="title"><b>Example 8. A GIR fragment showing an function node</b></p>
 <div class="example-contents">
   <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
     <tbody>
@@ -210,6 +216,6 @@
 </div>
 <div class="footer">
 <hr>
-          Generated by GTK-Doc V1.18.1</div>
+          Generated by GTK-Doc V1.21.1</div>
 </body>
 </html>

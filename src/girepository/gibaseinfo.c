@@ -20,6 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -71,6 +73,17 @@ _g_info_new_full (GIInfoType     type,
   return (GIBaseInfo*)info;
 }
 
+/**
+ * g_info_new:
+ * @type: TODO
+ * @container: TODO
+ * @typelib: TODO
+ * @offset: TODO
+ *
+ * TODO
+ *
+ * Returns: TODO
+ */
 GIBaseInfo *
 g_info_new (GIInfoType     type,
             GIBaseInfo    *container,
@@ -169,8 +182,8 @@ _g_type_info_init (GIBaseInfo *info,
 
 /**
  * SECTION:gibaseinfo
- * @Short_description: Base struct for all GITypelib structs
- * @Title: GIBaseInfo
+ * @title: GIBaseInfo
+ * @short_description: Base struct for all GITypelib structs
  *
  * GIBaseInfo is the common base struct of all other *Info structs
  * accessible through the #GIRepository API.
@@ -209,7 +222,6 @@ _g_type_info_init (GIBaseInfo *info,
  *    +----<link linkend="gi-GITypeInfo">GITypeInfo</link>
  * </synopsis>
  * </refsect1>
- *
  */
 
 /**
@@ -226,7 +238,7 @@ g_base_info_ref (GIBaseInfo *info)
   GIRealInfo *rinfo = (GIRealInfo*)info;
 
   g_assert (rinfo->ref_count != INVALID_REFCOUNT);
-  ((GIRealInfo*)info)->ref_count++;
+  g_atomic_int_inc (&rinfo->ref_count);
 
   return info;
 }
@@ -244,21 +256,20 @@ g_base_info_unref (GIBaseInfo *info)
   GIRealInfo *rinfo = (GIRealInfo*)info;
 
   g_assert (rinfo->ref_count > 0 && rinfo->ref_count != INVALID_REFCOUNT);
-  rinfo->ref_count--;
 
-  if (!rinfo->ref_count)
-    {
-      if (rinfo->container && ((GIRealInfo *) rinfo->container)->ref_count != INVALID_REFCOUNT)
-        g_base_info_unref (rinfo->container);
+  if (!g_atomic_int_dec_and_test (&rinfo->ref_count))
+    return;
 
-      if (rinfo->repository)
-        g_object_unref (rinfo->repository);
+  if (rinfo->container && ((GIRealInfo *) rinfo->container)->ref_count != INVALID_REFCOUNT)
+    g_base_info_unref (rinfo->container);
 
-      if (rinfo->type == GI_INFO_TYPE_UNRESOLVED)
-        g_slice_free (GIUnresolvedInfo, (GIUnresolvedInfo *) rinfo);
-      else
-        g_slice_free (GIRealInfo, rinfo);
-    }
+  if (rinfo->repository)
+    g_object_unref (rinfo->repository);
+
+  if (rinfo->type == GI_INFO_TYPE_UNRESOLVED)
+    g_slice_free (GIUnresolvedInfo, (GIUnresolvedInfo *) rinfo);
+  else
+    g_slice_free (GIRealInfo, rinfo);
 }
 
 /**
@@ -553,7 +564,10 @@ _attribute_blob_find_first (GIBaseInfo *info,
  *
  * Iterate over all attributes associated with this node.  The iterator
  * structure is typically stack allocated, and must have its first
- * member initialized to %NULL.
+ * member initialized to %NULL.  Attributes are arbitrary namespaced key–value
+ * pairs which can be attached to almost any item.  They are intended for use
+ * by software higher in the toolchain than bindings, and are distinct from
+ * normal GIR annotations.
  *
  * Both the @name and @value should be treated as constants
  * and must not be freed.

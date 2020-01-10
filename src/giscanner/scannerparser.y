@@ -128,6 +128,84 @@ out:
   return dest;
 }
 
+enum {
+  IRRELEVANT = 1,
+  NOT_GI_SCANNER = 2,
+  FOR_GI_SCANNER = 3,
+};
+
+static void
+update_skipping (GISourceScanner *scanner)
+{
+  GList *l;
+  for (l = scanner->conditionals.head; l != NULL; l = g_list_next (l))
+    {
+      if (GPOINTER_TO_INT (l->data) == NOT_GI_SCANNER)
+        {
+           scanner->skipping = TRUE;
+           return;
+        }
+    }
+
+  scanner->skipping = FALSE;
+}
+
+static void
+push_conditional (GISourceScanner *scanner,
+                  gint type)
+{
+  g_assert (type != 0);
+  g_queue_push_head (&scanner->conditionals, GINT_TO_POINTER (type));
+}
+
+static gint
+pop_conditional (GISourceScanner *scanner)
+{
+  gint type = GPOINTER_TO_INT (g_queue_pop_head (&scanner->conditionals));
+
+  if (type == 0)
+    {
+      gchar *filename = g_file_get_path (scanner->current_file);
+      fprintf (stderr, "%s:%d: mismatched %s", filename, lineno, yytext);
+      g_free (filename);
+    }
+
+  return type;
+}
+
+static void
+warn_if_cond_has_gi_scanner (GISourceScanner *scanner,
+                             const gchar *text)
+{
+  /* Some other conditional that is not __GI_SCANNER__ */
+  if (strstr (text, "__GI_SCANNER__"))
+    {
+      gchar *filename = g_file_get_path (scanner->current_file);
+      fprintf (stderr, "%s:%d: the __GI_SCANNER__ constant should only be used with simple #ifdef or #endif: %s",
+               filename, lineno, text);
+      g_free (filename);
+    }
+}
+
+static void
+toggle_conditional (GISourceScanner *scanner)
+{
+  switch (pop_conditional (scanner))
+    {
+    case FOR_GI_SCANNER:
+      push_conditional (scanner, NOT_GI_SCANNER);
+      break;
+    case NOT_GI_SCANNER:
+      push_conditional (scanner, FOR_GI_SCANNER);
+      break;
+    case 0:
+      break;
+    default:
+      push_conditional (scanner, IRRELEVANT);
+      break;
+    }
+}
+
 %}
 
 %error-verbose
@@ -148,7 +226,7 @@ out:
 %token <str> IDENTIFIER "identifier"
 %token <str> TYPEDEF_NAME "typedef-name"
 
-%token INTEGER FLOATING CHARACTER STRING
+%token INTEGER FLOATING BOOLEAN CHARACTER STRING
 
 %token INTL_CONST INTUL_CONST
 %token ELLIPSIS ADDEQ SUBEQ MULEQ DIVEQ MODEQ XOREQ ANDEQ OREQ SL SR
@@ -160,6 +238,8 @@ out:
 %token VOID VOLATILE WHILE
 
 %token FUNCTION_MACRO OBJECT_MACRO
+%token IFDEF_GI_SCANNER IFNDEF_GI_SCANNER
+%token IFDEF_COND IFNDEF_COND IF_COND ELIF_COND ELSE_COND ENDIF_COND
 
 %start translation_unit
 
@@ -225,7 +305,7 @@ primary_expression
 	  {
 		$$ = g_hash_table_lookup (const_table, $1);
 		if ($$ == NULL) {
-			$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+			$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		} else {
 			$$ = gi_source_symbol_ref ($$);
 		}
@@ -234,7 +314,7 @@ primary_expression
 	  {
 		char *rest;
 		guint64 value;
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		if (g_str_has_prefix (yytext, "0x") && strlen (yytext) > 2) {
 			value = g_ascii_strtoull (yytext + 2, &rest, 16);
@@ -246,15 +326,21 @@ primary_expression
 		$$->const_int = value;
 		$$->const_int_is_unsigned = (rest && (rest[0] == 'U'));
 	  }
+	| BOOLEAN
+	  {
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
+		$$->const_boolean_set = TRUE;
+		$$->const_boolean = g_ascii_strcasecmp (yytext, "true") == 0 ? TRUE : FALSE;
+	  }
 	| CHARACTER
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = g_utf8_get_char(yytext + 1);
 	  }
 	| FLOATING
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_double_set = TRUE;
 		$$->const_double = 0.0;
         sscanf (yytext, "%lf", &($$->const_double));
@@ -266,7 +352,7 @@ primary_expression
 	  }
 	| EXTENSION '(' '{' block_item_list '}' ')'
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	;
 
@@ -274,7 +360,7 @@ primary_expression
 strings
 	: STRING
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		yytext[strlen (yytext) - 1] = '\0';
 		$$->const_string = parse_c_string_literal (yytext + 1);
                 if (!g_utf8_validate ($$->const_string, -1, NULL))
@@ -316,31 +402,31 @@ postfix_expression
 	: primary_expression
 	| postfix_expression '[' expression ']'
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	| postfix_expression '(' argument_expression_list ')'
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	| postfix_expression '(' ')'
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	| postfix_expression '.' identifier_or_typedef_name
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	| postfix_expression ARROW identifier_or_typedef_name
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	| postfix_expression PLUSPLUS
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	| postfix_expression MINUSMINUS
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	;
 
@@ -353,11 +439,11 @@ unary_expression
 	: postfix_expression
 	| PLUSPLUS unary_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	| MINUSMINUS unary_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	| unary_operator cast_expression
 	  {
@@ -378,7 +464,7 @@ unary_expression
 			$$->const_int = !gi_source_symbol_get_const_boolean ($2);
 			break;
 		default:
-			$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+			$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 			break;
 		}
 	  }
@@ -398,12 +484,12 @@ unary_expression
 	  }
 	| SIZEOF unary_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	| SIZEOF '(' type_name ')'
 	  {
 		ctype_free ($3);
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	;
 
@@ -451,13 +537,13 @@ multiplicative_expression
 	: cast_expression
 	| multiplicative_expression '*' cast_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = $1->const_int * $3->const_int;
 	  }
 	| multiplicative_expression '/' cast_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		if ($3->const_int != 0) {
 			$$->const_int = $1->const_int / $3->const_int;
@@ -465,7 +551,7 @@ multiplicative_expression
 	  }
 	| multiplicative_expression '%' cast_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		if ($3->const_int != 0) {
 			$$->const_int = $1->const_int % $3->const_int;
@@ -477,13 +563,13 @@ additive_expression
 	: multiplicative_expression
 	| additive_expression '+' multiplicative_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = $1->const_int + $3->const_int;
 	  }
 	| additive_expression '-' multiplicative_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = $1->const_int - $3->const_int;
 	  }
@@ -493,7 +579,7 @@ shift_expression
 	: additive_expression
 	| shift_expression SL additive_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = $1->const_int << $3->const_int;
 
@@ -505,7 +591,7 @@ shift_expression
 	  }
 	| shift_expression SR additive_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = $1->const_int >> $3->const_int;
 	  }
@@ -515,25 +601,25 @@ relational_expression
 	: shift_expression
 	| relational_expression '<' shift_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = $1->const_int < $3->const_int;
 	  }
 	| relational_expression '>' shift_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = $1->const_int > $3->const_int;
 	  }
 	| relational_expression LTEQ shift_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = $1->const_int <= $3->const_int;
 	  }
 	| relational_expression GTEQ shift_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = $1->const_int >= $3->const_int;
 	  }
@@ -543,13 +629,13 @@ equality_expression
 	: relational_expression
 	| equality_expression EQ relational_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = $1->const_int == $3->const_int;
 	  }
 	| equality_expression NOTEQ relational_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = $1->const_int != $3->const_int;
 	  }
@@ -559,7 +645,7 @@ and_expression
 	: equality_expression
 	| and_expression '&' equality_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = $1->const_int & $3->const_int;
 	  }
@@ -569,7 +655,7 @@ exclusive_or_expression
 	: and_expression
 	| exclusive_or_expression '^' and_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = $1->const_int ^ $3->const_int;
 	  }
@@ -579,7 +665,7 @@ inclusive_or_expression
 	: exclusive_or_expression
 	| inclusive_or_expression '|' exclusive_or_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int = $1->const_int | $3->const_int;
 	  }
@@ -589,7 +675,7 @@ logical_and_expression
 	: inclusive_or_expression
 	| logical_and_expression ANDAND inclusive_or_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int =
 		  gi_source_symbol_get_const_boolean ($1) &&
@@ -601,7 +687,7 @@ logical_or_expression
 	: logical_and_expression
 	| logical_or_expression OROR logical_and_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_CONST, scanner->current_file, lineno);
 		$$->const_int_set = TRUE;
 		$$->const_int =
 		  gi_source_symbol_get_const_boolean ($1) ||
@@ -621,7 +707,7 @@ assignment_expression
 	: conditional_expression
 	| unary_expression assignment_operator assignment_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	;
 
@@ -644,7 +730,7 @@ expression
 	| expression ',' assignment_expression
 	| EXTENSION expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	;
 
@@ -823,7 +909,7 @@ struct_or_union_specifier
 		$$->name = $2;
 		$$->child_list = $4;
 
-		sym = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		sym = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		if ($$->type == CTYPE_STRUCT) {
 			sym->type = CSYMBOL_TYPE_STRUCT;
 		} else if ($$->type == CTYPE_UNION) {
@@ -922,12 +1008,12 @@ struct_declarator_list
 struct_declarator
 	: /* empty, support for anonymous structs and unions */
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	| declarator
 	| ':' constant_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 	  }
 	| declarator ':' constant_expression
 	  {
@@ -1003,7 +1089,7 @@ enumerator_list
 enumerator
 	: identifier
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_OBJECT, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_OBJECT, scanner->current_file, lineno);
 		$$->ident = $1;
 		$$->const_int_set = TRUE;
 		$$->const_int = ++last_enum_value;
@@ -1011,7 +1097,7 @@ enumerator
 	  }
 	| identifier '=' constant_expression
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_OBJECT, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_OBJECT, scanner->current_file, lineno);
 		$$->ident = $1;
 		$$->const_int_set = TRUE;
 		$$->const_int = $3->const_int;
@@ -1058,7 +1144,7 @@ declarator
 direct_declarator
 	: identifier
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		$$->ident = $1;
 	  }
 	| '(' declarator ')'
@@ -1165,25 +1251,25 @@ parameter_declaration
 	  }
 	| declaration_specifiers
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		$$->base_type = $1;
 	  }
 	| ELLIPSIS
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_ELLIPSIS, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_ELLIPSIS, scanner->current_file, lineno);
 	  }
 	;
 
 identifier_list
 	: identifier
 	  {
-		GISourceSymbol *sym = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		GISourceSymbol *sym = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		sym->ident = $1;
 		$$ = g_list_append (NULL, sym);
 	  }
 	| identifier_list ',' identifier
 	  {
-		GISourceSymbol *sym = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		GISourceSymbol *sym = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		sym->ident = $3;
 		$$ = g_list_append ($1, sym);
 	  }
@@ -1197,7 +1283,7 @@ type_name
 abstract_declarator
 	: pointer
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		gi_source_symbol_merge_type ($$, $1);
 	  }
 	| direct_abstract_declarator
@@ -1215,12 +1301,12 @@ direct_abstract_declarator
 	  }
 	| '[' ']'
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		gi_source_symbol_merge_type ($$, gi_source_array_new (NULL));
 	  }
 	| '[' assignment_expression ']'
 	  {
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		gi_source_symbol_merge_type ($$, gi_source_array_new ($2));
 	  }
 	| direct_abstract_declarator '[' ']'
@@ -1236,7 +1322,7 @@ direct_abstract_declarator
 	| '(' ')'
 	  {
 		GISourceType *func = gi_source_function_new ();
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		gi_source_symbol_merge_type ($$, func);
 	  }
 	| '(' parameter_list ')'
@@ -1246,7 +1332,7 @@ direct_abstract_declarator
 		if ($2 != NULL && ($2->next != NULL || ((GISourceSymbol *) $2->data)->base_type->type != CTYPE_VOID)) {
 			func->child_list = $2;
 		}
-		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_filename, lineno);
+		$$ = gi_source_symbol_new (CSYMBOL_TYPE_INVALID, scanner->current_file, lineno);
 		gi_source_symbol_merge_type ($$, func);
 	  }
 	| direct_abstract_declarator '(' ')'
@@ -1395,7 +1481,7 @@ function_macro_define
 object_macro_define
 	: object_macro constant_expression
 	  {
-		if ($2->const_int_set || $2->const_double_set || $2->const_string != NULL) {
+		if ($2->const_int_set || $2->const_boolean_set || $2->const_double_set || $2->const_string != NULL) {
 			$2->ident = $1;
 			gi_source_scanner_add_symbol (scanner, $2);
 			gi_source_symbol_unref ($2);
@@ -1403,9 +1489,55 @@ object_macro_define
 	  }
 	;
 
+preproc_conditional
+	: IFDEF_GI_SCANNER 
+	  {
+		push_conditional (scanner, FOR_GI_SCANNER);
+		update_skipping (scanner);
+	  }
+	| IFNDEF_GI_SCANNER
+	  {
+		push_conditional (scanner, NOT_GI_SCANNER);
+		update_skipping (scanner);
+	  }
+	| IFDEF_COND 
+	  {
+	 	warn_if_cond_has_gi_scanner (scanner, yytext);
+		push_conditional (scanner, IRRELEVANT);
+	  }
+	| IFNDEF_COND
+	  {
+		warn_if_cond_has_gi_scanner (scanner, yytext);
+		push_conditional (scanner, IRRELEVANT);
+	  }
+	| IF_COND 
+	  {
+		warn_if_cond_has_gi_scanner (scanner, yytext);
+		push_conditional (scanner, IRRELEVANT);
+	  }
+	| ELIF_COND
+	  {
+		warn_if_cond_has_gi_scanner (scanner, yytext);
+		pop_conditional (scanner);
+		push_conditional (scanner, IRRELEVANT);
+		update_skipping (scanner);
+	  }
+	| ELSE_COND
+	  {
+		toggle_conditional (scanner);
+		update_skipping (scanner);
+	  }
+	| ENDIF_COND
+	  {
+		pop_conditional (scanner);
+		update_skipping (scanner);
+	  }
+	;
+
 macro
 	: function_macro_define
 	| object_macro_define
+	| preproc_conditional
 	| error
 	;
 
@@ -1418,7 +1550,7 @@ yyerror (GISourceScanner *scanner, const char *s)
   if (!scanner->macro_scan)
     {
       fprintf(stderr, "%s:%d: %s in '%s' at '%s'\n",
-	      scanner->current_filename, lineno, s, linebuf, yytext);
+	      g_file_get_parse_name (scanner->current_file), lineno, s, linebuf, yytext);
     }
 }
 
@@ -1435,14 +1567,19 @@ eat_hspace (FILE * f)
 }
 
 static int
-eat_line (FILE * f, int c)
+pass_line (FILE * f, int c,
+           FILE *out)
 {
   while (c != EOF && c != '\n')
     {
+      if (out)
+        fputc (c, out);
       c = fgetc (f);
     }
   if (c == '\n')
     {
+      if (out)
+        fputc (c, out);
       c = fgetc (f);
       if (c == ' ' || c == '\t')
         {
@@ -1450,6 +1587,12 @@ eat_line (FILE * f, int c)
         }
     }
   return c;
+}
+
+static int
+eat_line (FILE * f, int c)
+{
+  return pass_line (f, c, NULL);
 }
 
 static int
@@ -1484,6 +1627,7 @@ gi_source_scanner_parse_macros (GISourceScanner *scanner, GList *filenames)
       GString *define_line;
       char *str;
       gboolean error_line = FALSE;
+      gboolean end_of_word;
       int c = eat_hspace (f);
       while (c != EOF)
         {
@@ -1502,7 +1646,22 @@ gi_source_scanner_parse_macros (GISourceScanner *scanner, GList *filenames)
 
           c = eat_hspace (f);
           c = read_identifier (f, c, &str);
-          if (strcmp (str, "define") != 0 || (c != ' ' && c != '\t'))
+          end_of_word = (c == ' ' || c == '\t' || c == '\n' || c == EOF);
+          if (end_of_word &&
+              (g_str_equal (str, "if") ||
+               g_str_equal (str, "endif") ||
+               g_str_equal (str, "ifndef") ||
+               g_str_equal (str, "ifdef") ||
+               g_str_equal (str, "else") ||
+               g_str_equal (str, "elif")))
+            {
+              fprintf (fmacros, "#%s ", str);
+              g_free (str);
+              c = pass_line (f, c, fmacros);
+              line++;
+              continue;
+            }
+          else if (strcmp (str, "define") != 0 || !end_of_word)
             {
               g_free (str);
               /* ignore line */

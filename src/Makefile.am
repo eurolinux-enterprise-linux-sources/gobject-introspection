@@ -9,8 +9,10 @@ check_LTLIBRARIES =
 check_PROGRAMS =
 bin_PROGRAMS =
 bin_SCRIPTS =
-GTESTER_PROGS =
-noinst_PROGRAMS = $(GTESTER_PROGS)
+noinst_PROGRAMS =
+EXTRA_LTLIBRARIES =
+EXTRA_PROGRAMS =
+TESTS =
 
 include common.mk
 include Makefile.introspection
@@ -28,8 +30,8 @@ ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
 SUBDIRS = . docs tests build
 
-DIST_SUBDIRS = m4 $(SUBDIRS)
-DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
+DIST_SUBDIRS = $(SUBDIRS)
+DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --enable-doctool
 
 man_MANS += 			\
 	docs/g-ir-compiler.1	\
@@ -55,15 +57,15 @@ EXTRA_DIST += 			\
 	misc/pep8.py		\
 	misc/pyflakes.py
 
+# Default pep8.py --exclude + emacs backup files
+PEP8_EXCLUDES=--exclude='.svn,CVS,.bzr,.hg,.git,__pycache__,.\#*'
+
 check-local:
-	gtester --verbose $(GTESTER_PROGS)
 	@echo "TEST: PEP-8 INQUISITION"
-	@find $(top_srcdir)/giscanner -name \*.py | sort | uniq | xargs $(PYTHON) $(top_srcdir)/misc/pep8.py --repeat --exclude=config.py
-	@echo "TEST: Annotation pattern programs"
-	PYTHONPATH="$(top_builddir):$(top_srcdir)" $(PYTHON) $(top_srcdir)/tests/scanner/annotationparser/test_patterns.py
-	@echo "TEST: GTK-Doc Annotation Parser"
-	PYTHONPATH="$(top_builddir):$(top_srcdir)" $(PYTHON) $(top_srcdir)/tests/scanner/annotationparser/test_parser.py
-	@touch $(top_builddir)/.make-check-passed
+	@find $(top_srcdir)/giscanner -name \*.py | sort | uniq | xargs \
+		$(PYTHON) $(top_srcdir)/misc/pep8.py --max-line-length=99 --ignore=E128 $(PEP8_EXCLUDES)
+	@find $(top_srcdir)/tests -name \*.py | sort | uniq | xargs \
+		$(PYTHON) $(top_srcdir)/misc/pep8.py --ignore=E127,E501 $(PEP8_EXCLUDES)
 
 check-pyflakes:
 	@echo "  CHECK Pyflakes"

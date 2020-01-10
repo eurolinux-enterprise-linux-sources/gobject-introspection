@@ -20,6 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include "config.h"
+
 #include <glib.h>
 
 #include <girepository.h>
@@ -28,8 +30,8 @@
 
 /**
  * SECTION:gitypeinfo
- * @Short_description: Struct representing a type
- * @Title: GITypeInfo
+ * @title: GITypeInfo
+ * @short_description: Struct representing a type
  *
  * GITypeInfo represents a type. You can retrieve a type info from
  * an argument (see #GIArgInfo), a functions return value (see #GIFunctionInfo),
@@ -48,7 +50,6 @@
  *    +----GITypeInfo
  * </synopsis>
  * </refsect1>
- *
  */
 
 /**

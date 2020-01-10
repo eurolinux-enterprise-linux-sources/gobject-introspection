@@ -20,6 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include "config.h"
+
 #include <glib.h>
 #include <string.h> // memcpy
 
@@ -29,8 +31,8 @@
 
 /**
  * SECTION:giconstantinfo
- * @Short_description: Struct representing a constant
- * @Title: GIConstantInfo
+ * @title: GIConstantInfo
+ * @short_description: Struct representing a constant
  *
  * GIConstantInfo represents a constant. A constant has a type associated
  * which can be obtained by calling g_constant_info_get_type() and a value,

@@ -31,22 +31,53 @@
 
 G_BEGIN_DECLS
 
+/**
+ * GI_IS_TYPE_INFO
+ * @info: an info structure
+ *
+ * Checks if @info is a #GITypeInfo.
+ */
 #define GI_IS_TYPE_INFO(info) \
     (g_base_info_get_type((GIBaseInfo*)info) ==  GI_INFO_TYPE_TYPE)
 
+/**
+ * G_TYPE_TAG_IS_BASIC
+ * @tag: a type tag
+ *
+ * Checks if @tag is a basic type.
+ */
 #define G_TYPE_TAG_IS_BASIC(tag) (tag < GI_TYPE_TAG_ARRAY || tag == GI_TYPE_TAG_UNICHAR)
 
+GI_AVAILABLE_IN_ALL
 const gchar*           g_type_tag_to_string            (GITypeTag   type);
+
+GI_AVAILABLE_IN_ALL
 const gchar*           g_info_type_to_string           (GIInfoType  type);
 
+
+GI_AVAILABLE_IN_ALL
 gboolean               g_type_info_is_pointer          (GITypeInfo *info);
+
+GI_AVAILABLE_IN_ALL
 GITypeTag              g_type_info_get_tag             (GITypeInfo *info);
+
+GI_AVAILABLE_IN_ALL
 GITypeInfo *           g_type_info_get_param_type      (GITypeInfo *info,
 						        gint       n);
+
+GI_AVAILABLE_IN_ALL
 GIBaseInfo *           g_type_info_get_interface       (GITypeInfo *info);
+
+GI_AVAILABLE_IN_ALL
 gint                   g_type_info_get_array_length    (GITypeInfo *info);
+
+GI_AVAILABLE_IN_ALL
 gint                   g_type_info_get_array_fixed_size(GITypeInfo *info);
+
+GI_AVAILABLE_IN_ALL
 gboolean               g_type_info_is_zero_terminated  (GITypeInfo *info);
+
+GI_AVAILABLE_IN_ALL
 GIArrayType            g_type_info_get_array_type      (GITypeInfo *info);
 
 G_END_DECLS

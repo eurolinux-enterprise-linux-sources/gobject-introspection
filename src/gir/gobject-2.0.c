@@ -63,13 +63,13 @@
  * This signal is typically used to obtain change notification for a
  * single property, by specifying the property name as a detail in the
  * g_signal_connect() call, like this:
- * |[
+ * |[<!-- language="C" -->
  * g_signal_connect (text_view->buffer, "notify::paste-target-list",
  *                   G_CALLBACK (gtk_text_view_target_list_notify),
  *                   text_view)
  * ]|
  * It is important to note that you must use
- * <link linkend="canonical-parameter-name">canonical</link> parameter names as
+ * [canonical][canonical-parameter-name] parameter names as
  * detail strings for the notify signal.
  */
 
@@ -77,7 +77,7 @@
 /**
  * GParamSpecPool:
  *
- * A #GParamSpecPool maintains a collection of #GParamSpec<!-- -->s which can be
+ * A #GParamSpecPool maintains a collection of #GParamSpecs which can be
  * quickly accessed by owner and name. The implementation of the #GObject property
  * system uses such a pool to store the #GParamSpecs of the properties all object
  * types.
@@ -102,9 +102,9 @@
  * objects.
  *
  * If the object's #GObjectClass.dispose method results in additional
- * references to the object being held, any #GWeakRef<!-- -->s taken
+ * references to the object being held, any #GWeakRefs taken
  * before it was disposed will continue to point to %NULL.  If
- * #GWeakRef<!-- -->s are taken after the object is disposed and
+ * #GWeakRefs are taken after the object is disposed and
  * re-referenced, they will continue to point to it until its refcount
  * goes back to zero, at which point they too will be invalidated.
  */
@@ -114,7 +114,8 @@
  * SECTION:enumerations_flags
  * @short_description: Enumeration and flags types
  * @title: Enumeration and Flag Types
- * @see_also: #GParamSpecEnum, #GParamSpecFlags, g_param_spec_enum(), g_param_spec_flags()
+ * @see_also: #GParamSpecEnum, #GParamSpecFlags, g_param_spec_enum(),
+ * g_param_spec_flags()
  *
  * The GLib type system provides fundamental types for enumeration and
  * flags types. (Flags types are like enumerations, but allow their
@@ -127,9 +128,8 @@
  * GLib type system, it can be used as value type for object
  * properties, using g_param_spec_enum() or g_param_spec_flags().
  *
- * GObject ships with a utility called <link
- * linkend="glib-mkenums">glib-mkenums</link> that can construct
- * suitable type registration functions from C enumeration
+ * GObject ships with a utility called [glib-mkenums][glib-mkenums],
+ * that can construct suitable type registration functions from C enumeration
  * definitions.
  */
 
@@ -145,21 +145,21 @@
  * value is applied to the target property; for instance, the following
  * binding:
  *
- * |[
+ * |[<!-- language="C" -->
  *   g_object_bind_property (object1, "property-a",
  *                           object2, "property-b",
  *                           G_BINDING_DEFAULT);
  * ]|
  *
- * will cause <emphasis>object2:property-b</emphasis> to be updated every
- * time g_object_set() or the specific accessor changes the value of
- * <emphasis>object1:property-a</emphasis>.
+ * will cause the property named "property-b" of @object2 to be updated
+ * every time g_object_set() or the specific accessor changes the value of
+ * the property "property-a" of @object1.
  *
  * It is possible to create a bidirectional binding between two properties
  * of two #GObject instances, so that if either property changes, the
  * other is updated as well, for instance:
  *
- * |[
+ * |[<!-- language="C" -->
  *   g_object_bind_property (object1, "property-a",
  *                           object2, "property-b",
  *                           G_BINDING_BIDIRECTIONAL);
@@ -172,7 +172,7 @@
  * transformation from the source value to the target value before
  * applying it; for instance, the following binding:
  *
- * |[
+ * |[<!-- language="C" -->
  *   g_object_bind_property_full (adjustment1, "value",
  *                                adjustment2, "value",
  *                                G_BINDING_BIDIRECTIONAL,
@@ -181,15 +181,15 @@
  *                                NULL, NULL);
  * ]|
  *
- * will keep the <emphasis>value</emphasis> property of the two adjustments
- * in sync; the <function>celsius_to_fahrenheit</function> function will be
- * called whenever the <emphasis>adjustment1:value</emphasis> property changes
- * and will transform the current value of the property before applying it
- * to the <emphasis>adjustment2:value</emphasis> property; vice versa, the
- * <function>fahrenheit_to_celsius</function> function will be called whenever
- * the <emphasis>adjustment2:value</emphasis> property changes, and will
- * transform the current value of the property before applying it to the
- * <emphasis>adjustment1:value</emphasis>.
+ * will keep the "value" property of the two adjustments in sync; the
+ * @celsius_to_fahrenheit function will be called whenever the "value"
+ * property of @adjustment1 changes and will transform the current value
+ * of the property before applying it to the "value" property of @adjustment2.
+ *
+ * Vice versa, the @fahrenheit_to_celsius function will be called whenever
+ * the "value" property of @adjustment2 changes, and will transform the
+ * current value of the property before applying it to the "value" property
+ * of @adjustment1.
  *
  * Note that #GBinding does not resolve cycles by itself; a cycle like
  *
@@ -210,13 +210,19 @@
  * either one of the #GObject instances it refers to are finalized, or when
  * the #GBinding instance loses its last reference.
  *
+ * Bindings for languages with garbage collection can use
+ * g_binding_unbind() to explicitly release a binding between the source
+ * and target properties, instead of relying on the last reference on the
+ * binding, source, and target instances to drop.
+ *
  * #GBinding is available since GObject 2.26
  */
 
 
 /**
  * SECTION:gboxed
- * @short_description: A mechanism to wrap opaque C structures registered by the type system
+ * @short_description: A mechanism to wrap opaque C structures registered
+ *     by the type system
  * @see_also: #GParamSpecBoxed, g_param_spec_boxed()
  * @title: Boxed Types
  *
@@ -237,14 +243,14 @@
  *
  * A #GClosure represents a callback supplied by the programmer. It
  * will generally comprise a function of some kind and a marshaller
- * used to call it. It is the reponsibility of the marshaller to
- * convert the arguments for the invocation from #GValue<!-- -->s into
+ * used to call it. It is the responsibility of the marshaller to
+ * convert the arguments for the invocation from #GValues into
  * a suitable form, perform the callback on the converted arguments,
  * and transform the return value back into a #GValue.
  *
  * In the case of C programs, a closure usually just holds a pointer
  * to a function and maybe a data argument, and the marshaller
- * converts between #GValue<!-- --> and native C types. The GObject
+ * converts between #GValue and native C types. The GObject
  * library provides the #GCClosure type for this purpose. Bindings for
  * other languages need marshallers which convert between #GValue<!--
  * -->s and suitable representations in the runtime of the language in
@@ -256,9 +262,8 @@
  * marshaller for any closure which is connected to this
  * signal. GObject provides a number of C marshallers for this
  * purpose, see the g_cclosure_marshal_*() functions. Additional C
- * marshallers can be generated with the <link
- * linkend="glib-genmarshal">glib-genmarshal</link> utility.  Closures
- * can be explicitly connected to signals with
+ * marshallers can be generated with the [glib-genmarshal][glib-genmarshal]
+ * utility.  Closures can be explicitly connected to signals with
  * g_signal_connect_closure(), but it usually more convenient to let
  * GObject create a closure automatically by using one of the
  * g_signal_connect_*() functions which take a callback function/user
@@ -266,29 +271,29 @@
  *
  * Using closures has a number of important advantages over a simple
  * callback function/data pointer combination:
- * <itemizedlist>
- * <listitem><para>
- * Closures allow the callee to get the types of the callback parameters,
- * which means that language bindings don't have to write individual glue
- * for each callback type.
- * </para></listitem>
- * <listitem><para>
- * The reference counting of #GClosure makes it easy to handle reentrancy
- * right; if a callback is removed while it is being invoked, the closure
- * and its parameters won't be freed until the invocation finishes.
- * </para></listitem>
- * <listitem><para>
- * g_closure_invalidate() and invalidation notifiers allow callbacks to be
- * automatically removed when the objects they point to go away.
- * </para></listitem>
- * </itemizedlist>
+ *
+ * - Closures allow the callee to get the types of the callback parameters,
+ *   which means that language bindings don't have to write individual glue
+ *   for each callback type.
+ *
+ * - The reference counting of #GClosure makes it easy to handle reentrancy
+ *   right; if a callback is removed while it is being invoked, the closure
+ *   and its parameters won't be freed until the invocation finishes.
+ *
+ * - g_closure_invalidate() and invalidation notifiers allow callbacks to be
+ *   automatically removed when the objects they point to go away.
  */
 
 
 /**
  * SECTION:generic_values
- * @short_description: A polymorphic type that can hold values of any other type
- * @see_also: The fundamental types which all support #GValue operations and thus can be used as a type initializer for g_value_init() are defined by a separate interface.  See the <link linkend="gobject-Standard-Parameter-and-Value-Types">Standard Values API</link> for details.
+ * @short_description: A polymorphic type that can hold values of any
+ *     other type
+ * @see_also: The fundamental types which all support #GValue
+ *     operations and thus can be used as a type initializer for
+ *     g_value_init() are defined by a separate interface.  See the
+ *     [standard values API][gobject-Standard-Parameter-and-Value-Types]
+ *     for details
  * @title: Generic values
  *
  * The #GValue structure is basically a variable container that consists
@@ -306,8 +311,8 @@
  * The code in the example program below demonstrates #GValue's
  * features.
  *
- * |[
- * #include &lt;glib-object.h&gt;
+ * |[<!-- language="C" -->
+ * #include <glib-object.h>
  *
  * static void
  * int2string (const GValue *src_value,
@@ -323,40 +328,40 @@
  * main (int   argc,
  *       char *argv[])
  * {
- *   /&ast; GValues must be initialized &ast;/
+ *   // GValues must be initialized
  *   GValue a = G_VALUE_INIT;
  *   GValue b = G_VALUE_INIT;
  *   const gchar *message;
  *
- *   /&ast; The GValue starts empty &ast;/
- *   g_assert (!G_VALUE_HOLDS_STRING (&amp;a));
+ *   // The GValue starts empty
+ *   g_assert (!G_VALUE_HOLDS_STRING (&a));
  *
- *   /&ast; Put a string in it &ast;/
- *   g_value_init (&amp;a, G_TYPE_STRING);
- *   g_assert (G_VALUE_HOLDS_STRING (&amp;a));
- *   g_value_set_static_string (&amp;a, "Hello, world!");
- *   g_printf ("%s\n", g_value_get_string (&amp;a));
+ *   // Put a string in it
+ *   g_value_init (&a, G_TYPE_STRING);
+ *   g_assert (G_VALUE_HOLDS_STRING (&a));
+ *   g_value_set_static_string (&a, "Hello, world!");
+ *   g_printf ("%s\n", g_value_get_string (&a));
  *
- *   /&ast; Reset it to its pristine state &ast;/
- *   g_value_unset (&amp;a);
+ *   // Reset it to its pristine state
+ *   g_value_unset (&a);
  *
- *   /&ast; It can then be reused for another type &ast;/
- *   g_value_init (&amp;a, G_TYPE_INT);
- *   g_value_set_int (&amp;a, 42);
+ *   // It can then be reused for another type
+ *   g_value_init (&a, G_TYPE_INT);
+ *   g_value_set_int (&a, 42);
  *
- *   /&ast; Attempt to transform it into a GValue of type STRING &ast;/
- *   g_value_init (&amp;b, G_TYPE_STRING);
+ *   // Attempt to transform it into a GValue of type STRING
+ *   g_value_init (&b, G_TYPE_STRING);
  *
- *   /&ast; An INT is transformable to a STRING &ast;/
+ *   // An INT is transformable to a STRING
  *   g_assert (g_value_type_transformable (G_TYPE_INT, G_TYPE_STRING));
  *
- *   g_value_transform (&amp;a, &amp;b);
- *   g_printf ("%s\n", g_value_get_string (&amp;b));
+ *   g_value_transform (&a, &b);
+ *   g_printf ("%s\n", g_value_get_string (&b));
  *
- *   /&ast; Attempt to transform it again using a custom transform function &ast;/
+ *   // Attempt to transform it again using a custom transform function
  *   g_value_register_transform_func (G_TYPE_INT, G_TYPE_STRING, int2string);
- *   g_value_transform (&amp;a, &amp;b);
- *   g_printf ("%s\n", g_value_get_string (&amp;b));
+ *   g_value_transform (&a, &b);
+ *   g_printf ("%s\n", g_value_get_string (&b));
  *   return 0;
  * }
  * ]|
@@ -366,25 +371,28 @@
 /**
  * SECTION:gparamspec
  * @short_description: Metadata for parameter specifications
- * @see_also: g_object_class_install_property(), g_object_set(), g_object_get(), g_object_set_property(), g_object_get_property(), g_value_register_transform_func()
+ * @see_also: g_object_class_install_property(), g_object_set(),
+ *     g_object_get(), g_object_set_property(), g_object_get_property(),
+ *     g_value_register_transform_func()
  * @title: GParamSpec
  *
  * #GParamSpec is an object structure that encapsulates the metadata
  * required to specify parameters, such as e.g. #GObject properties.
  *
- * <para id="canonical-parameter-name">
- * Parameter names need to start with a letter (a-z or A-Z). Subsequent
- * characters can be letters, numbers or a '-'.
+ * ## Parameter names # {#canonical-parameter-names}
+ *
+ * Parameter names need to start with a letter (a-z or A-Z).
+ * Subsequent characters can be letters, numbers or a '-'.
  * All other characters are replaced by a '-' during construction.
- * The result of this replacement is called the canonical name of the
- * parameter.
- * </para>
+ * The result of this replacement is called the canonical name of
+ * the parameter.
  */
 
 
 /**
  * SECTION:gtype
- * @short_description: The GLib Runtime type identification and management system
+ * @short_description: The GLib Runtime type identification and
+ *     management system
  * @title: Type Information
  *
  * The GType API is the foundation of the GObject system.  It provides the
@@ -396,15 +404,18 @@
  * unloaded at run-time as dynamic types may be.  Static types are created
  * with g_type_register_static() that gets type specific information passed
  * in via a #GTypeInfo structure.
+ *
  * Dynamic types are created with g_type_register_dynamic() which takes a
  * #GTypePlugin structure instead. The remaining type information (the
  * #GTypeInfo structure) is retrieved during runtime through #GTypePlugin
  * and the g_type_plugin_*() API.
+ *
  * These registration functions are usually called only once from a
  * function whose only purpose is to return the type identifier for a
  * specific class.  Once the type (or class or interface) is registered,
  * it may be instantiated, inherited, or implemented depending on exactly
  * what sort of type it is.
+ *
  * There is also a third registration function for registering fundamental
  * types called g_type_register_fundamental() which requires both a #GTypeInfo
  * structure and a #GTypeFundamentalInfo structure but it is seldom used
@@ -417,32 +428,30 @@
  * separately (typically by using #GArray or #GPtrArray) and put a pointer
  * to the buffer in the structure.
  *
- * A final word about type names.
- * Such an identifier needs to be at least three characters long. There is no
- * upper length limit. The first character needs to be a letter (a-z or A-Z)
- * or an underscore '_'. Subsequent characters can be letters, numbers or
- * any of '-_+'.
+ * A final word about type names: Such an identifier needs to be at least
+ * three characters long. There is no upper length limit. The first character
+ * needs to be a letter (a-z or A-Z) or an underscore '_'. Subsequent
+ * characters can be letters, numbers or any of '-_+'.
  */
 
 
 /**
  * SECTION:gtypemodule
  * @short_description: Type loading modules
- * @see_also: <variablelist> <varlistentry> <term>#GTypePlugin</term> <listitem><para>The abstract type loader interface.</para></listitem> </varlistentry> <varlistentry> <term>#GModule</term> <listitem><para>Portable mechanism for dynamically loaded modules.</para></listitem> </varlistentry> </variablelist>
+ * @see_also: #GTypePlugin, #GModule
  * @title: GTypeModule
  *
  * #GTypeModule provides a simple implementation of the #GTypePlugin
  * interface. The model of #GTypeModule is a dynamically loaded module
- * which implements some number of types and interface
- * implementations. When the module is loaded, it registers its types
- * and interfaces using g_type_module_register_type() and
- * g_type_module_add_interface().  As long as any instances of these
- * types and interface implementations are in use, the module is kept
- * loaded. When the types and interfaces are gone, the module may be
- * unloaded. If the types and interfaces become used again, the module
- * will be reloaded. Note that the last unref cannot happen in module
- * code, since that would lead to the caller's code being unloaded before
- * g_object_unref() returns to it.
+ * which implements some number of types and interface implementations.
+ * When the module is loaded, it registers its types and interfaces
+ * using g_type_module_register_type() and g_type_module_add_interface().
+ * As long as any instances of these types and interface implementations
+ * are in use, the module is kept loaded. When the types and interfaces
+ * are gone, the module may be unloaded. If the types and interfaces
+ * become used again, the module will be reloaded. Note that the last
+ * unref cannot happen in module code, since that would lead to the
+ * caller's code being unloaded before g_object_unref() returns to it.
  *
  * Keeping track of whether the module should be loaded or not is done by
  * using a use count - it starts at zero, and whenever it is greater than
@@ -467,49 +476,40 @@
  * @see_also: #GTypeModule and g_type_register_dynamic().
  * @title: GTypePlugin
  *
- * The GObject type system supports dynamic loading of types. The
- * #GTypePlugin interface is used to handle the lifecycle of
- * dynamically loaded types.  It goes as follows:
+ * The GObject type system supports dynamic loading of types.
+ * The #GTypePlugin interface is used to handle the lifecycle
+ * of dynamically loaded types. It goes as follows:
  *
- * <orderedlist>
- * <listitem><para>
- *   The type is initially introduced (usually upon loading the module
- *   the first time, or by your main application that knows what modules
- *   introduces what types), like this:
- *   |[
- *   new_type_id = g_type_register_dynamic (parent_type_id,
- *                                                 "TypeName",
- *                                                 new_type_plugin,
- *                                                 type_flags);
- *   ]|
- *   where <literal>new_type_plugin</literal> is an implementation of the
- *   #GTypePlugin interface.
- * </para></listitem>
- * <listitem><para>
- *    The type's implementation is referenced, e.g. through
+ * 1. The type is initially introduced (usually upon loading the module
+ *    the first time, or by your main application that knows what modules
+ *    introduces what types), like this:
+ *    |[<!-- language="C" -->
+ *    new_type_id = g_type_register_dynamic (parent_type_id,
+ *                                           "TypeName",
+ *                                           new_type_plugin,
+ *                                           type_flags);
+ *    ]|
+ *    where @new_type_plugin is an implementation of the
+ *    #GTypePlugin interface.
+ *
+ * 2. The type's implementation is referenced, e.g. through
  *    g_type_class_ref() or through g_type_create_instance() (this is
  *    being called by g_object_new()) or through one of the above done on
- *    a type derived from <literal>new_type_id</literal>.
- * </para></listitem>
- * <listitem><para>
- *    This causes the type system to load the type's implementation by calling
- *    g_type_plugin_use() and g_type_plugin_complete_type_info() on
- *    <literal>new_type_plugin</literal>.
- * </para></listitem>
- * <listitem><para>
- *    At some point the type's implementation isn't required anymore, e.g. after
- *    g_type_class_unref() or g_type_free_instance() (called when the reference
- *    count of an instance drops to zero).
- * </para></listitem>
- * <listitem><para>
- *    This causes the type system to throw away the information retrieved from
- *    g_type_plugin_complete_type_info() and then it calls
- *    g_type_plugin_unuse() on <literal>new_type_plugin</literal>.
- * </para></listitem>
- * <listitem><para>
- *    Things may repeat from the second step.
- * </para></listitem>
- * </orderedlist>
+ *    a type derived from @new_type_id.
+ *
+ * 3. This causes the type system to load the type's implementation by
+ *    calling g_type_plugin_use() and g_type_plugin_complete_type_info()
+ *    on @new_type_plugin.
+ *
+ * 4. At some point the type's implementation isn't required anymore,
+ *    e.g. after g_type_class_unref() or g_type_free_instance() (called
+ *    when the reference count of an instance drops to zero).
+ *
+ * 5. This causes the type system to throw away the information retrieved
+ *    from g_type_plugin_complete_type_info() and then it calls
+ *    g_type_plugin_unuse() on @new_type_plugin.
+ *
+ * 6. Things may repeat from the second step.
  *
  * So basically, you need to implement a #GTypePlugin type that
  * carries a use_count, once use_count goes from zero to one, you need
@@ -536,58 +536,59 @@
  * methods for all object types in GTK+, Pango and other libraries
  * based on GObject.  The GObject class provides methods for object
  * construction and destruction, property access methods, and signal
- * support.  Signals are described in detail in <xref
- * linkend="gobject-Signals"/>.
+ * support.  Signals are described in detail [here][gobject-Signals].
  *
- * <para id="floating-ref">
+ * ## Floating references # {#floating-ref}
+ *
  * GInitiallyUnowned is derived from GObject. The only difference between
  * the two is that the initial reference of a GInitiallyUnowned is flagged
- * as a <firstterm>floating</firstterm> reference.
- * This means that it is not specifically claimed to be "owned" by
- * any code portion. The main motivation for providing floating references is
- * C convenience. In particular, it allows code to be written as:
- * |[
+ * as a "floating" reference. This means that it is not specifically
+ * claimed to be "owned" by any code portion. The main motivation for
+ * providing floating references is C convenience. In particular, it
+ * allows code to be written as:
+ * |[<!-- language="C" -->
  * container = create_container ();
  * container_add_child (container, create_child());
  * ]|
- * If <function>container_add_child()</function> will g_object_ref_sink() the
- * passed in child, no reference of the newly created child is leaked.
- * Without floating references, <function>container_add_child()</function>
- * can only g_object_ref() the new child, so to implement this code without
- * reference leaks, it would have to be written as:
- * |[
+ * If container_add_child() calls g_object_ref_sink() on the passed-in child,
+ * no reference of the newly created child is leaked. Without floating
+ * references, container_add_child() can only g_object_ref() the new child,
+ * so to implement this code without reference leaks, it would have to be
+ * written as:
+ * |[<!-- language="C" -->
  * Child *child;
  * container = create_container ();
  * child = create_child ();
  * container_add_child (container, child);
  * g_object_unref (child);
  * ]|
- * The floating reference can be converted into
- * an ordinary reference by calling g_object_ref_sink().
- * For already sunken objects (objects that don't have a floating reference
- * anymore), g_object_ref_sink() is equivalent to g_object_ref() and returns
- * a new reference.
+ * The floating reference can be converted into an ordinary reference by
+ * calling g_object_ref_sink(). For already sunken objects (objects that
+ * don't have a floating reference anymore), g_object_ref_sink() is equivalent
+ * to g_object_ref() and returns a new reference.
+ *
  * Since floating references are useful almost exclusively for C convenience,
  * language bindings that provide automated reference and memory ownership
  * maintenance (such as smart pointers or garbage collection) should not
  * expose floating references in their API.
- * </para>
  *
  * Some object implementations may need to save an objects floating state
  * across certain code portions (an example is #GtkMenu), to achieve this,
  * the following sequence can be used:
  *
- * |[
- * /&ast; save floating state &ast;/
+ * |[<!-- language="C" -->
+ * // save floating state
  * gboolean was_floating = g_object_is_floating (object);
  * g_object_ref_sink (object);
- * /&ast; protected code portion &ast;/
- * ...;
- * /&ast; restore floating state &ast;/
+ * // protected code portion
+ *
+ * ...
+ *
+ * // restore floating state
  * if (was_floating)
  *   g_object_force_floating (object);
  * else
- *   g_object_unref (object); /&ast; release previously acquired reference &ast;/
+ *   g_object_unref (object); // release previously acquired reference
  * ]|
  */
 
@@ -614,61 +615,60 @@
 
 /**
  * SECTION:signals
- * @short_description: A means for customization of object behaviour and a general purpose notification mechanism
+ * @short_description: A means for customization of object behaviour
+ *     and a general purpose notification mechanism
  * @title: Signals
  *
- * The basic concept of the signal system is that of the
- * <emphasis>emission</emphasis> of a signal. Signals are introduced
- * per-type and are identified through strings.  Signals introduced
- * for a parent type are available in derived types as well, so
- * basically they are a per-type facility that is inherited.  A signal
- * emission mainly involves invocation of a certain set of callbacks
- * in precisely defined manner. There are two main categories of such
- * callbacks, per-object
- * <footnote><para>Although signals can deal with any kind of instantiatable
- * type, i'm referring to those types as "object types" in the following,
- * simply because that is the context most users will encounter signals in.
- * </para></footnote>
- * ones and user provided ones.
+ * The basic concept of the signal system is that of the emission
+ * of a signal. Signals are introduced per-type and are identified
+ * through strings. Signals introduced for a parent type are available
+ * in derived types as well, so basically they are a per-type facility
+ * that is inherited.
+ *
+ * A signal emission mainly involves invocation of a certain set of
+ * callbacks in precisely defined manner. There are two main categories
+ * of such callbacks, per-object ones and user provided ones.
+ * (Although signals can deal with any kind of instantiatable type, I'm
+ * referring to those types as "object types" in the following, simply
+ * because that is the context most users will encounter signals in.)
  * The per-object callbacks are most often referred to as "object method
  * handler" or "default (signal) handler", while user provided callbacks are
  * usually just called "signal handler".
+ *
  * The object method handler is provided at signal creation time (this most
  * frequently happens at the end of an object class' creation), while user
- * provided handlers are frequently connected and disconnected to/from a certain
- * signal on certain object instances.
+ * provided handlers are frequently connected and disconnected to/from a
+ * certain signal on certain object instances.
  *
  * A signal emission consists of five stages, unless prematurely stopped:
- * <variablelist>
- * <varlistentry><term></term><listitem><para>
- * 	1 - Invocation of the object method handler for %G_SIGNAL_RUN_FIRST signals
- * </para></listitem></varlistentry>
- * <varlistentry><term></term><listitem><para>
- * 	2 - Invocation of normal user-provided signal handlers (<emphasis>after</emphasis> flag %FALSE)
- * </para></listitem></varlistentry>
- * <varlistentry><term></term><listitem><para>
- * 	3 - Invocation of the object method handler for %G_SIGNAL_RUN_LAST signals
- * </para></listitem></varlistentry>
- * <varlistentry><term></term><listitem><para>
- * 	4 - Invocation of user provided signal handlers, connected with an <emphasis>after</emphasis> flag of %TRUE
- * </para></listitem></varlistentry>
- * <varlistentry><term></term><listitem><para>
- * 	5 - Invocation of the object method handler for %G_SIGNAL_RUN_CLEANUP signals
- * </para></listitem></varlistentry>
- * </variablelist>
+ *
+ * 1. Invocation of the object method handler for %G_SIGNAL_RUN_FIRST signals
+ *
+ * 2. Invocation of normal user-provided signal handlers (where the @after
+ *    flag is not set)
+ *
+ * 3. Invocation of the object method handler for %G_SIGNAL_RUN_LAST signals
+ *
+ * 4. Invocation of user provided signal handlers (where the @after flag is set)
+ *
+ * 5. Invocation of the object method handler for %G_SIGNAL_RUN_CLEANUP signals
+ *  
  * The user-provided signal handlers are called in the order they were
  * connected in.
+ *
  * All handlers may prematurely stop a signal emission, and any number of
  * handlers may be connected, disconnected, blocked or unblocked during
  * a signal emission.
+ *
  * There are certain criteria for skipping user handlers in stages 2 and 4
  * of a signal emission.
- * First, user handlers may be <emphasis>blocked</emphasis>, blocked handlers are omitted
- * during callback invocation, to return from the "blocked" state, a
- * handler has to get unblocked exactly the same amount of times
- * it has been blocked before.
+ *
+ * First, user handlers may be blocked. Blocked handlers are omitted during
+ * callback invocation, to return from the blocked state, a handler has to
+ * get unblocked exactly the same amount of times it has been blocked before.
+ *
  * Second, upon emission of a %G_SIGNAL_DETAILED signal, an additional
- * "detail" argument passed in to g_signal_emit() has to match the detail
+ * @detail argument passed in to g_signal_emit() has to match the detail
  * argument of the signal handler currently subject to invocation.
  * Specification of no detail argument for signal handlers (omission of the
  * detail part of the signal specification upon connection) serves as a
@@ -678,7 +678,8 @@
 
 /**
  * SECTION:value_arrays
- * @short_description: A container structure to maintain an array of generic values
+ * @short_description: A container structure to maintain an array of
+ *     generic values
  * @see_also: #GValue, #GParamSpecValueArray, g_param_spec_value_array()
  * @title: Value arrays
  *
@@ -693,13 +694,13 @@
  * g_value_unset() as the clear function using g_array_set_clear_func(),
  * for instance, the following code:
  *
- * |[
+ * |[<!-- language="C" -->
  *   GValueArray *array = g_value_array_new (10);
  * ]|
  *
  * can be replaced by:
  *
- * |[
+ * |[<!-- language="C" -->
  *   GArray *array = g_array_sized_new (FALSE, TRUE, sizeof (GValue), 10);
  *   g_array_set_clear_func (array, (GDestroyNotify) g_value_unset);
  * ]|
@@ -710,7 +711,7 @@
  * g_binding_get_flags:
  * @binding: a #GBinding
  *
- * Retrieves the flags passed when constructing the #GBinding
+ * Retrieves the flags passed when constructing the #GBinding.
  *
  * Returns: the #GBindingFlags used by the #GBinding
  * Since: 2.26
@@ -721,7 +722,7 @@
  * g_binding_get_source:
  * @binding: a #GBinding
  *
- * Retrieves the #GObject instance used as the source of the binding
+ * Retrieves the #GObject instance used as the source of the binding.
  *
  * Returns: (transfer none): the source #GObject
  * Since: 2.26
@@ -733,7 +734,7 @@
  * @binding: a #GBinding
  *
  * Retrieves the name of the property of #GBinding:source used as the source
- * of the binding
+ * of the binding.
  *
  * Returns: the name of the source property
  * Since: 2.26
@@ -744,7 +745,7 @@
  * g_binding_get_target:
  * @binding: a #GBinding
  *
- * Retrieves the #GObject instance used as the target of the binding
+ * Retrieves the #GObject instance used as the target of the binding.
  *
  * Returns: (transfer none): the target #GObject
  * Since: 2.26
@@ -756,10 +757,26 @@
  * @binding: a #GBinding
  *
  * Retrieves the name of the property of #GBinding:target used as the target
- * of the binding
+ * of the binding.
  *
  * Returns: the name of the target property
  * Since: 2.26
+ */
+
+
+/**
+ * g_binding_unbind:
+ * @binding: a #GBinding
+ *
+ * Explicitly releases the binding between the source and the target
+ * property expressed by @binding.
+ *
+ * This function will release the reference that is being held on
+ * the @binding instance; if you want to hold on to the #GBinding instance
+ * after calling g_binding_unbind(), you will need to hold a reference
+ * to it.
+ *
+ * Since: 2.38
  */
 
 
@@ -770,7 +787,7 @@
  *
  * Provide a copy of a boxed structure @src_boxed which is of type @boxed_type.
  *
- * Returns: The newly created copy of the boxed structure.
+ * Returns: (transfer full): The newly created copy of the boxed structure.
  */
 
 
@@ -803,11 +820,12 @@
  * @return_value: a #GValue which can store the returned #gboolean
  * @n_param_values: 2
  * @param_values: a #GValue array holding instance and arg1
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>gboolean (*callback) (gpointer instance, gint arg1, gpointer user_data)</literal> where the #gint parameter
+ * `gboolean (*callback) (gpointer instance, gint arg1, gpointer user_data)` where the #gint parameter
  * denotes a flags type.
  */
 
@@ -818,11 +836,12 @@
  * @return_value: a #GValue, which can store the returned string
  * @n_param_values: 3
  * @param_values: a #GValue array holding instance, arg1 and arg2
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>gboolean (*callback) (gpointer instance, GBoxed *arg1, GBoxed *arg2, gpointer user_data)</literal>.
+ * `gboolean (*callback) (gpointer instance, GBoxed *arg1, GBoxed *arg2, gpointer user_data)`.
  *
  * Since: 2.26
  */
@@ -841,11 +860,12 @@
  * @return_value: a #GValue, which can store the returned string
  * @n_param_values: 3
  * @param_values: a #GValue array holding instance, arg1 and arg2
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>gchar* (*callback) (gpointer instance, GObject *arg1, gpointer arg2, gpointer user_data)</literal>.
+ * `gchar* (*callback) (gpointer instance, GObject *arg1, gpointer arg2, gpointer user_data)`.
  */
 
 
@@ -855,11 +875,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #gboolean parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, gboolean arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, gboolean arg1, gpointer user_data)`.
  */
 
 
@@ -869,11 +890,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #GBoxed* parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, GBoxed *arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, GBoxed *arg1, gpointer user_data)`.
  */
 
 
@@ -883,11 +905,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #gchar parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, gchar arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, gchar arg1, gpointer user_data)`.
  */
 
 
@@ -897,11 +920,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #gdouble parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, gdouble arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, gdouble arg1, gpointer user_data)`.
  */
 
 
@@ -911,11 +935,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the enumeration parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, gint arg1, gpointer user_data)</literal> where the #gint parameter denotes an enumeration type..
+ * `void (*callback) (gpointer instance, gint arg1, gpointer user_data)` where the #gint parameter denotes an enumeration type..
  */
 
 
@@ -925,11 +950,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the flags parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, gint arg1, gpointer user_data)</literal> where the #gint parameter denotes a flags type.
+ * `void (*callback) (gpointer instance, gint arg1, gpointer user_data)` where the #gint parameter denotes a flags type.
  */
 
 
@@ -939,11 +965,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #gfloat parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, gfloat arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, gfloat arg1, gpointer user_data)`.
  */
 
 
@@ -953,11 +980,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #gint parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, gint arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, gint arg1, gpointer user_data)`.
  */
 
 
@@ -967,11 +995,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #glong parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, glong arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, glong arg1, gpointer user_data)`.
  */
 
 
@@ -981,11 +1010,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #GObject* parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, GObject *arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, GObject *arg1, gpointer user_data)`.
  */
 
 
@@ -995,11 +1025,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #GParamSpec* parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, GParamSpec *arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, GParamSpec *arg1, gpointer user_data)`.
  */
 
 
@@ -1009,11 +1040,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #gpointer parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, gpointer arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, gpointer arg1, gpointer user_data)`.
  */
 
 
@@ -1023,11 +1055,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #gchar* parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, const gchar *arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, const gchar *arg1, gpointer user_data)`.
  */
 
 
@@ -1037,11 +1070,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #guchar parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, guchar arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, guchar arg1, gpointer user_data)`.
  */
 
 
@@ -1051,11 +1085,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #guint parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, guint arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, guint arg1, gpointer user_data)`.
  */
 
 
@@ -1065,11 +1100,12 @@
  * @return_value: ignored
  * @n_param_values: 3
  * @param_values: a #GValue array holding instance, arg1 and arg2
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, guint arg1, gpointer arg2, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, guint arg1, gpointer arg2, gpointer user_data)`.
  */
 
 
@@ -1079,11 +1115,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #gulong parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, gulong arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, gulong arg1, gpointer user_data)`.
  */
 
 
@@ -1093,11 +1130,12 @@
  * @return_value: ignored
  * @n_param_values: 2
  * @param_values: a #GValue array holding the instance and the #GVariant* parameter
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, GVariant *arg1, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, GVariant *arg1, gpointer user_data)`.
  *
  * Since: 2.26
  */
@@ -1109,25 +1147,34 @@
  * @return_value: ignored
  * @n_param_values: 1
  * @param_values: a #GValue array holding only the instance
- * @invocation_hint: the invocation hint given as the last argument to g_closure_invoke()
+ * @invocation_hint: the invocation hint given as the last argument
+ *  to g_closure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * <literal>void (*callback) (gpointer instance, gpointer user_data)</literal>.
+ * `void (*callback) (gpointer instance, gpointer user_data)`.
  */
 
 
 /**
  * g_cclosure_marshal_generic:
  * @closure: A #GClosure.
- * @return_gvalue: A #GValue to store the return value. May be %NULL if the callback of closure doesn't return a value.
+ * @return_gvalue: A #GValue to store the return value. May be %NULL
+ *   if the callback of closure doesn't return a value.
  * @n_param_values: The length of the @param_values array.
- * @param_values: An array of #GValue<!-- -->s holding the arguments on which to invoke the callback of closure.
- * @invocation_hint: The invocation hint given as the last argument to g_closure_invoke().
- * @marshal_data: Additional data specified when registering the marshaller, see g_closure_set_marshal() and g_closure_set_meta_marshal()
+ * @param_values: An array of #GValues holding the arguments
+ *   on which to invoke the callback of closure.
+ * @invocation_hint: The invocation hint given as the last argument to
+ *   g_closure_invoke().
+ * @marshal_data: Additional data specified when registering the
+ *   marshaller, see g_closure_set_marshal() and
+ *   g_closure_set_meta_marshal()
  *
- * A generic marshaller function implemented via <ulink
- * url="http://sourceware.org/libffi/">libffi</ulink>.
+ * A generic marshaller function implemented via
+ * [libffi](http://sourceware.org/libffi/).
+ *
+ * Normally this function is not passed explicitly to g_signal_new(),
+ * but used automatically by GLib when specifying a %NULL marshaller.
  *
  * Since: 2.30
  */
@@ -1200,9 +1247,6 @@
  * If the reference is %NULL then this function does nothing.
  * Otherwise, the reference count of the object is decreased and the
  * pointer is set to %NULL.
- *
- * This function is threadsafe and modifies the pointer atomically,
- * using memory barriers where needed.
  *
  * A macro is also included that allows this function to be used without
  * pointer casts.
@@ -1277,9 +1321,13 @@
 /**
  * g_closure_invoke:
  * @closure: a #GClosure
- * @return_value: (allow-none): a #GValue to store the return value. May be %NULL if the callback of @closure doesn't return a value.
+ * @return_value: (allow-none): a #GValue to store the return
+ *                value. May be %NULL if the callback of @closure
+ *                doesn't return a value.
  * @n_param_values: the length of the @param_values array
- * @param_values: (array length=n_param_values): an array of #GValue<!-- -->s holding the arguments on which to invoke the callback of @closure
+ * @param_values: (array length=n_param_values): an array of
+ *                #GValues holding the arguments on which to
+ *                invoke the callback of @closure
  * @invocation_hint: (allow-none): a context-dependent invocation hint
  *
  * Invokes the closure, i.e. executes the callback represented by the @closure.
@@ -1288,8 +1336,10 @@
 
 /**
  * g_closure_new_object:
- * @sizeof_closure: the size of the structure to allocate, must be at least <literal>sizeof (GClosure)</literal>
- * @object: a #GObject pointer to store in the @data field of the newly allocated #GClosure
+ * @sizeof_closure: the size of the structure to allocate, must be at least
+ *  `sizeof (GClosure)`
+ * @object: a #GObject pointer to store in the @data field of the newly
+ *  allocated #GClosure
  *
  * A variant of g_closure_new_simple() which stores @object in the
  * @data field of the closure and calls g_object_watch_closure() on
@@ -1302,14 +1352,15 @@
 
 /**
  * g_closure_new_simple:
- * @sizeof_closure: the size of the structure to allocate, must be at least <literal>sizeof (GClosure)</literal>
+ * @sizeof_closure: the size of the structure to allocate, must be at least
+ *                  `sizeof (GClosure)`
  * @data: data to store in the @data field of the newly allocated #GClosure
  *
  * Allocates a struct of the given size and initializes the initial
  * part as a #GClosure. This function is mainly useful when
  * implementing new types of closures.
  *
- * |[
+ * |[<!-- language="C" -->
  * typedef struct _MyClosure MyClosure;
  * struct _MyClosure
  * {
@@ -1360,7 +1411,8 @@
 /**
  * g_closure_remove_finalize_notifier: (skip)
  * @closure: a #GClosure
- * @notify_data: data which was passed to g_closure_add_finalize_notifier() when registering @notify_func
+ * @notify_data: data which was passed to g_closure_add_finalize_notifier()
+ *  when registering @notify_func
  * @notify_func: the callback function to remove
  *
  * Removes a finalization notifier.
@@ -1372,7 +1424,8 @@
 /**
  * g_closure_remove_invalidate_notifier: (skip)
  * @closure: a #GClosure
- * @notify_data: data which was passed to g_closure_add_invalidate_notifier() when registering @notify_func
+ * @notify_data: data which was passed to g_closure_add_invalidate_notifier()
+ *               when registering @notify_func
  * @notify_func: the callback function to remove
  *
  * Removes an invalidation notifier.
@@ -1386,7 +1439,7 @@
  * @closure: a #GClosure
  * @marshal: a #GClosureMarshal function
  *
- * Sets the marshaller of @closure. The <literal>marshal_data</literal>
+ * Sets the marshaller of @closure. The `marshal_data`
  * of @marshal provides a way for a meta marshaller to provide additional
  * information to the marshaller. (See g_closure_set_meta_marshal().) For
  * GObject's C predefined marshallers (the g_cclosure_marshal_*()
@@ -1404,9 +1457,8 @@
  * Sets the meta marshaller of @closure.  A meta marshaller wraps
  * @closure->marshal and modifies the way it is called in some
  * fashion. The most common use of this facility is for C callbacks.
- * The same marshallers (generated by <link
- * linkend="glib-genmarshal">glib-genmarshal</link>) are used
- * everywhere, but the way that we get the callback function
+ * The same marshallers (generated by [glib-genmarshal][glib-genmarshal]),
+ * are used everywhere, but the way that we get the callback function
  * differs. In most cases we want to use @closure->callback, but in
  * other cases we want to use some different technique to retrieve the
  * callback function.
@@ -1421,30 +1473,31 @@
 
 /**
  * g_closure_sink:
- * @closure: #GClosure to decrement the initial reference count on, if it's still being held
+ * @closure: #GClosure to decrement the initial reference count on, if it's
+ *           still being held
  *
  * Takes over the initial ownership of a closure.  Each closure is
- * initially created in a <firstterm>floating</firstterm> state, which
- * means that the initial reference count is not owned by any caller.
- * g_closure_sink() checks to see if the object is still floating, and
- * if so, unsets the floating state and decreases the reference
- * count. If the closure is not floating, g_closure_sink() does
- * nothing. The reason for the existence of the floating state is to
- * prevent cumbersome code sequences like:
- * |[
+ * initially created in a "floating" state, which means that the initial
+ * reference count is not owned by any caller. g_closure_sink() checks
+ * to see if the object is still floating, and if so, unsets the
+ * floating state and decreases the reference count. If the closure
+ * is not floating, g_closure_sink() does nothing. The reason for the
+ * existence of the floating state is to prevent cumbersome code
+ * sequences like:
+ * |[<!-- language="C" -->
  * closure = g_cclosure_new (cb_func, cb_data);
  * g_source_set_closure (source, closure);
- * g_closure_unref (closure); // XXX GObject doesn't really need this
+ * g_closure_unref (closure); // GObject doesn't really need this
  * ]|
  * Because g_source_set_closure() (and similar functions) take ownership of the
  * initial reference count, if it is unowned, we instead can write:
- * |[
+ * |[<!-- language="C" -->
  * g_source_set_closure (source, g_cclosure_new (cb_func, cb_data));
  * ]|
  *
  * Generally, this function is used together with g_closure_ref(). Ane example
  * of storing a closure for later notification looks like:
- * |[
+ * |[<!-- language="C" -->
  * static GClosure *notify_closure = NULL;
  * void
  * foo_notify_set_closure (GClosure *closure)
@@ -1479,14 +1532,16 @@
 /**
  * g_enum_complete_type_info:
  * @g_enum_type: the type identifier of the type being completed
- * @info: the #GTypeInfo struct to be filled in
- * @const_values: An array of #GEnumValue structs for the possible enumeration values. The array is terminated by a struct with all members being 0.
+ * @info: (out callee-allocates): the #GTypeInfo struct to be filled in
+ * @const_values: An array of #GEnumValue structs for the possible
+ *  enumeration values. The array is terminated by a struct with all
+ *  members being 0.
  *
- * This function is meant to be called from the <literal>complete_type_info</literal>
+ * This function is meant to be called from the `complete_type_info`
  * function of a #GTypePlugin implementation, as in the following
  * example:
  *
- * |[
+ * |[<!-- language="C" -->
  * static void
  * my_enum_complete_type_info (GTypePlugin     *plugin,
  *                             GType            g_type,
@@ -1512,7 +1567,8 @@
  *
  * Returns the #GEnumValue for a value.
  *
- * Returns: the #GEnumValue for @value, or %NULL if @value is not a member of the enumeration
+ * Returns: (transfer none): the #GEnumValue for @value, or %NULL
+ *          if @value is not a member of the enumeration
  */
 
 
@@ -1523,7 +1579,9 @@
  *
  * Looks up a #GEnumValue by name.
  *
- * Returns: the #GEnumValue with name @name, or %NULL if the enumeration doesn't have a member with that name
+ * Returns: (transfer none): the #GEnumValue with name @name,
+ *          or %NULL if the enumeration doesn't have a member
+ *          with that name
  */
 
 
@@ -1534,21 +1592,25 @@
  *
  * Looks up a #GEnumValue by nickname.
  *
- * Returns: the #GEnumValue with nickname @nick, or %NULL if the enumeration doesn't have a member with that nickname
+ * Returns: (transfer none): the #GEnumValue with nickname @nick,
+ *          or %NULL if the enumeration doesn't have a member
+ *          with that nickname
  */
 
 
 /**
  * g_enum_register_static:
  * @name: A nul-terminated string used as the name of the new type.
- * @const_static_values: An array of #GEnumValue structs for the possible enumeration values. The array is terminated by a struct with all members being 0. GObject keeps a reference to the data, so it cannot be stack-allocated.
+ * @const_static_values: An array of #GEnumValue structs for the possible
+ *  enumeration values. The array is terminated by a struct with all
+ *  members being 0. GObject keeps a reference to the data, so it cannot
+ *  be stack-allocated.
  *
  * Registers a new static enumeration type with the name @name.
  *
- * It is normally more convenient to let <link
- * linkend="glib-mkenums">glib-mkenums</link> generate a
- * my_enum_get_type() function from a usual C enumeration definition
- * than to write one yourself using g_enum_register_static().
+ * It is normally more convenient to let [glib-mkenums][glib-mkenums],
+ * generate a my_enum_get_type() function from a usual C enumeration
+ * definition  than to write one yourself using g_enum_register_static().
  *
  * Returns: The new type identifier.
  */
@@ -1557,8 +1619,10 @@
 /**
  * g_flags_complete_type_info:
  * @g_flags_type: the type identifier of the type being completed
- * @info: the #GTypeInfo struct to be filled in
- * @const_values: An array of #GFlagsValue structs for the possible enumeration values. The array is terminated by a struct with all members being 0.
+ * @info: (out callee-allocates): the #GTypeInfo struct to be filled in
+ * @const_values: An array of #GFlagsValue structs for the possible
+ *  enumeration values. The array is terminated by a struct with all
+ *  members being 0.
  *
  * This function is meant to be called from the complete_type_info()
  * function of a #GTypePlugin implementation, see the example for
@@ -1573,7 +1637,8 @@
  *
  * Returns the first #GFlagsValue which is set in @value.
  *
- * Returns: the first #GFlagsValue which is set in @value, or %NULL if none is set
+ * Returns: (transfer none): the first #GFlagsValue which is set in
+ *          @value, or %NULL if none is set
  */
 
 
@@ -1584,7 +1649,8 @@
  *
  * Looks up a #GFlagsValue by name.
  *
- * Returns: the #GFlagsValue with name @name, or %NULL if there is no flag with that name
+ * Returns: (transfer none): the #GFlagsValue with name @name,
+ *          or %NULL if there is no flag with that name
  */
 
 
@@ -1595,21 +1661,23 @@
  *
  * Looks up a #GFlagsValue by nickname.
  *
- * Returns: the #GFlagsValue with nickname @nick, or %NULL if there is no flag with that nickname
+ * Returns: (transfer none): the #GFlagsValue with nickname @nick,
+ *          or %NULL if there is no flag with that nickname
  */
 
 
 /**
  * g_flags_register_static:
  * @name: A nul-terminated string used as the name of the new type.
- * @const_static_values: An array of #GFlagsValue structs for the possible flags values. The array is terminated by a struct with all members being 0. GObject keeps a reference to the data, so it cannot be stack-allocated.
+ * @const_static_values: An array of #GFlagsValue structs for the possible
+ *  flags values. The array is terminated by a struct with all members being 0.
+ *  GObject keeps a reference to the data, so it cannot be stack-allocated.
  *
  * Registers a new static flags type with the name @name.
  *
- * It is normally more convenient to let <link
- * linkend="glib-mkenums">glib-mkenums</link> generate a
- * my_flags_get_type() function from a usual C enumeration definition
- * than to write one yourself using g_flags_register_static().
+ * It is normally more convenient to let [glib-mkenums][glib-mkenums]
+ * generate a my_flags_get_type() function from a usual C enumeration
+ * definition than to write one yourself using g_flags_register_static().
  *
  * Returns: The new type identifier.
  */
@@ -1618,7 +1686,9 @@
 /**
  * g_object_add_toggle_ref: (skip)
  * @object: a #GObject
- * @notify: a function to call when this reference is the last reference to the object, or is no longer the last reference.
+ * @notify: a function to call when this reference is the
+ *  last reference to the object, or is no longer
+ *  the last reference.
  * @data: data to pass to @notify
  *
  * Increases the reference count of the object by one and sets a
@@ -1637,8 +1707,8 @@
  * to the proxy object, but when there are other references held to
  * @object, a strong reference is held. The @notify callback is called
  * when the reference from @object to the proxy object should be
- * <firstterm>toggled</firstterm> from strong to weak (@is_last_ref
- * true) or weak to strong (@is_last_ref false).
+ * "toggled" from strong to weak (@is_last_ref true) or weak to strong
+ * (@is_last_ref false).
  *
  * Since a (normal) reference must be held to the object before
  * calling g_object_add_toggle_ref(), the initial state of the reverse
@@ -1702,7 +1772,9 @@
  *
  * A #GObject can have multiple bindings.
  *
- * Returns: (transfer none): the #GBinding instance representing the binding between the two #GObject instances. The binding is released whenever the #GBinding reference count reaches zero.
+ * Returns: (transfer none): the #GBinding instance representing the
+ *     binding between the two #GObject instances. The binding is released
+ *     whenever the #GBinding reference count reaches zero.
  * Since: 2.26
  */
 
@@ -1714,10 +1786,14 @@
  * @target: (type GObject.Object): the target #GObject
  * @target_property: the property on @target to bind
  * @flags: flags to pass to #GBinding
- * @transform_to: (scope notified) (allow-none): the transformation function from the @source to the @target, or %NULL to use the default
- * @transform_from: (scope notified) (allow-none): the transformation function from the @target to the @source, or %NULL to use the default
- * @user_data: custom data to be passed to the transformation functions, or %NULL
- * @notify: function to be called when disposing the binding, to free the resources used by the transformation functions
+ * @transform_to: (scope notified) (allow-none): the transformation function
+ *     from the @source to the @target, or %NULL to use the default
+ * @transform_from: (scope notified) (allow-none): the transformation function
+ *     from the @target to the @source, or %NULL to use the default
+ * @user_data: custom data to be passed to the transformation functions,
+ *     or %NULL
+ * @notify: function to be called when disposing the binding, to free the
+ *     resources used by the transformation functions
  *
  * Complete version of g_object_bind_property().
  *
@@ -1737,37 +1813,42 @@
  *
  * A #GObject can have multiple bindings.
  *
- * <note>The same @user_data parameter will be used for both @transform_to
+ * The same @user_data parameter will be used for both @transform_to
  * and @transform_from transformation functions; the @notify function will
  * be called once, when the binding is removed. If you need different data
  * for each transformation function, please use
- * g_object_bind_property_with_closures() instead.</note>
+ * g_object_bind_property_with_closures() instead.
  *
- * Returns: (transfer none): the #GBinding instance representing the binding between the two #GObject instances. The binding is released whenever the #GBinding reference count reaches zero.
+ * Returns: (transfer none): the #GBinding instance representing the
+ *     binding between the two #GObject instances. The binding is released
+ *     whenever the #GBinding reference count reaches zero.
  * Since: 2.26
  */
 
 
 /**
- * g_object_bind_property_with_closures:
+ * g_object_bind_property_with_closures: (rename-to g_object_bind_property_full)
  * @source: (type GObject.Object): the source #GObject
  * @source_property: the property on @source to bind
  * @target: (type GObject.Object): the target #GObject
  * @target_property: the property on @target to bind
  * @flags: flags to pass to #GBinding
- * @transform_to: a #GClosure wrapping the transformation function from the @source to the @target, or %NULL to use the default
- * @transform_from: a #GClosure wrapping the transformation function from the @target to the @source, or %NULL to use the default
+ * @transform_to: a #GClosure wrapping the transformation function
+ *     from the @source to the @target, or %NULL to use the default
+ * @transform_from: a #GClosure wrapping the transformation function
+ *     from the @target to the @source, or %NULL to use the default
  *
  * Creates a binding between @source_property on @source and @target_property
  * on @target, allowing you to set the transformation functions to be used by
  * the binding.
  *
  * This function is the language bindings friendly version of
- * g_object_bind_property_full(), using #GClosure<!-- -->s instead of
+ * g_object_bind_property_full(), using #GClosures instead of
  * function pointers.
  *
- * Rename to: g_object_bind_property_full
- * Returns: (transfer none): the #GBinding instance representing the binding between the two #GObject instances. The binding is released whenever the #GBinding reference count reaches zero.
+ * Returns: (transfer none): the #GBinding instance representing the
+ *     binding between the two #GObject instances. The binding is released
+ *     whenever the #GBinding reference count reaches zero.
  * Since: 2.26
  */
 
@@ -1779,18 +1860,24 @@
  *
  * Looks up the #GParamSpec for a property of a class.
  *
- * Returns: (transfer none): the #GParamSpec for the property, or %NULL if the class doesn't have a property of that name
+ * Returns: (transfer none): the #GParamSpec for the property, or
+ *          %NULL if the class doesn't have a property of that name
  */
 
 
 /**
  * g_object_class_install_properties:
  * @oclass: a #GObjectClass
- * @n_pspecs: the length of the #GParamSpec<!-- -->s array
- * @pspecs: (array length=n_pspecs): the #GParamSpec<!-- -->s array defining the new properties
+ * @n_pspecs: the length of the #GParamSpecs array
+ * @pspecs: (array length=n_pspecs): the #GParamSpecs array
+ *   defining the new properties
  *
- * Installs new properties from an array of #GParamSpec<!-- -->s. This is
- * usually done in the class initializer.
+ * Installs new properties from an array of #GParamSpecs.
+ *
+ * All properties should be installed during the class initializer.  It
+ * is possible to install properties after that, but doing so is not
+ * recommend, and specifically, is not guaranteed to be thread-safe vs.
+ * use of properties on the same type on other threads.
  *
  * The property id of each property is the index of each #GParamSpec in
  * the @pspecs array.
@@ -1799,10 +1886,10 @@
  * be used to store a #GParamSpec.
  *
  * This function should be used if you plan to use a static array of
- * #GParamSpec<!-- -->s and g_object_notify_by_pspec(). For instance, this
+ * #GParamSpecs and g_object_notify_by_pspec(). For instance, this
  * class initialization:
  *
- * |[
+ * |[<!-- language="C" -->
  * enum {
  *   PROP_0, PROP_FOO, PROP_BAR, N_PROPERTIES
  * };
@@ -1835,7 +1922,7 @@
  *
  * allows calling g_object_notify_by_pspec() to notify of property changes:
  *
- * |[
+ * |[<!-- language="C" -->
  * void
  * my_object_set_foo (MyObject *self, gint foo)
  * {
@@ -1857,7 +1944,12 @@
  * @property_id: the id for the new property
  * @pspec: the #GParamSpec for the new property
  *
- * Installs a new property. This is usually done in the class initializer.
+ * Installs a new property.
+ *
+ * All properties should be installed during the class initializer.  It
+ * is possible to install properties after that, but doing so is not
+ * recommend, and specifically, is not guaranteed to be thread-safe vs.
+ * use of properties on the same type on other threads.
  *
  * Note that it is possible to redefine a property in a derived class,
  * by installing a property with the same name. This can be useful at times,
@@ -1872,7 +1964,8 @@
  *
  * Get an array of #GParamSpec* for all properties of a class.
  *
- * Returns: (array length=n_properties) (transfer container): an array of #GParamSpec* which should be freed after use
+ * Returns: (array length=n_properties) (transfer container): an array of
+ *          #GParamSpec* which should be freed after use
  */
 
 
@@ -1880,15 +1973,15 @@
  * g_object_class_override_property:
  * @oclass: a #GObjectClass
  * @property_id: the new property ID
- * @name: the name of a property registered in a parent class or in an interface of this class.
+ * @name: the name of a property registered in a parent class or
+ *  in an interface of this class.
  *
- * Registers @property_id as referring to a property with the
- * name @name in a parent class or in an interface implemented
- * by @oclass. This allows this class to <firstterm>override</firstterm>
- * a property implementation in a parent class or to provide
- * the implementation of a property from an interface.
+ * Registers @property_id as referring to a property with the name
+ * @name in a parent class or in an interface implemented by @oclass.
+ * This allows this class to "override" a property implementation in
+ * a parent class or to provide the implementation of a property from
+ * an interface.
  *
- * <note>
  * Internally, overriding is implemented by creating a property of type
  * #GParamSpecOverride; generally operations that query the properties of
  * the object class, such as g_object_class_find_property() or
@@ -1899,7 +1992,6 @@
  * correct.  For virtually all uses, this makes no difference. If you
  * need to get the overridden property, you can call
  * g_param_spec_get_redirect_target().
- * </note>
  *
  * Since: 2.4
  */
@@ -1909,78 +2001,31 @@
  * g_object_connect: (skip)
  * @object: a #GObject
  * @signal_spec: the spec for the first signal
- * @...: #GCallback for the first signal, followed by data for the first signal, followed optionally by more signal spec/callback/data triples, followed by %NULL
+ * @...: #GCallback for the first signal, followed by data for the
+ *       first signal, followed optionally by more signal
+ *       spec/callback/data triples, followed by %NULL
  *
  * A convenience function to connect multiple signals at once.
  *
  * The signal specs expected by this function have the form
  * "modifier::signal_name", where modifier can be one of the following:
- * <variablelist>
- * <varlistentry>
- * <term>signal</term>
- * <listitem><para>
- * equivalent to <literal>g_signal_connect_data (..., NULL, 0)</literal>
- * </para></listitem>
- * </varlistentry>
- * <varlistentry>
- * <term>object_signal</term>
- * <term>object-signal</term>
- * <listitem><para>
- * equivalent to <literal>g_signal_connect_object (..., 0)</literal>
- * </para></listitem>
- * </varlistentry>
- * <varlistentry>
- * <term>swapped_signal</term>
- * <term>swapped-signal</term>
- * <listitem><para>
- * equivalent to <literal>g_signal_connect_data (..., NULL, G_CONNECT_SWAPPED)</literal>
- * </para></listitem>
- * </varlistentry>
- * <varlistentry>
- * <term>swapped_object_signal</term>
- * <term>swapped-object-signal</term>
- * <listitem><para>
- * equivalent to <literal>g_signal_connect_object (..., G_CONNECT_SWAPPED)</literal>
- * </para></listitem>
- * </varlistentry>
- * <varlistentry>
- * <term>signal_after</term>
- * <term>signal-after</term>
- * <listitem><para>
- * equivalent to <literal>g_signal_connect_data (..., NULL, G_CONNECT_AFTER)</literal>
- * </para></listitem>
- * </varlistentry>
- * <varlistentry>
- * <term>object_signal_after</term>
- * <term>object-signal-after</term>
- * <listitem><para>
- * equivalent to <literal>g_signal_connect_object (..., G_CONNECT_AFTER)</literal>
- * </para></listitem>
- * </varlistentry>
- * <varlistentry>
- * <term>swapped_signal_after</term>
- * <term>swapped-signal-after</term>
- * <listitem><para>
- * equivalent to <literal>g_signal_connect_data (..., NULL, G_CONNECT_SWAPPED | G_CONNECT_AFTER)</literal>
- * </para></listitem>
- * </varlistentry>
- * <varlistentry>
- * <term>swapped_object_signal_after</term>
- * <term>swapped-object-signal-after</term>
- * <listitem><para>
- * equivalent to <literal>g_signal_connect_object (..., G_CONNECT_SWAPPED | G_CONNECT_AFTER)</literal>
- * </para></listitem>
- * </varlistentry>
- * </variablelist>
+ * * - signal: equivalent to g_signal_connect_data (..., NULL, 0)
+ * - object-signal, object_signal: equivalent to g_signal_connect_object (..., 0)
+ * - swapped-signal, swapped_signal: equivalent to g_signal_connect_data (..., NULL, G_CONNECT_SWAPPED)
+ * - swapped_object_signal, swapped-object-signal: equivalent to g_signal_connect_object (..., G_CONNECT_SWAPPED)
+ * - signal_after, signal-after: equivalent to g_signal_connect_data (..., NULL, G_CONNECT_AFTER)
+ * - object_signal_after, object-signal-after: equivalent to g_signal_connect_object (..., G_CONNECT_AFTER)
+ * - swapped_signal_after, swapped-signal-after: equivalent to g_signal_connect_data (..., NULL, G_CONNECT_SWAPPED | G_CONNECT_AFTER)
+ * - swapped_object_signal_after, swapped-object-signal-after: equivalent to g_signal_connect_object (..., G_CONNECT_SWAPPED | G_CONNECT_AFTER)
  *
- * |[
+ * |[<!-- language="C" -->
  *   menu->toplevel = g_object_connect (g_object_new (GTK_TYPE_WINDOW,
  * 						   "type", GTK_WINDOW_POPUP,
  * 						   "child", menu,
  * 						   NULL),
  * 				     "signal::event", gtk_menu_window_event, menu,
  * 				     "signal::size_request", gtk_menu_window_size_request, menu,
- * 				     "signal::destroy", gtk_widget_destroyed, &amp;menu-&gt;toplevel,
+ * 				     "signal::destroy", gtk_widget_destroyed, &menu->toplevel,
  * 				     NULL);
  * ]|
  *
@@ -1992,7 +2037,9 @@
  * g_object_disconnect: (skip)
  * @object: a #GObject
  * @signal_spec: the spec for the first signal
- * @...: #GCallback for the first signal, followed by data for the first signal, followed optionally by more signal spec/callback/data triples, followed by %NULL
+ * @...: #GCallback for the first signal, followed by data for the first signal,
+ *  followed optionally by more signal spec/callback/data triples,
+ *  followed by %NULL
  *
  * A convenience function to disconnect multiple signals at once.
  *
@@ -2025,7 +2072,10 @@
  * threads are using object data on the same key on the same
  * object.
  *
- * Returns: the result of calling @dup_func on the value associated with @key on @object, or %NULL if not set. If @dup_func is %NULL, the value is returned unmodified.
+ * Returns: the result of calling @dup_func on the value
+ *     associated with @key on @object, or %NULL if not set.
+ *     If @dup_func is %NULL, the value is returned
+ *     unmodified.
  * Since: 2.34
  */
 
@@ -2052,7 +2102,10 @@
  * threads are using object data on the same key on the same
  * object.
  *
- * Returns: the result of calling @dup_func on the value associated with @quark on @object, or %NULL if not set. If @dup_func is %NULL, the value is returned unmodified.
+ * Returns: the result of calling @dup_func on the value
+ *     associated with @quark on @object, or %NULL if not set.
+ *     If @dup_func is %NULL, the value is returned
+ *     unmodified.
  * Since: 2.34
  */
 
@@ -2061,11 +2114,10 @@
  * g_object_force_floating:
  * @object: a #GObject
  *
- * This function is intended for #GObject implementations to re-enforce a
- * <link linkend="floating-ref">floating</link> object reference.
- * Doing this is seldom required: all
- * #GInitiallyUnowned<!-- -->s are created with a floating reference which
- * usually just needs to be sunken by calling g_object_ref_sink().
+ * This function is intended for #GObject implementations to re-enforce
+ * a [floating][floating-ref] object reference. Doing this is seldom
+ * required: all #GInitiallyUnowneds are created with a floating reference
+ * which usually just needs to be sunken by calling g_object_ref_sink().
  *
  * Since: 2.10
  */
@@ -2091,7 +2143,8 @@
  * g_object_get: (skip)
  * @object: a #GObject
  * @first_property_name: name of the first property to get
- * @...: return location for the first property, followed optionally by more name/return location pairs, followed by %NULL
+ * @...: return location for the first property, followed optionally by more
+ *  name/return location pairs, followed by %NULL
  *
  * Gets properties of an object.
  *
@@ -2099,12 +2152,9 @@
  * is responsible for freeing the memory in the appropriate manner for
  * the type, for instance by calling g_free() or g_object_unref().
  *
- * <example>
- * <title>Using g_object_get(<!-- -->)</title>
- * An example of using g_object_get() to get the contents
- * of three properties - one of type #G_TYPE_INT,
- * one of type #G_TYPE_STRING, and one of type #G_TYPE_OBJECT:
- * <programlisting>
+ * Here is an example of using g_object_get() to get the contents
+ * of three properties: an integer, a string and an object:
+ * |[<!-- language="C" -->
  *  gint intval;
  *  gchar *strval;
  *  GObject *objval;
@@ -2119,8 +2169,7 @@
  *
  *  g_free (strval);
  *  g_object_unref (objval);
- * </programlisting>
- * </example>
+ *  ]|
  */
 
 
@@ -2169,7 +2218,8 @@
  * g_object_get_valist: (skip)
  * @object: a #GObject
  * @first_property_name: name of the first property to get
- * @var_args: return location for the first property, followed optionally by more name/return location pairs, followed by %NULL
+ * @var_args: return location for the first property, followed optionally by more
+ *  name/return location pairs, followed by %NULL
  *
  * Gets properties of an object.
  *
@@ -2183,7 +2233,8 @@
 
 /**
  * g_object_interface_find_property:
- * @g_iface: any interface vtable for the interface, or the default vtable for the interface
+ * @g_iface: any interface vtable for the interface, or the default
+ *  vtable for the interface
  * @property_name: name of a property to lookup.
  *
  * Find the #GParamSpec with the given name for an
@@ -2193,13 +2244,16 @@
  * g_type_default_interface_peek().
  *
  * Since: 2.4
- * Returns: (transfer none): the #GParamSpec for the property of the interface with the name @property_name, or %NULL if no such property exists.
+ * Returns: (transfer none): the #GParamSpec for the property of the
+ *          interface with the name @property_name, or %NULL if no
+ *          such property exists.
  */
 
 
 /**
  * g_object_interface_install_property:
- * @g_iface: any interface vtable for the interface, or the default vtable for the interface.
+ * @g_iface: any interface vtable for the interface, or the default
+ *  vtable for the interface.
  * @pspec: the #GParamSpec for the new property
  *
  * Add a property to an interface; this is only useful for interfaces
@@ -2223,7 +2277,8 @@
 
 /**
  * g_object_interface_list_properties:
- * @g_iface: any interface vtable for the interface, or the default vtable for the interface
+ * @g_iface: any interface vtable for the interface, or the default
+ *  vtable for the interface
  * @n_properties_p: (out): location to store number of properties returned.
  *
  * Lists the properties of an interface.Generally, the interface
@@ -2232,7 +2287,11 @@
  * already been loaded, g_type_default_interface_peek().
  *
  * Since: 2.4
- * Returns: (array length=n_properties_p) (transfer container): a pointer to an array of pointers to #GParamSpec structures. The paramspecs are owned by GLib, but the array should be freed with g_free() when you are done with it.
+ * Returns: (array length=n_properties_p) (transfer container): a
+ *          pointer to an array of pointers to #GParamSpec
+ *          structures. The paramspecs are owned by GLib, but the
+ *          array should be freed with g_free() when you are done with
+ *          it.
  */
 
 
@@ -2240,8 +2299,7 @@
  * g_object_is_floating:
  * @object: (type GObject.Object): a #GObject
  *
- * Checks whether @object has a <link linkend="floating-ref">floating</link>
- * reference.
+ * Checks whether @object has a [floating][floating-ref] reference.
  *
  * Since: 2.10
  * Returns: %TRUE if @object has a floating reference
@@ -2252,7 +2310,8 @@
  * g_object_new: (skip)
  * @object_type: the type id of the #GObject subtype to instantiate
  * @first_property_name: the name of the first property
- * @...: the value of the first property, followed optionally by more name/value pairs, followed by %NULL
+ * @...: the value of the first property, followed optionally by more
+ *  name/value pairs, followed by %NULL
  *
  * Creates a new instance of a #GObject subtype and sets its properties.
  *
@@ -2267,7 +2326,8 @@
  * g_object_new_valist: (skip)
  * @object_type: the type id of the #GObject subtype to instantiate
  * @first_property_name: the name of the first property
- * @var_args: the value of the first property, followed optionally by more name/value pairs, followed by %NULL
+ * @var_args: the value of the first property, followed optionally by more
+ *  name/value pairs, followed by %NULL
  *
  * Creates a new instance of a #GObject subtype and sets its properties.
  *
@@ -2279,7 +2339,7 @@
 
 
 /**
- * g_object_newv:
+ * g_object_newv: (rename-to g_object_new)
  * @object_type: the type id of the #GObject subtype to instantiate
  * @n_parameters: the length of the @parameters array
  * @parameters: (array length=n_parameters): an array of #GParameter
@@ -2289,8 +2349,8 @@
  * Construction parameters (see #G_PARAM_CONSTRUCT, #G_PARAM_CONSTRUCT_ONLY)
  * which are not explicitly specified are set to their default values.
  *
- * Rename to: g_object_new
- * Returns: (type GObject.Object) (transfer full): a new instance of @object_type
+ * Returns: (type GObject.Object) (transfer full): a new instance of
+ * @object_type
  */
 
 
@@ -2304,6 +2364,11 @@
  * When possible, eg. when signaling a property change from within the class
  * that registered the property, you should use g_object_notify_by_pspec()
  * instead.
+ *
+ * Note that emission of the notify signal may be blocked with
+ * g_object_freeze_notify(). In this case, the signal emissions are queued
+ * and will be emitted (in reverse order) when g_object_thaw_notify() is
+ * called.
  */
 
 
@@ -2322,7 +2387,7 @@
  * instead, is to store the GParamSpec used with
  * g_object_class_install_property() inside a static array, e.g.:
  *
- * |[
+ * |[<!-- language="C" -->
  *   enum
  *   {
  *     PROP_0,
@@ -2347,7 +2412,7 @@
  *
  * and then notify a change on the "foo" property with:
  *
- * |[
+ * |[<!-- language="C" -->
  *   g_object_notify_by_pspec (self, properties[PROP_FOO]);
  * ]|
  *
@@ -2370,8 +2435,7 @@
  * @object: (type GObject.Object): a #GObject
  *
  * Increase the reference count of @object, and possibly remove the
- * <link linkend="floating-ref">floating</link> reference, if @object
- * has a floating reference.
+ * [floating][floating-ref] reference, if @object has a floating reference.
  *
  * In other words, if the object is floating, then this call "assumes
  * ownership" of the floating reference, converting it to a normal
@@ -2387,7 +2451,9 @@
 /**
  * g_object_remove_toggle_ref: (skip)
  * @object: a #GObject
- * @notify: a function to call when this reference is the last reference to the object, or is no longer the last reference.
+ * @notify: a function to call when this reference is the
+ *  last reference to the object, or is no longer
+ *  the last reference.
  * @data: data to pass to @notify
  *
  * Removes a reference added with g_object_add_toggle_ref(). The
@@ -2426,14 +2492,13 @@
  *
  * If the previous value was replaced then ownership of the
  * old value (@oldval) is passed to the caller, including
- * the registred destroy notify for it (passed out in @old_destroy).
+ * the registered destroy notify for it (passed out in @old_destroy).
  * Its up to the caller to free this as he wishes, which may
  * or may not include using @old_destroy as sometimes replacement
  * should not destroy the object in the normal way.
  *
- * Return: %TRUE if the existing value for @key was replaced
+ * Returns: %TRUE if the existing value for @key was replaced
  *  by @newval, %FALSE otherwise.
- *
  * Since: 2.34
  */
 
@@ -2456,14 +2521,13 @@
  *
  * If the previous value was replaced then ownership of the
  * old value (@oldval) is passed to the caller, including
- * the registred destroy notify for it (passed out in @old_destroy).
+ * the registered destroy notify for it (passed out in @old_destroy).
  * Its up to the caller to free this as he wishes, which may
  * or may not include using @old_destroy as sometimes replacement
  * should not destroy the object in the normal way.
  *
- * Return: %TRUE if the existing value for @quark was replaced
+ * Returns: %TRUE if the existing value for @quark was replaced
  *  by @newval, %FALSE otherwise.
- *
  * Since: 2.34
  */
 
@@ -2483,9 +2547,14 @@
  * g_object_set: (skip)
  * @object: a #GObject
  * @first_property_name: name of the first property to set
- * @...: value for the first property, followed optionally by more name/value pairs, followed by %NULL
+ * @...: value for the first property, followed optionally by more
+ *  name/value pairs, followed by %NULL
  *
  * Sets properties on an object.
+ *
+ * Note that the "notify" signals are queued and only emitted (in
+ * reverse order) after all properties have been set. See
+ * g_object_freeze_notify().
  */
 
 
@@ -2550,7 +2619,8 @@
  * @object: The GObject to set store a user data pointer
  * @quark: A #GQuark, naming the user data pointer
  * @data: An opaque user data pointer
- * @destroy: Function to invoke with @data as argument, when @data needs to be freed
+ * @destroy: Function to invoke with @data as argument, when @data
+ *           needs to be freed
  *
  * This function works like g_object_set_qdata(), but in addition,
  * a void (*destroy) (gpointer) function may be specified which is
@@ -2564,7 +2634,8 @@
  * g_object_set_valist: (skip)
  * @object: a #GObject
  * @first_property_name: name of the first property to set
- * @var_args: value for the first property, followed optionally by more name/value pairs, followed by %NULL
+ * @var_args: value for the first property, followed optionally by more
+ *  name/value pairs, followed by %NULL
  *
  * Sets properties on an object.
  */
@@ -2593,7 +2664,7 @@
  * set).
  * Usually, calling this function is only required to update
  * user data pointers with a destroy notifier, for example:
- * |[
+ * |[<!-- language="C" -->
  * void
  * object_add_to_user_list (GObject     *object,
  *                          const gchar *new_string)
@@ -2636,7 +2707,8 @@
  * and when it reaches zero, queued "notify" signals are emitted.
  *
  * Duplicate notifications for each property are squashed so that at most one
- * #GObject::notify signal is emitted for each property.
+ * #GObject::notify signal is emitted for each property, in the reverse order
+ * in which they have been queued.
  *
  * It is an error to call this function when the freeze count is zero.
  */
@@ -2694,6 +2766,19 @@
  * @data: data to search for
  *
  * Removes a weak reference callback to an object.
+ */
+
+
+/**
+ * g_param_get_default_value:
+ * @param: a #GParamSpec
+ *
+ * Gets the default value of @param as a pointer to a #GValue.
+ *
+ * The #GValue will remain value for the life of @param.
+ *
+ * Returns: a pointer to a #GValue which must not be modified
+ * Since: 2.38
  */
 
 
@@ -2877,7 +2962,8 @@
  * for an example of the use of this capability.
  *
  * Since: 2.4
- * Returns: (transfer none): paramspec to which requests on this paramspec should be redirected, or %NULL if none.
+ * Returns: (transfer none): paramspec to which requests on this
+ *          paramspec should be redirected, or %NULL if none.
  */
 
 
@@ -2886,7 +2972,8 @@
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
- * @is_a_type: a #GType whose subtypes are allowed as values of the property (use %G_TYPE_NONE for any type)
+ * @is_a_type: a #GType whose subtypes are allowed as values
+ *  of the property (use %G_TYPE_NONE for any type)
  * @flags: flags for the property specified
  *
  * Creates a new #GParamSpecGType instance specifying a
@@ -2955,7 +3042,7 @@
  * efficient and in fact required when using property names as detail
  * strings for signals.
  *
- * Beyond the name, #GParamSpec<!-- -->s have two more descriptive
+ * Beyond the name, #GParamSpecs have two more descriptive
  * strings associated with them, the @nick, which should be suitable
  * for use as a label for the property in a property editor, and the
  * @blurb, which should be a somewhat longer description, suitable for
@@ -3062,10 +3149,12 @@
  * @owner_type: the owner to look for
  * @n_pspecs_p: (out): return location for the length of the returned array
  *
- * Gets an array of all #GParamSpec<!-- -->s owned by @owner_type in
+ * Gets an array of all #GParamSpecs owned by @owner_type in
  * the pool.
  *
- * Returns: (array length=n_pspecs_p) (transfer container): a newly allocated array containing pointers to all #GParamSpecs owned by @owner_type in the pool
+ * Returns: (array length=n_pspecs_p) (transfer container): a newly
+ *          allocated array containing pointers to all #GParamSpecs
+ *          owned by @owner_type in the pool
  */
 
 
@@ -3074,10 +3163,12 @@
  * @pool: a #GParamSpecPool
  * @owner_type: the owner to look for
  *
- * Gets an #GList of all #GParamSpec<!-- -->s owned by @owner_type in
+ * Gets an #GList of all #GParamSpecs owned by @owner_type in
  * the pool.
  *
- * Returns: (transfer container) (element-type GObject.ParamSpec): a #GList of all #GParamSpec<!-- -->s owned by @owner_type in the pool#GParamSpec<!-- -->s.
+ * Returns: (transfer container) (element-type GObject.ParamSpec): a
+ *          #GList of all #GParamSpecs owned by @owner_type in
+ *          the pool#GParamSpecs.
  */
 
 
@@ -3086,11 +3177,13 @@
  * @pool: a #GParamSpecPool
  * @param_name: the name to look for
  * @owner_type: the owner to look for
- * @walk_ancestors: If %TRUE, also try to find a #GParamSpec with @param_name owned by an ancestor of @owner_type.
+ * @walk_ancestors: If %TRUE, also try to find a #GParamSpec with @param_name
+ *  owned by an ancestor of @owner_type.
  *
  * Looks up a #GParamSpec in the pool.
  *
- * Returns: (transfer none): The found #GParamSpec, or %NULL if no matching #GParamSpec was found.
+ * Returns: (transfer none): The found #GParamSpec, or %NULL if no
+ * matching #GParamSpec was found.
  */
 
 
@@ -3159,10 +3252,11 @@
  * @pspec: the #GParamSpec to set store a user data pointer
  * @quark: a #GQuark, naming the user data pointer
  * @data: an opaque user data pointer
- * @destroy: function to invoke with @data as argument, when @data needs to be freed
+ * @destroy: function to invoke with @data as argument, when @data needs to
+ *  be freed
  *
  * This function works like g_param_spec_set_qdata(), but in addition,
- * a <literal>void (*destroy) (gpointer)</literal> function may be
+ * a `void (*destroy) (gpointer)` function may be
  * specified which is called with @data as argument when the @pspec is
  * finalized, or the data is being overwritten by a call to
  * g_param_spec_set_qdata() with the same @quark.
@@ -3176,8 +3270,8 @@
  * The initial reference count of a newly created #GParamSpec is 1,
  * even though no one has explicitly called g_param_spec_ref() on it
  * yet. So the initial reference count is flagged as "floating", until
- * someone calls <literal>g_param_spec_ref (pspec); g_param_spec_sink
- * (pspec);</literal> in sequence on it, taking over the initial
+ * someone calls `g_param_spec_ref (pspec); g_param_spec_sink
+ * (pspec);` in sequence on it, taking over the initial
  * reference count (thus ending up with a @pspec that has a reference
  * count of 1 still, but is not flagged "floating" anymore).
  */
@@ -3316,7 +3410,8 @@
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
- * @element_spec: a #GParamSpec describing the elements contained in arrays of this property, may be %NULL
+ * @element_spec: a #GParamSpec describing the elements contained in
+ *  arrays of this property, may be %NULL
  * @flags: flags for the property specified
  *
  * Creates a new #GParamSpecValueArray instance specifying a
@@ -3336,7 +3431,8 @@
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
  * @type: a #GVariantType
- * @default_value: (allow-none) (transfer full): a #GVariant of type @type to use as the default value, or %NULL
+ * @default_value: (allow-none) (transfer full): a #GVariant of type @type to
+ *                 use as the default value, or %NULL
  * @flags: flags for the property specified
  *
  * Creates a new #GParamSpecVariant instance specifying a #GVariant
@@ -3370,7 +3466,8 @@
  * @pspec: a valid #GParamSpec
  * @src_value: souce #GValue
  * @dest_value: destination #GValue of correct type for @pspec
- * @strict_validation: %TRUE requires @dest_value to conform to @pspec without modifications
+ * @strict_validation: %TRUE requires @dest_value to conform to @pspec
+ * without modifications
  *
  * Transforms @src_value into @dest_value if possible, and then
  * validates @dest_value, in order for it to conform to @pspec.  If
@@ -3380,7 +3477,8 @@
  * See also g_value_type_transformable(), g_value_transform() and
  * g_param_value_validate().
  *
- * Returns: %TRUE if transformation and validation were successful, %FALSE otherwise and @dest_value is left untouched.
+ * Returns: %TRUE if transformation and validation were successful,
+ *  %FALSE otherwise and @dest_value is left untouched.
  */
 
 
@@ -3480,8 +3578,8 @@
  * that a return of %TRUE stops the signal emission: no further
  * callbacks will be invoked, while a return of %FALSE allows
  * the emission to continue. The idea here is that a %TRUE return
- * indicates that the callback <emphasis>handled</emphasis> the signal,
- * and no further handling is needed.
+ * indicates that the callback handled the signal, and no further
+ * handling is needed.
  *
  * Since: 2.4
  * Returns: standard #GSignalAccumulator result
@@ -3506,7 +3604,9 @@
 
 /**
  * g_signal_chain_from_overridden:
- * @instance_and_params: (array): the argument list of the signal emission. The first element in the array is a #GValue for the instance the signal is being emitted on. The rest are any arguments to be passed to the signal.
+ * @instance_and_params: (array): the argument list of the signal emission.
+ *  The first element in the array is a #GValue for the instance the signal
+ *  is being emitted on. The rest are any arguments to be passed to the signal.
  * @return_value: Location for the return value.
  *
  * Calls the original class closure of a signal. This function should only
@@ -3517,9 +3617,11 @@
 
 
 /**
- * g_signal_chain_from_overridden_handler:
+ * g_signal_chain_from_overridden_handler: (skip)
  * @instance: the instance the signal is being emitted on.
- * @...: parameters to be passed to the parent class closure, followed by a location for the return value. If the return type of the signal is #G_TYPE_NONE, the return value location can be omitted.
+ * @...: parameters to be passed to the parent class closure, followed by a
+ *  location for the return value. If the return type of the signal
+ *  is #G_TYPE_NONE, the return value location can be omitted.
  *
  * Calls the original class closure of a signal. This function should
  * only be called from an overridden class closure; see
@@ -3532,34 +3634,36 @@
 
 /**
  * g_signal_connect_closure:
- * @instance: the instance to connect to.
+ * @instance: (type GObject.Object): the instance to connect to.
  * @detailed_signal: a string of the form "signal-name::detail".
  * @closure: the closure to connect.
- * @after: whether the handler should be called before or after the default handler of the signal.
+ * @after: whether the handler should be called before or after the
+ *  default handler of the signal.
  *
  * Connects a closure to a signal for a particular object.
  *
- * Returns: the handler id
+ * Returns: the handler id (always greater than 0 for successful connections)
  */
 
 
 /**
  * g_signal_connect_closure_by_id:
- * @instance: the instance to connect to.
+ * @instance: (type GObject.Object): the instance to connect to.
  * @signal_id: the id of the signal.
  * @detail: the detail.
  * @closure: the closure to connect.
- * @after: whether the handler should be called before or after the default handler of the signal.
+ * @after: whether the handler should be called before or after the
+ *  default handler of the signal.
  *
  * Connects a closure to a signal for a particular object.
  *
- * Returns: the handler id
+ * Returns: the handler id (always greater than 0 for successful connections)
  */
 
 
 /**
  * g_signal_connect_data:
- * @instance: the instance to connect to.
+ * @instance: (type GObject.Object): the instance to connect to.
  * @detailed_signal: a string of the form "signal-name::detail".
  * @c_handler: the #GCallback to connect.
  * @data: data to pass to @c_handler calls.
@@ -3569,10 +3673,10 @@
  * Connects a #GCallback function to a signal for a particular object. Similar
  * to g_signal_connect(), but allows to provide a #GClosureNotify for the data
  * which will be called when the signal handler is disconnected and no longer
- * used. Specify @connect_flags if you need <literal>..._after()</literal> or
- * <literal>..._swapped()</literal> variants of this function.
+ * used. Specify @connect_flags if you need `..._after()` or
+ * `..._swapped()` variants of this function.
  *
- * Returns: the handler id
+ * Returns: the handler id (always greater than 0 for successful connections)
  */
 
 
@@ -3599,10 +3703,12 @@
 
 /**
  * g_signal_emit:
- * @instance: the instance the signal is being emitted on.
+ * @instance: (type GObject.Object): the instance the signal is being emitted on.
  * @signal_id: the signal id
  * @detail: the detail
- * @...: parameters to be passed to the signal, followed by a location for the return value. If the return type of the signal is #G_TYPE_NONE, the return value location can be omitted.
+ * @...: parameters to be passed to the signal, followed by a
+ *  location for the return value. If the return type of the signal
+ *  is #G_TYPE_NONE, the return value location can be omitted.
  *
  * Emits a signal.
  *
@@ -3613,9 +3719,11 @@
 
 /**
  * g_signal_emit_by_name:
- * @instance: the instance the signal is being emitted on.
+ * @instance: (type GObject.Object): the instance the signal is being emitted on.
  * @detailed_signal: a string of the form "signal-name::detail".
- * @...: parameters to be passed to the signal, followed by a location for the return value. If the return type of the signal is #G_TYPE_NONE, the return value location can be omitted.
+ * @...: parameters to be passed to the signal, followed by a
+ *  location for the return value. If the return type of the signal
+ *  is #G_TYPE_NONE, the return value location can be omitted.
  *
  * Emits a signal.
  *
@@ -3625,11 +3733,13 @@
 
 
 /**
- * g_signal_emit_valist:
+ * g_signal_emit_valist: (skip)
  * @instance: the instance the signal is being emitted on.
  * @signal_id: the signal id
  * @detail: the detail
- * @var_args: a list of parameters to be passed to the signal, followed by a location for the return value. If the return type of the signal is #G_TYPE_NONE, the return value location can be omitted.
+ * @var_args: a list of parameters to be passed to the signal, followed by a
+ *  location for the return value. If the return type of the signal
+ *  is #G_TYPE_NONE, the return value location can be omitted.
  *
  * Emits a signal.
  *
@@ -3640,7 +3750,9 @@
 
 /**
  * g_signal_emitv:
- * @instance_and_params: (array): argument list for the signal emission. The first element in the array is a #GValue for the instance the signal is being emitted on. The rest are any arguments to be passed to the signal.
+ * @instance_and_params: (array): argument list for the signal emission.
+ *  The first element in the array is a #GValue for the instance the signal
+ *  is being emitted on. The rest are any arguments to be passed to the signal.
  * @signal_id: the signal id
  * @detail: the detail
  * @return_value: Location to store the return value of the signal emission.
@@ -3654,7 +3766,7 @@
 
 /**
  * g_signal_get_invocation_hint:
- * @instance: the instance to query
+ * @instance: (type GObject.Object): the instance to query
  *
  * Returns the invocation hint of the innermost signal emission of instance.
  *
@@ -3664,7 +3776,7 @@
 
 /**
  * g_signal_handler_block:
- * @instance: The instance to block the signal handler of.
+ * @instance: (type GObject.Object): The instance to block the signal handler of.
  * @handler_id: Handler id of the handler to be blocked.
  *
  * Blocks a handler of an instance so it will not be called during any
@@ -3680,7 +3792,7 @@
 
 /**
  * g_signal_handler_disconnect:
- * @instance: The instance to remove the signal handler from.
+ * @instance: (type GObject.Object): The instance to remove the signal handler from.
  * @handler_id: Handler id of the handler to be disconnected.
  *
  * Disconnects a handler from an instance so it will not be called during
@@ -3694,8 +3806,9 @@
 
 /**
  * g_signal_handler_find:
- * @instance: The instance owning the signal handler to be found.
- * @mask: Mask indicating which of @signal_id, @detail, @closure, @func and/or @data the handler has to match.
+ * @instance: (type GObject.Object): The instance owning the signal handler to be found.
+ * @mask: Mask indicating which of @signal_id, @detail, @closure, @func
+ *  and/or @data the handler has to match.
  * @signal_id: Signal the handler has to be connected to.
  * @detail: Signal detail the handler has to be connected to.
  * @closure: (allow-none): The closure the handler will invoke.
@@ -3714,7 +3827,7 @@
 
 /**
  * g_signal_handler_is_connected:
- * @instance: The instance where a signal handler is sought.
+ * @instance: (type GObject.Object): The instance where a signal handler is sought.
  * @handler_id: the handler id.
  *
  * Returns whether @handler_id is the id of a handler connected to @instance.
@@ -3725,7 +3838,7 @@
 
 /**
  * g_signal_handler_unblock:
- * @instance: The instance to unblock the signal handler of.
+ * @instance: (type GObject.Object): The instance to unblock the signal handler of.
  * @handler_id: Handler id of the handler to be unblocked.
  *
  * Undoes the effect of a previous g_signal_handler_block() call.  A
@@ -3746,8 +3859,9 @@
 
 /**
  * g_signal_handlers_block_matched:
- * @instance: The instance to block handlers from.
- * @mask: Mask indicating which of @signal_id, @detail, @closure, @func and/or @data the handlers have to match.
+ * @instance: (type GObject.Object): The instance to block handlers from.
+ * @mask: Mask indicating which of @signal_id, @detail, @closure, @func
+ *  and/or @data the handlers have to match.
  * @signal_id: Signal the handlers have to be connected to.
  * @detail: Signal detail the handlers have to be connected to.
  * @closure: (allow-none): The closure the handlers will invoke.
@@ -3767,9 +3881,20 @@
 
 
 /**
+ * g_signal_handlers_destroy:
+ * @instance: (type GObject.Object): The instance whose signal handlers are destroyed
+ *
+ * Destroy all signal handlers of a type instance. This function is
+ * an implementation detail of the #GObject dispose implementation,
+ * and should not be used outside of the type system.
+ */
+
+
+/**
  * g_signal_handlers_disconnect_matched:
- * @instance: The instance to remove handlers from.
- * @mask: Mask indicating which of @signal_id, @detail, @closure, @func and/or @data the handlers have to match.
+ * @instance: (type GObject.Object): The instance to remove handlers from.
+ * @mask: Mask indicating which of @signal_id, @detail, @closure, @func
+ *  and/or @data the handlers have to match.
  * @signal_id: Signal the handlers have to be connected to.
  * @detail: Signal detail the handlers have to be connected to.
  * @closure: (allow-none): The closure the handlers will invoke.
@@ -3791,8 +3916,9 @@
 
 /**
  * g_signal_handlers_unblock_matched:
- * @instance: The instance to unblock handlers from.
- * @mask: Mask indicating which of @signal_id, @detail, @closure, @func and/or @data the handlers have to match.
+ * @instance: (type GObject.Object): The instance to unblock handlers from.
+ * @mask: Mask indicating which of @signal_id, @detail, @closure, @func
+ *  and/or @data the handlers have to match.
  * @signal_id: Signal the handlers have to be connected to.
  * @detail: Signal detail the handlers have to be connected to.
  * @closure: (allow-none): The closure the handlers will invoke.
@@ -3814,7 +3940,7 @@
 
 /**
  * g_signal_has_handler_pending:
- * @instance: the object whose signal handlers are sought.
+ * @instance: (type GObject.Object): the object whose signal handlers are sought.
  * @signal_id: the signal id.
  * @detail: the detail.
  * @may_be_blocked: whether blocked handlers should count as match.
@@ -3827,7 +3953,8 @@
  * emit the signal if no one is attached anyway, thus saving the cost
  * of building the arguments.
  *
- * Returns: %TRUE if a handler is connected to the signal, %FALSE otherwise.
+ * Returns: %TRUE if a handler is connected to the signal, %FALSE
+ *          otherwise.
  */
 
 
@@ -3876,13 +4003,20 @@
 /**
  * g_signal_new:
  * @signal_name: the name for the signal
- * @itype: the type this signal pertains to. It will also pertain to types which are derived from this type.
- * @signal_flags: a combination of #GSignalFlags specifying detail of when the default handler is to be invoked. You should at least specify %G_SIGNAL_RUN_FIRST or %G_SIGNAL_RUN_LAST.
- * @class_offset: The offset of the function pointer in the class structure for this type. Used to invoke a class method generically. Pass 0 to not associate a class method slot with this signal.
+ * @itype: the type this signal pertains to. It will also pertain to
+ *  types which are derived from this type.
+ * @signal_flags: a combination of #GSignalFlags specifying detail of when
+ *  the default handler is to be invoked. You should at least specify
+ *  %G_SIGNAL_RUN_FIRST or %G_SIGNAL_RUN_LAST.
+ * @class_offset: The offset of the function pointer in the class structure
+ *  for this type. Used to invoke a class method generically. Pass 0 to
+ *  not associate a class method slot with this signal.
  * @accumulator: the accumulator for this signal; may be %NULL.
  * @accu_data: user data for the @accumulator.
- * @c_marshaller: (allow-none): the function to translate arrays of parameter values to signal emissions into C language callback invocations or %NULL.
- * @return_type: the type of return value, or #G_TYPE_NONE for a signal without a return value.
+ * @c_marshaller: (allow-none): the function to translate arrays of parameter
+ *  values to signal emissions into C language callback invocations or %NULL.
+ * @return_type: the type of return value, or #G_TYPE_NONE for a signal
+ *  without a return value.
  * @n_params: the number of parameter types to follow.
  * @...: a list of types, one for each parameter.
  *
@@ -3897,9 +4031,8 @@
  * be used, but they cannot be mixed.
  *
  * If 0 is used for @class_offset subclasses cannot override the class handler
- * in their <code>class_init</code> method by doing
- * <code>super_class->signal_handler = my_signal_handler</code>. Instead they
- * will have to use g_signal_override_class_handler().
+ * in their class_init method by doing super_class->signal_handler = my_signal_handler.
+ * Instead they will have to use g_signal_override_class_handler().
  *
  * If c_marshaller is %NULL, g_cclosure_marshal_generic() will be used as
  * the marshaller for this signal.
@@ -3911,13 +4044,20 @@
 /**
  * g_signal_new_class_handler:
  * @signal_name: the name for the signal
- * @itype: the type this signal pertains to. It will also pertain to types which are derived from this type.
- * @signal_flags: a combination of #GSignalFlags specifying detail of when the default handler is to be invoked. You should at least specify %G_SIGNAL_RUN_FIRST or %G_SIGNAL_RUN_LAST.
- * @class_handler: a #GCallback which acts as class implementation of this signal. Used to invoke a class method generically. Pass %NULL to not associate a class method with this signal.
+ * @itype: the type this signal pertains to. It will also pertain to
+ *  types which are derived from this type.
+ * @signal_flags: a combination of #GSignalFlags specifying detail of when
+ *  the default handler is to be invoked. You should at least specify
+ *  %G_SIGNAL_RUN_FIRST or %G_SIGNAL_RUN_LAST.
+ * @class_handler: a #GCallback which acts as class implementation of
+ *  this signal. Used to invoke a class method generically. Pass %NULL to
+ *  not associate a class method with this signal.
  * @accumulator: the accumulator for this signal; may be %NULL.
  * @accu_data: user data for the @accumulator.
- * @c_marshaller: (allow-none): the function to translate arrays of parameter values to signal emissions into C language callback invocations or %NULL.
- * @return_type: the type of return value, or #G_TYPE_NONE for a signal without a return value.
+ * @c_marshaller: (allow-none): the function to translate arrays of parameter
+ *  values to signal emissions into C language callback invocations or %NULL.
+ * @return_type: the type of return value, or #G_TYPE_NONE for a signal
+ *  without a return value.
  * @n_params: the number of parameter types to follow.
  * @...: a list of types, one for each parameter.
  *
@@ -3935,7 +4075,7 @@
  *
  * See g_signal_new() for information about signal names.
  *
- * If c_marshaller is %NULL @g_cclosure_marshal_generic will be used as
+ * If c_marshaller is %NULL, g_cclosure_marshal_generic() will be used as
  * the marshaller for this signal.
  *
  * Returns: the signal id
@@ -3946,13 +4086,18 @@
 /**
  * g_signal_new_valist:
  * @signal_name: the name for the signal
- * @itype: the type this signal pertains to. It will also pertain to types which are derived from this type.
- * @signal_flags: a combination of #GSignalFlags specifying detail of when the default handler is to be invoked. You should at least specify %G_SIGNAL_RUN_FIRST or %G_SIGNAL_RUN_LAST.
+ * @itype: the type this signal pertains to. It will also pertain to
+ *  types which are derived from this type.
+ * @signal_flags: a combination of #GSignalFlags specifying detail of when
+ *  the default handler is to be invoked. You should at least specify
+ *  %G_SIGNAL_RUN_FIRST or %G_SIGNAL_RUN_LAST.
  * @class_closure: The closure to invoke on signal emission; may be %NULL.
  * @accumulator: the accumulator for this signal; may be %NULL.
  * @accu_data: user data for the @accumulator.
- * @c_marshaller: (allow-none): the function to translate arrays of parameter values to signal emissions into C language callback invocations or %NULL.
- * @return_type: the type of return value, or #G_TYPE_NONE for a signal without a return value.
+ * @c_marshaller: (allow-none): the function to translate arrays of parameter
+ *  values to signal emissions into C language callback invocations or %NULL.
+ * @return_type: the type of return value, or #G_TYPE_NONE for a signal
+ *  without a return value.
  * @n_params: the number of parameter types in @args.
  * @args: va_list of #GType, one for each parameter.
  *
@@ -3970,21 +4115,29 @@
 /**
  * g_signal_newv:
  * @signal_name: the name for the signal
- * @itype: the type this signal pertains to. It will also pertain to types which are derived from this type
- * @signal_flags: a combination of #GSignalFlags specifying detail of when the default handler is to be invoked. You should at least specify %G_SIGNAL_RUN_FIRST or %G_SIGNAL_RUN_LAST
- * @class_closure: (allow-none): The closure to invoke on signal emission; may be %NULL
+ * @itype: the type this signal pertains to. It will also pertain to
+ *     types which are derived from this type
+ * @signal_flags: a combination of #GSignalFlags specifying detail of when
+ *     the default handler is to be invoked. You should at least specify
+ *     %G_SIGNAL_RUN_FIRST or %G_SIGNAL_RUN_LAST
+ * @class_closure: (allow-none): The closure to invoke on signal emission;
+ *     may be %NULL
  * @accumulator: (allow-none): the accumulator for this signal; may be %NULL
  * @accu_data: user data for the @accumulator
- * @c_marshaller: (allow-none): the function to translate arrays of parameter values to signal emissions into C language callback invocations or %NULL
- * @return_type: the type of return value, or #G_TYPE_NONE for a signal without a return value
+ * @c_marshaller: (allow-none): the function to translate arrays of
+ *     parameter values to signal emissions into C language callback
+ *     invocations or %NULL
+ * @return_type: the type of return value, or #G_TYPE_NONE for a signal
+ *     without a return value
  * @n_params: the length of @param_types
- * @param_types: (array length=n_params): an array of types, one for each parameter
+ * @param_types: (array length=n_params): an array of types, one for
+ *     each parameter
  *
  * Creates a new signal. (This is usually done in the class initializer.)
  *
  * See g_signal_new() for details on allowed signal names.
  *
- * If c_marshaller is %NULL @g_cclosure_marshal_generic will be used as
+ * If c_marshaller is %NULL, g_cclosure_marshal_generic() will be used as
  * the marshaller for this signal.
  *
  * Returns: the signal id
@@ -3994,7 +4147,8 @@
 /**
  * g_signal_override_class_closure:
  * @signal_id: the signal id
- * @instance_type: the instance type on which to override the class closure for the signal.
+ * @instance_type: the instance type on which to override the class closure
+ *  for the signal.
  * @class_closure: the closure.
  *
  * Overrides the class closure (i.e. the default handler) for the given signal
@@ -4010,12 +4164,13 @@
 /**
  * g_signal_override_class_handler:
  * @signal_name: the name for the signal
- * @instance_type: the instance type on which to override the class handler for the signal.
+ * @instance_type: the instance type on which to override the class handler
+ *  for the signal.
  * @class_handler: the handler.
  *
  * Overrides the class closure (i.e. the default handler) for the
  * given signal for emissions on instances of @instance_type with
- * callabck @class_handler. @instance_type must be derived from the
+ * callback @class_handler. @instance_type must be derived from the
  * type to which the signal belongs.
  *
  * See g_signal_chain_from_overridden() and
@@ -4044,7 +4199,8 @@
 /**
  * g_signal_query:
  * @signal_id: The signal id of the signal to query information for.
- * @query: (out caller-allocates): A user provided structure that is filled in with constant values upon success.
+ * @query: (out caller-allocates): A user provided structure that is
+ *  filled in with constant values upon success.
  *
  * Queries the signal system for in-depth information about a
  * specific signal. This function will fill in a user-provided
@@ -4058,7 +4214,8 @@
 /**
  * g_signal_remove_emission_hook:
  * @signal_id: the id of the signal
- * @hook_id: the id of the emission hook, as returned by g_signal_add_emission_hook()
+ * @hook_id: the id of the emission hook, as returned by
+ *  g_signal_add_emission_hook()
  *
  * Deletes an emission hook.
  */
@@ -4066,7 +4223,7 @@
 
 /**
  * g_signal_stop_emission:
- * @instance: the object whose signal handlers you wish to stop.
+ * @instance: (type GObject.Object): the object whose signal handlers you wish to stop.
  * @signal_id: the signal identifier, as returned by g_signal_lookup().
  * @detail: the detail which the signal was emitted with.
  *
@@ -4082,7 +4239,7 @@
 
 /**
  * g_signal_stop_emission_by_name:
- * @instance: the object whose signal handlers you wish to stop.
+ * @instance: (type GObject.Object): the object whose signal handlers you wish to stop.
  * @detailed_signal: a string of the form "signal-name::detail".
  *
  * Stops a signal's current emission.
@@ -4095,7 +4252,8 @@
 /**
  * g_signal_type_cclosure_new:
  * @itype: the #GType identifier of an interface or classed type
- * @struct_offset: the offset of the member function of @itype's class structure which is to be invoked by the new closure
+ * @struct_offset: the offset of the member function of @itype's class
+ *  structure which is to be invoked by the new closure
  *
  * Creates a new closure which invokes the function found at the offset
  * @struct_offset in the class structure of the interface or classed type
@@ -4165,14 +4323,16 @@
 
 /**
  * g_type_add_class_private:
- * @class_type: GType of an classed type.
- * @private_size: size of private structure.
+ * @class_type: GType of an classed type
+ * @private_size: size of private structure
  *
  * Registers a private class structure for a classed type;
  * when the class is allocated, the private structures for
  * the class and all of its parent types are allocated
  * sequentially in the same memory block as the public
- * structures. This function should be called in the
+ * structures, and are zero-filled.
+ *
+ * This function should be called in the
  * type's get_type() function after the type is registered.
  * The private structure can be retrieved using the
  * G_TYPE_CLASS_GET_PRIVATE() macro.
@@ -4184,14 +4344,15 @@
 /**
  * g_type_add_interface_check: (skip)
  * @check_data: data to pass to @check_func
- * @check_func: function to be called after each interface is initialized.
+ * @check_func: function to be called after each interface
+ *     is initialized
  *
  * Adds a function to be called after an interface vtable is
- * initialized for any class (i.e. after the @interface_init member of
- * #GInterfaceInfo has been called).
+ * initialized for any class (i.e. after the @interface_init
+ * member of #GInterfaceInfo has been called).
  *
- * This function is useful when you want to check an invariant that
- * depends on the interfaces of a class. For instance, the
+ * This function is useful when you want to check an invariant
+ * that depends on the interfaces of a class. For instance, the
  * implementation of #GObject uses this facility to check that an
  * object implements all of the properties that are defined on its
  * interfaces.
@@ -4202,9 +4363,9 @@
 
 /**
  * g_type_add_interface_dynamic:
- * @instance_type: the #GType value of an instantiable type.
- * @interface_type: the #GType value of an interface type.
- * @plugin: the #GTypePlugin structure to retrieve the #GInterfaceInfo from.
+ * @instance_type: #GType value of an instantiable type
+ * @interface_type: #GType value of an interface type
+ * @plugin: #GTypePlugin structure to retrieve the #GInterfaceInfo from
  *
  * Adds the dynamic @interface_type to @instantiable_type. The information
  * contained in the #GTypePlugin structure pointed to by @plugin
@@ -4214,50 +4375,53 @@
 
 /**
  * g_type_add_interface_static:
- * @instance_type: #GType value of an instantiable type.
- * @interface_type: #GType value of an interface type.
- * @info: The #GInterfaceInfo structure for this (@instance_type, @interface_type) combination.
+ * @instance_type: #GType value of an instantiable type
+ * @interface_type: #GType value of an interface type
+ * @info: #GInterfaceInfo structure for this
+ *        (@instance_type, @interface_type) combination
  *
- * Adds the static @interface_type to @instantiable_type.  The
- * information contained in the #GInterfaceInfo structure pointed to by
- * @info is used to manage the relationship.
+ * Adds the static @interface_type to @instantiable_type.
+ * The information contained in the #GInterfaceInfo structure
+ * pointed to by @info is used to manage the relationship.
  */
 
 
 /**
  * g_type_check_instance:
- * @instance: A valid #GTypeInstance structure.
+ * @instance: a valid #GTypeInstance structure
  *
- * Private helper function to aid implementation of the G_TYPE_CHECK_INSTANCE()
- * macro.
+ * Private helper function to aid implementation of the
+ * G_TYPE_CHECK_INSTANCE() macro.
  *
- * Returns: %TRUE if @instance is valid, %FALSE otherwise.
+ * Returns: %TRUE if @instance is valid, %FALSE otherwise
  */
 
 
 /**
  * g_type_children:
- * @type: The parent type.
- * @n_children: (out) (allow-none): Optional #guint pointer to contain the number of child types.
+ * @type: the parent type
+ * @n_children: (out) (allow-none): location to store the length of
+ *     the returned array, or %NULL
  *
- * Return a newly allocated and 0-terminated array of type IDs, listing the
- * child types of @type. The return value has to be g_free()ed after use.
+ * Return a newly allocated and 0-terminated array of type IDs, listing
+ * the child types of @type.
  *
- * Returns: (array length=n_children) (transfer full): Newly allocated and 0-terminated array of child types.
+ * Returns: (array length=n_children) (transfer full): Newly allocated
+ *     and 0-terminated array of child types, free with g_free()
  */
 
 
 /**
  * g_type_class_add_private:
  * @g_class: class structure for an instantiatable type
- * @private_size: size of private structure.
+ * @private_size: size of private structure
  *
  * Registers a private structure for an instantiatable type.
  *
  * When an object is allocated, the private structures for
  * the type and all of its parent types are allocated
  * sequentially in the same memory block as the public
- * structures.
+ * structures, and are zero-filled.
  *
  * Note that the accumulated size of the private structures of
  * a type and all its parent types cannot exceed 64 KiB.
@@ -4267,14 +4431,13 @@
  * G_TYPE_INSTANCE_GET_PRIVATE() macro.
  *
  * The following example shows attaching a private structure
- * <structname>MyObjectPrivate</structname> to an object
- * <structname>MyObject</structname> defined in the standard GObject
- * fashion.
- * type's class_init() function.
+ * MyObjectPrivate to an object MyObject defined in the standard
+ * GObject fashion in the type's class_init() function.
+ *
  * Note the use of a structure member "priv" to avoid the overhead
  * of repeatedly calling MY_OBJECT_GET_PRIVATE().
  *
- * |[
+ * |[<!-- language="C" -->
  * typedef struct _MyObject        MyObject;
  * typedef struct _MyObjectPrivate MyObjectPrivate;
  *
@@ -4300,6 +4463,7 @@
  *   my_object->priv = G_TYPE_INSTANCE_GET_PRIVATE (my_object,
  *                                                  MY_TYPE_OBJECT,
  *                                                  MyObjectPrivate);
+ *   // my_object->priv->some_field will be automatically initialised to 0
  * }
  *
  * static int
@@ -4320,64 +4484,88 @@
 
 
 /**
+ * g_type_class_get_instance_private_offset: (skip)
+ * @g_class: a #GTypeClass
+ *
+ * Gets the offset of the private data for instances of @g_class.
+ *
+ * This is how many bytes you should add to the instance pointer of a
+ * class in order to get the private data for the type represented by
+ * @g_class.
+ *
+ * You can only call this function after you have registered a private
+ * data area for @g_class using g_type_class_add_private().
+ *
+ * Returns: the offset, in bytes
+ * Since: 2.38
+ */
+
+
+/**
  * g_type_class_peek:
- * @type: Type ID of a classed type.
+ * @type: type ID of a classed type
  *
- * This function is essentially the same as g_type_class_ref(), except that
- * the classes reference count isn't incremented. As a consequence, this function
- * may return %NULL if the class of the type passed in does not currently
- * exist (hasn't been referenced before).
+ * This function is essentially the same as g_type_class_ref(),
+ * except that the classes reference count isn't incremented.
+ * As a consequence, this function may return %NULL if the class
+ * of the type passed in does not currently exist (hasn't been
+ * referenced before).
  *
- * Returns: (type GObject.TypeClass) (transfer none): The #GTypeClass structure for the given type ID or %NULL if the class does not currently exist.
+ * Returns: (type GObject.TypeClass) (transfer none): the #GTypeClass
+ *     structure for the given type ID or %NULL if the class does not
+ *     currently exist
  */
 
 
 /**
  * g_type_class_peek_parent:
- * @g_class: (type GObject.TypeClass): The #GTypeClass structure to retrieve the parent class for.
+ * @g_class: (type GObject.TypeClass): the #GTypeClass structure to
+ *     retrieve the parent class for
  *
  * This is a convenience function often needed in class initializers.
  * It returns the class structure of the immediate parent type of the
  * class passed in.  Since derived classes hold a reference count on
  * their parent classes as long as they are instantiated, the returned
- * class will always exist. This function is essentially equivalent
- * to:
+ * class will always exist.
  *
- * <programlisting>
- * g_type_class_peek (g_type_parent (G_TYPE_FROM_CLASS (g_class)));
- * </programlisting>
+ * This function is essentially equivalent to:
+ * g_type_class_peek (g_type_parent (G_TYPE_FROM_CLASS (g_class)))
  *
- * Returns: (type GObject.TypeClass) (transfer none): The parent class of @g_class.
+ * Returns: (type GObject.TypeClass) (transfer none): the parent class
+ *     of @g_class
  */
 
 
 /**
  * g_type_class_peek_static:
- * @type: Type ID of a classed type.
+ * @type: type ID of a classed type
  *
  * A more efficient version of g_type_class_peek() which works only for
  * static types.
  *
+ * Returns: (type GObject.TypeClass) (transfer none): the #GTypeClass
+ *     structure for the given type ID or %NULL if the class does not
+ *     currently exist or is dynamically loaded
  * Since: 2.4
- * Returns: (type GObject.TypeClass) (transfer none): The #GTypeClass structure for the given type ID or %NULL if the class does not currently exist or is dynamically loaded.
  */
 
 
 /**
  * g_type_class_ref:
- * @type: Type ID of a classed type.
+ * @type: type ID of a classed type
  *
  * Increments the reference count of the class structure belonging to
  * @type. This function will demand-create the class if it doesn't
  * exist already.
  *
- * Returns: (type GObject.TypeClass) (transfer none): The #GTypeClass structure for the given type ID.
+ * Returns: (type GObject.TypeClass) (transfer none): the #GTypeClass
+ *     structure for the given type ID
  */
 
 
 /**
  * g_type_class_unref:
- * @g_class: (type GObject.TypeClass): The #GTypeClass structure to unreference.
+ * @g_class: (type GObject.TypeClass): a #GTypeClass structure to unref
  *
  * Decrements the reference count of the class structure being passed in.
  * Once the last reference count of a class has been released, classes
@@ -4388,18 +4576,18 @@
 
 /**
  * g_type_class_unref_uncached: (skip)
- * @g_class: (type GObject.TypeClass): The #GTypeClass structure to unreference.
+ * @g_class: (type GObject.TypeClass): a #GTypeClass structure to unref
  *
  * A variant of g_type_class_unref() for use in #GTypeClassCacheFunc
  * implementations. It unreferences a class without consulting the chain
- * of #GTypeClassCacheFunc<!-- -->s, avoiding the recursion which would occur
+ * of #GTypeClassCacheFuncs, avoiding the recursion which would occur
  * otherwise.
  */
 
 
 /**
  * g_type_create_instance: (skip)
- * @type: An instantiatable type to create an instance for.
+ * @type: an instantiatable type to create an instance for
  *
  * Creates and initializes an instance of @type if @type is valid and
  * can be instantiated. The type system only performs basic allocation
@@ -4407,15 +4595,19 @@
  * happen through functions supplied by the type's fundamental type
  * implementation.  So use of g_type_create_instance() is reserved for
  * implementators of fundamental types only. E.g. instances of the
- * #GObject hierarchy should be created via g_object_new() and
- * <emphasis>never</emphasis> directly through
- * g_type_create_instance() which doesn't handle things like singleton
- * objects or object construction.  Note: Do <emphasis>not</emphasis>
- * use this function, unless you're implementing a fundamental
- * type. Also language bindings should <emphasis>not</emphasis> use
- * this function but g_object_new() instead.
+ * #GObject hierarchy should be created via g_object_new() and never
+ * directly through g_type_create_instance() which doesn't handle things
+ * like singleton objects or object construction.
  *
- * Returns: An allocated and initialized instance, subject to further treatment by the fundamental type implementation.
+ * The extended members of the returned instance are guaranteed to be filled
+ * with zeros.
+ *
+ * Note: Do not use this function, unless you're implementing a
+ * fundamental type. Also language bindings should not use this
+ * function, but g_object_new() instead.
+ *
+ * Returns: an allocated and initialized instance, subject to further
+ *     treatment by the fundamental type implementation
  */
 
 
@@ -4427,7 +4619,9 @@
  * default interface vtable.
  *
  * Since: 2.4
- * Returns: (type GObject.TypeInterface) (transfer none): the default vtable for the interface, or %NULL if the type is not currently in use.
+ * Returns: (type GObject.TypeInterface) (transfer none): the default
+ *     vtable for the interface, or %NULL if the type is not currently
+ *     in use
  */
 
 
@@ -4441,27 +4635,28 @@
  * If the type is not currently in use, then the default vtable
  * for the type will be created and initalized by calling
  * the base interface init and default vtable init functions for
- * the type (the @<structfield>base_init</structfield>
- * and <structfield>class_init</structfield> members of #GTypeInfo).
+ * the type (the @base_init and @class_init members of #GTypeInfo).
  * Calling g_type_default_interface_ref() is useful when you
  * want to make sure that signals and properties for an interface
  * have been installed.
  *
  * Since: 2.4
- * Returns: (type GObject.TypeInterface) (transfer none): the default vtable for the interface; call g_type_default_interface_unref() when you are done using the interface.
+ * Returns: (type GObject.TypeInterface) (transfer none): the default
+ *     vtable for the interface; call g_type_default_interface_unref()
+ *     when you are done using the interface.
  */
 
 
 /**
  * g_type_default_interface_unref:
- * @g_iface: (type GObject.TypeInterface): the default vtable structure for a interface, as returned by g_type_default_interface_ref()
+ * @g_iface: (type GObject.TypeInterface): the default vtable
+ *     structure for a interface, as returned by g_type_default_interface_ref()
  *
  * Decrements the reference count for the type corresponding to the
  * interface default vtable @g_iface. If the type is dynamic, then
  * when no one is using the interface and all references have
  * been released, the finalize function for the interface's default
- * vtable (the <structfield>class_finalize</structfield> member of
- * #GTypeInfo) will be called.
+ * vtable (the @class_finalize member of #GTypeInfo) will be called.
  *
  * Since: 2.4
  */
@@ -4469,18 +4664,18 @@
 
 /**
  * g_type_depth:
- * @type: A #GType value.
+ * @type: a #GType
  *
  * Returns the length of the ancestry of the passed in type. This
  * includes the type itself, so that e.g. a fundamental type has depth 1.
  *
- * Returns: The depth of @type.
+ * Returns: the depth of @type
  */
 
 
 /**
  * g_type_ensure:
- * @type: a #GType.
+ * @type: a #GType
  *
  * Ensures that the indicated @type has been registered with the
  * type system, and its _class_init() method has been run.
@@ -4501,7 +4696,7 @@
 
 /**
  * g_type_free_instance:
- * @instance: an instance of a type.
+ * @instance: an instance of a type
  *
  * Frees an instance of a type, returning it to the instance pool for
  * the type, if there is one.
@@ -4513,14 +4708,14 @@
 
 /**
  * g_type_from_name:
- * @name: Type name to lookup.
+ * @name: type name to lookup
  *
  * Lookup the type ID from a given type name, returning 0 if no type
  * has been registered under this name (this is the preferred method
  * to find out by name whether a specific type has been registered
  * yet).
  *
- * Returns: Corresponding type ID or 0.
+ * Returns: corresponding type ID or 0
  */
 
 
@@ -4529,7 +4724,7 @@
  * @type_id: valid type ID
  *
  * Internal function, used to extract the fundamental type ID portion.
- * use G_TYPE_FUNDAMENTAL() instead.
+ * Use G_TYPE_FUNDAMENTAL() instead.
  *
  * Returns: fundamental type ID
  */
@@ -4543,18 +4738,19 @@
  * The returned type ID represents the highest currently registered
  * fundamental type identifier.
  *
- * Returns: The nextmost fundamental type ID to be registered, or 0 if the type system ran out of fundamental type IDs.
+ * Returns: the next available fundamental type ID to be registered,
+ *     or 0 if the type system ran out of fundamental type IDs
  */
 
 
 /**
  * g_type_get_plugin:
- * @type: The #GType to retrieve the plugin for.
+ * @type: #GType to retrieve the plugin for
  *
- * Returns the #GTypePlugin structure for @type or
- * %NULL if @type does not have a #GTypePlugin structure.
+ * Returns the #GTypePlugin structure for @type.
  *
- * Returns: (transfer none): The corresponding plugin if @type is a dynamic type, %NULL otherwise.
+ * Returns: (transfer none): the corresponding plugin
+ *     if @type is a dynamic type, %NULL otherwise
  */
 
 
@@ -4577,14 +4773,14 @@
 /**
  * g_type_get_type_registration_serial:
  *
- * Returns an opaque serial number that represents the state of the set of registered
- * types. Any time a type is registred this serial changes, which means you can
- * cache information based on type lookups (such as g_type_from_name) and know if
- * the cache is still valid at a later time by comparing the current serial with
- * the one at the type lookup.
+ * Returns an opaque serial number that represents the state of the set
+ * of registered types. Any time a type is registered this serial changes,
+ * which means you can cache information based on type lookups (such as
+ * g_type_from_name()) and know if the cache is still valid at a later
+ * time by comparing the current serial with the one at the type lookup.
  *
  * Since: 2.36
- * Returns: An unsigned int, representing the state of type registrations.
+ * Returns: An unsigned int, representing the state of type registrations
  */
 
 
@@ -4601,7 +4797,8 @@
 
 /**
  * g_type_init_with_debug_flags:
- * @debug_flags: Bitwise combination of #GTypeDebugFlags values for debugging purposes.
+ * @debug_flags: bitwise combination of #GTypeDebugFlags values for
+ *     debugging purposes
  *
  * This function used to initialise the type system with debugging
  * flags.  Since GLib 2.36, the type system is initialised automatically
@@ -4616,8 +4813,8 @@
 
 /**
  * g_type_interface_add_prerequisite:
- * @interface_type: #GType value of an interface type.
- * @prerequisite_type: #GType value of an interface or instantiatable type.
+ * @interface_type: #GType value of an interface type
+ * @prerequisite_type: #GType value of an interface or instantiatable type
  *
  * Adds @prerequisite_type to the list of prerequisites of @interface_type.
  * This means that any type implementing @interface_type must also implement
@@ -4629,78 +4826,89 @@
 
 /**
  * g_type_interface_get_plugin:
- * @instance_type: the #GType value of an instantiatable type.
- * @interface_type: the #GType value of an interface type.
+ * @instance_type: #GType of an instantiatable type
+ * @interface_type: #GType of an interface type
  *
  * Returns the #GTypePlugin structure for the dynamic interface
- * @interface_type which has been added to @instance_type, or %NULL if
- * @interface_type has not been added to @instance_type or does not
- * have a #GTypePlugin structure. See g_type_add_interface_dynamic().
+ * @interface_type which has been added to @instance_type, or %NULL
+ * if @interface_type has not been added to @instance_type or does
+ * not have a #GTypePlugin structure. See g_type_add_interface_dynamic().
  *
- * Returns: (transfer none): the #GTypePlugin for the dynamic interface @interface_type of @instance_type.
+ * Returns: (transfer none): the #GTypePlugin for the dynamic
+ *     interface @interface_type of @instance_type
  */
 
 
 /**
  * g_type_interface_peek:
- * @instance_class: (type GObject.TypeClass): A #GTypeClass structure.
- * @iface_type: An interface ID which this class conforms to.
+ * @instance_class: (type GObject.TypeClass): a #GTypeClass structure
+ * @iface_type: an interface ID which this class conforms to
  *
  * Returns the #GTypeInterface structure of an interface to which the
  * passed in class conforms.
  *
- * Returns: (type GObject.TypeInterface) (transfer none): The GTypeInterface structure of iface_type if implemented by @instance_class, %NULL otherwise
+ * Returns: (type GObject.TypeInterface) (transfer none): the #GTypeInterface
+ *     structure of @iface_type if implemented by @instance_class, %NULL
+ *     otherwise
  */
 
 
 /**
  * g_type_interface_peek_parent:
- * @g_iface: (type GObject.TypeInterface): A #GTypeInterface structure.
+ * @g_iface: (type GObject.TypeInterface): a #GTypeInterface structure
  *
  * Returns the corresponding #GTypeInterface structure of the parent type
  * of the instance type to which @g_iface belongs. This is useful when
  * deriving the implementation of an interface from the parent type and
  * then possibly overriding some methods.
  *
- * Returns: (transfer none) (type GObject.TypeInterface): The corresponding #GTypeInterface structure of the parent type of the instance type to which @g_iface belongs, or %NULL if the parent type doesn't conform to the interface.
+ * Returns: (transfer none) (type GObject.TypeInterface): the
+ *     corresponding #GTypeInterface structure of the parent type of the
+ *     instance type to which @g_iface belongs, or %NULL if the parent
+ *     type doesn't conform to the interface
  */
 
 
 /**
  * g_type_interface_prerequisites:
  * @interface_type: an interface type
- * @n_prerequisites: (out) (allow-none): location to return the number of prerequisites, or %NULL
+ * @n_prerequisites: (out) (allow-none): location to return the number
+ *     of prerequisites, or %NULL
  *
  * Returns the prerequisites of an interfaces type.
  *
  * Since: 2.2
- * Returns: (array length=n_prerequisites) (transfer full): a newly-allocated zero-terminated array of #GType containing the prerequisites of @interface_type
+ * Returns: (array length=n_prerequisites) (transfer full): a
+ *     newly-allocated zero-terminated array of #GType containing
+ *     the prerequisites of @interface_type
  */
 
 
 /**
  * g_type_interfaces:
- * @type: The type to list interface types for.
- * @n_interfaces: (out) (allow-none): Optional #guint pointer to contain the number of interface types.
+ * @type: the type to list interface types for
+ * @n_interfaces: (out) (allow-none): location to store the length of
+ *     the returned array, or %NULL
  *
- * Return a newly allocated and 0-terminated array of type IDs, listing the
- * interface types that @type conforms to. The return value has to be
- * g_free()ed after use.
+ * Return a newly allocated and 0-terminated array of type IDs, listing
+ * the interface types that @type conforms to.
  *
- * Returns: (array length=n_interfaces) (transfer full): Newly allocated and 0-terminated array of interface types.
+ * Returns: (array length=n_interfaces) (transfer full): Newly allocated
+ *     and 0-terminated array of interface types, free with g_free()
  */
 
 
 /**
  * g_type_is_a:
- * @type: Type to check anchestry for.
- * @is_a_type: Possible anchestor of @type or interface @type could conform to.
+ * @type: type to check anchestry for
+ * @is_a_type: possible anchestor of @type or interface that @type
+ *     could conform to
  *
  * If @is_a_type is a derivable type, check whether @type is a
- * descendant of @is_a_type.  If @is_a_type is an interface, check
+ * descendant of @is_a_type. If @is_a_type is an interface, check
  * whether @type conforms to it.
  *
- * Returns: %TRUE if @type is_a @is_a_type holds true.
+ * Returns: %TRUE if @type is a @is_a_type
  */
 
 
@@ -4724,7 +4932,10 @@
  * g_type_module_register_enum:
  * @module: a #GTypeModule
  * @name: name for the type
- * @const_static_values: an array of #GEnumValue structs for the possible enumeration values. The array is terminated by a struct with all members being 0.
+ * @const_static_values: an array of #GEnumValue structs for the
+ *                       possible enumeration values. The array is
+ *                       terminated by a struct with all members being
+ *                       0.
  *
  * Looks up or registers an enumeration that is implemented with a particular
  * type plugin. If a type with name @type_name was previously registered,
@@ -4743,7 +4954,10 @@
  * g_type_module_register_flags:
  * @module: a #GTypeModule
  * @name: name for the type
- * @const_static_values: an array of #GFlagsValue structs for the possible flags values. The array is terminated by a struct with all members being 0.
+ * @const_static_values: an array of #GFlagsValue structs for the
+ *                       possible flags values. The array is
+ *                       terminated by a struct with all members being
+ *                       0.
  *
  * Looks up or registers a flags type that is implemented with a particular
  * type plugin. If a type with name @type_name was previously registered,
@@ -4812,13 +5026,14 @@
  * If loading the plugin fails, the use count is reset to
  * its prior value.
  *
- * Returns: %FALSE if the plugin needed to be loaded and loading the plugin failed.
+ * Returns: %FALSE if the plugin needed to be loaded and
+ *  loading the plugin failed.
  */
 
 
 /**
  * g_type_name:
- * @type: Type to return name for.
+ * @type: type to return name for
  *
  * Get the unique name that is assigned to a type ID.  Note that this
  * function (like all other GType API) cannot cope with invalid type
@@ -4826,42 +5041,43 @@
  * other validly registered type ID, but randomized type IDs should
  * not be passed in and will most likely lead to a crash.
  *
- * Returns: Static type name or %NULL.
+ * Returns: static type name or %NULL
  */
 
 
 /**
  * g_type_next_base:
- * @leaf_type: Descendant of @root_type and the type to be returned.
- * @root_type: Immediate parent of the returned type.
+ * @leaf_type: descendant of @root_type and the type to be returned
+ * @root_type: immediate parent of the returned type
  *
  * Given a @leaf_type and a @root_type which is contained in its
  * anchestry, return the type that @root_type is the immediate parent
- * of.  In other words, this function determines the type that is
+ * of. In other words, this function determines the type that is
  * derived directly from @root_type which is also a base class of
  * @leaf_type.  Given a root type and a leaf type, this function can
  * be used to determine the types and order in which the leaf type is
  * descended from the root type.
  *
- * Returns: Immediate child of @root_type and anchestor of @leaf_type.
+ * Returns: immediate child of @root_type and anchestor of @leaf_type
  */
 
 
 /**
  * g_type_parent:
- * @type: The derived type.
+ * @type: the derived type
  *
- * Return the direct parent type of the passed in type.  If the passed
+ * Return the direct parent type of the passed in type. If the passed
  * in type has no parent, i.e. is a fundamental type, 0 is returned.
  *
- * Returns: The parent type.
+ * Returns: the parent type
  */
 
 
 /**
  * g_type_plugin_complete_interface_info:
  * @plugin: the #GTypePlugin
- * @instance_type: the #GType of an instantiable type to which the interface is added
+ * @instance_type: the #GType of an instantiable type to which the interface
+ *  is added
  * @interface_type: the #GType of the interface whose info is completed
  * @info: the #GInterfaceInfo to fill in
  *
@@ -4906,18 +5122,19 @@
 
 /**
  * g_type_qname:
- * @type: Type to return quark of type name for.
+ * @type: type to return quark of type name for
  *
  * Get the corresponding quark of the type IDs name.
  *
- * Returns: The type names quark or 0.
+ * Returns: the type names quark or 0
  */
 
 
 /**
  * g_type_query:
- * @type: the #GType value of a static, classed type.
- * @query: (out caller-allocates): A user provided structure that is filled in with constant values upon success.
+ * @type: #GType of a static, classed type
+ * @query: (out caller-allocates): a user provided structure that is
+ *     filled in with constant values upon success
  *
  * Queries the type system for information about a specific type.
  * This function will fill in a user-provided structure to hold
@@ -4930,10 +5147,10 @@
 
 /**
  * g_type_register_dynamic:
- * @parent_type: Type from which this type will be derived.
- * @type_name: 0-terminated string used as the name of the new type.
- * @plugin: The #GTypePlugin structure to retrieve the #GTypeInfo from.
- * @flags: Bitwise combination of #GTypeFlags values.
+ * @parent_type: type from which this type will be derived
+ * @type_name: 0-terminated string used as the name of the new type
+ * @plugin: #GTypePlugin structure to retrieve the #GTypeInfo from
+ * @flags: bitwise combination of #GTypeFlags values
  *
  * Registers @type_name as the name of a new dynamic type derived from
  * @parent_type.  The type system uses the information contained in the
@@ -4941,56 +5158,56 @@
  * instances (if not abstract).  The value of @flags determines the nature
  * (e.g. abstract or not) of the type.
  *
- * Returns: The new type identifier or #G_TYPE_INVALID if registration failed.
+ * Returns: the new type identifier or #G_TYPE_INVALID if registration failed
  */
 
 
 /**
  * g_type_register_fundamental:
- * @type_id: A predefined type identifier.
- * @type_name: 0-terminated string used as the name of the new type.
- * @info: The #GTypeInfo structure for this type.
- * @finfo: The #GTypeFundamentalInfo structure for this type.
- * @flags: Bitwise combination of #GTypeFlags values.
+ * @type_id: a predefined type identifier
+ * @type_name: 0-terminated string used as the name of the new type
+ * @info: #GTypeInfo structure for this type
+ * @finfo: #GTypeFundamentalInfo structure for this type
+ * @flags: bitwise combination of #GTypeFlags values
  *
  * Registers @type_id as the predefined identifier and @type_name as the
- * name of a fundamental type. If @type_id is already registered, or a type
- * named @type_name is already registered, the behaviour is undefined. The type
- * system uses the information contained in the #GTypeInfo structure pointed to
- * by @info and the #GTypeFundamentalInfo structure pointed to by @finfo to
- * manage the type and its instances. The value of @flags determines additional
- * characteristics of the fundamental type.
+ * name of a fundamental type. If @type_id is already registered, or a
+ * type named @type_name is already registered, the behaviour is undefined.
+ * The type system uses the information contained in the #GTypeInfo structure
+ * pointed to by @info and the #GTypeFundamentalInfo structure pointed to by
+ * @finfo to manage the type and its instances. The value of @flags determines
+ * additional characteristics of the fundamental type.
  *
- * Returns: The predefined type identifier.
+ * Returns: the predefined type identifier
  */
 
 
 /**
  * g_type_register_static:
- * @parent_type: Type from which this type will be derived.
- * @type_name: 0-terminated string used as the name of the new type.
- * @info: The #GTypeInfo structure for this type.
- * @flags: Bitwise combination of #GTypeFlags values.
+ * @parent_type: type from which this type will be derived
+ * @type_name: 0-terminated string used as the name of the new type
+ * @info: #GTypeInfo structure for this type
+ * @flags: bitwise combination of #GTypeFlags values
  *
  * Registers @type_name as the name of a new static type derived from
- * @parent_type.  The type system uses the information contained in the
+ * @parent_type. The type system uses the information contained in the
  * #GTypeInfo structure pointed to by @info to manage the type and its
- * instances (if not abstract).  The value of @flags determines the nature
+ * instances (if not abstract). The value of @flags determines the nature
  * (e.g. abstract or not) of the type.
  *
- * Returns: The new type identifier.
+ * Returns: the new type identifier
  */
 
 
 /**
  * g_type_register_static_simple: (skip)
- * @parent_type: Type from which this type will be derived.
- * @type_name: 0-terminated string used as the name of the new type.
- * @class_size: Size of the class structure (see #GTypeInfo)
- * @class_init: Location of the class initialization function (see #GTypeInfo)
- * @instance_size: Size of the instance structure (see #GTypeInfo)
- * @instance_init: Location of the instance initialization function (see #GTypeInfo)
- * @flags: Bitwise combination of #GTypeFlags values.
+ * @parent_type: type from which this type will be derived
+ * @type_name: 0-terminated string used as the name of the new type
+ * @class_size: size of the class structure (see #GTypeInfo)
+ * @class_init: location of the class initialization function (see #GTypeInfo)
+ * @instance_size: size of the instance structure (see #GTypeInfo)
+ * @instance_init: location of the instance initialization function (see #GTypeInfo)
+ * @flags: bitwise combination of #GTypeFlags values
  *
  * Registers @type_name as the name of a new static type derived from
  * @parent_type.  The value of @flags determines the nature (e.g.
@@ -4998,7 +5215,7 @@
  * struct and calling g_type_register_static().
  *
  * Since: 2.12
- * Returns: The new type identifier.
+ * Returns: the new type identifier
  */
 
 
@@ -5037,14 +5254,16 @@
 
 /**
  * g_type_value_table_peek: (skip)
- * @type: A #GType value.
+ * @type: a #GType
  *
  * Returns the location of the #GTypeValueTable associated with @type.
- * <emphasis>Note that this function should only be used from source code
- * that implements or has internal knowledge of the implementation of
- * @type.</emphasis>
  *
- * Returns: Location of the #GTypeValueTable associated with @type or %NULL if there is no #GTypeValueTable associated with @type.
+ * Note that this function should only be used from source code
+ * that implements or has internal knowledge of the implementation of
+ * @type.
+ *
+ * Returns: location of the #GTypeValueTable associated with @type or
+ *     %NULL if there is no #GTypeValueTable associated with @type
  */
 
 
@@ -5098,7 +5317,7 @@
 /**
  * g_value_array_insert:
  * @value_array: #GValueArray to add an element to
- * @index_: insertion position, must be &lt;= value_array-&gt;n_values
+ * @index_: insertion position, must be <= value_array-&gt;n_values
  * @value: (allow-none): #GValue to copy into #GValueArray, or %NULL
  *
  * Insert a copy of @value at specified position into @value_array. If @value
@@ -5138,7 +5357,8 @@
 /**
  * g_value_array_remove:
  * @value_array: #GValueArray to remove an element from
- * @index_: position of value to remove, which must be less than <code>value_array-><link linkend="GValueArray.n-values">n_values</link></code>
+ * @index_: position of value to remove, which must be less than
+ *     @value_array->n_values
  *
  * Remove the value at position @index_ from @value_array.
  *
@@ -5155,7 +5375,8 @@
  * Sort @value_array using @compare_func to compare the elements according to
  * the semantics of #GCompareFunc.
  *
- * The current implementation uses Quick-Sort as sorting algorithm.
+ * The current implementation uses the same sorting algorithm as standard
+ * C qsort() function.
  *
  * Returns: (transfer none): the #GValueArray passed in as @value_array
  * Deprecated: 2.32: Use #GArray and g_array_sort().
@@ -5163,7 +5384,7 @@
 
 
 /**
- * g_value_array_sort_with_data:
+ * g_value_array_sort_with_data: (rename-to g_value_array_sort)
  * @value_array: #GValueArray to sort
  * @compare_func: (scope call): function to compare elements
  * @user_data: (closure): extra data argument provided for @compare_func
@@ -5171,9 +5392,9 @@
  * Sort @value_array using @compare_func to compare the elements according
  * to the semantics of #GCompareDataFunc.
  *
- * The current implementation uses Quick-Sort as sorting algorithm.
+ * The current implementation uses the same sorting algorithm as standard
+ * C qsort() function.
  *
- * Rename to: g_value_array_sort
  * Returns: (transfer none): the #GValueArray passed in as @value_array
  * Deprecated: 2.32: Use #GArray and g_array_sort_with_data().
  */
@@ -5209,7 +5430,8 @@
  * its reference count. If the contents of the #GValue are %NULL, then
  * %NULL will be returned.
  *
- * Returns: (type GObject.Object) (transfer full): object content of @value, should be unreferenced when no longer needed.
+ * Returns: (type GObject.Object) (transfer full): object content of @value,
+ *          should be unreferenced when no longer needed.
  */
 
 
@@ -5220,7 +5442,8 @@
  * Get the contents of a %G_TYPE_PARAM #GValue, increasing its
  * reference count.
  *
- * Returns: #GParamSpec content of @value, should be unreferenced when no longer needed.
+ * Returns: #GParamSpec content of @value, should be unreferenced when
+ *          no longer needed.
  */
 
 
@@ -5240,7 +5463,8 @@
  *
  * Get the contents of a variant #GValue, increasing its refcount.
  *
- * Returns: variant contents of @value, should be unrefed using g_variant_unref() when no longer needed
+ * Returns: variant contents of @value, should be unrefed using
+ *   g_variant_unref() when no longer needed
  * Since: 2.26
  */
 
@@ -5485,10 +5709,31 @@
 
 
 /**
- * g_value_peek_pointer:
- * @value: An initialized #GValue structure.
+ * g_value_init_from_instance:
+ * @value: An uninitialized #GValue structure.
+ * @instance: the instance
  *
- * Returns: (transfer none): the value contents as pointer. This function asserts that g_value_fits_pointer() returned %TRUE for the passed in value.  This is an internal function introduced mainly for C marshallers.
+ * Initializes and sets @value from an instantiatable type via the
+ * value_table's collect_value() function.
+ *
+ * Note: The @value will be initialised with the exact type of
+ * @instance.  If you wish to set the @value's type to a different GType
+ * (such as a parent class GType), you need to manually call
+ * g_value_init() and g_value_set_instance().
+ *
+ * Since: 2.42
+ */
+
+
+/**
+ * g_value_peek_pointer:
+ * @value: An initialized #GValue structure
+ *
+ * Returns the value contents as pointer. This function asserts that
+ * g_value_fits_pointer() returned %TRUE for the passed in value.
+ * This is an internal function introduced mainly for C marshallers.
+ *
+ * Returns: (transfer none): the value contents as pointer
  */
 
 
@@ -5496,7 +5741,8 @@
  * g_value_register_transform_func: (skip)
  * @src_type: Source type.
  * @dest_type: Target type.
- * @transform_func: a function which transforms values of type @src_type into value of type @dest_type
+ * @transform_func: a function which transforms values of type @src_type
+ *  into value of type @dest_type
  *
  * Registers a value transformation function for use in g_value_transform().
  * A previously registered transformation function for @src_type and @dest_type
@@ -5888,7 +6134,8 @@
  * results and shouldn't be relied upon for production code (such
  * as rcfile value or object property serialization).
  *
- * Returns: Whether a transformation rule was found and could be applied. Upon failing transformations, @dest_value is left untouched.
+ * Returns: Whether a transformation rule was found and could be applied.
+ *  Upon failing transformations, @dest_value is left untouched.
  */
 
 
@@ -5910,7 +6157,9 @@
  * @dest_type: Target type.
  *
  * Check whether g_value_transform() is able to transform values
- * of type @src_type into values of type @dest_type.
+ * of type @src_type into values of type @dest_type. Note that for
+ * the types to be transformable, they must be compatible and a
+ * transform function must be registered.
  *
  * Returns: %TRUE if the transformation is possible, %FALSE otherwise.
  */
@@ -5937,7 +6186,8 @@
 
 /**
  * g_weak_ref_clear: (skip)
- * @weak_ref: (inout): location of a weak reference, which may be empty
+ * @weak_ref: (inout): location of a weak reference, which
+ *  may be empty
  *
  * Frees resources associated with a non-statically-allocated #GWeakRef.
  * After this call, the #GWeakRef is left in an undefined state.
@@ -5963,14 +6213,16 @@
  * The caller should release the resulting reference in the usual way,
  * by using g_object_unref().
  *
- * Returns: (transfer full) (type GObject.Object): the object pointed to by @weak_ref, or %NULL if it was empty
+ * Returns: (transfer full) (type GObject.Object): the object pointed to
+ *     by @weak_ref, or %NULL if it was empty
  * Since: 2.32
  */
 
 
 /**
  * g_weak_ref_init: (skip)
- * @weak_ref: (inout): uninitialized or empty location for a weak reference
+ * @weak_ref: (inout): uninitialized or empty location for a weak
+ *    reference
  * @object: (allow-none): a #GObject or %NULL
  *
  * Initialise a non-statically-allocated #GWeakRef.

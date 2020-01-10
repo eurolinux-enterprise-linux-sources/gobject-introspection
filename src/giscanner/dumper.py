@@ -27,6 +27,7 @@ import tempfile
 
 from .gdumpparser import IntrospectionBinary
 from . import utils
+from .ccompiler import CCompiler
 
 # bugzilla.gnome.org/558436
 # Compile a binary program which is then linked to a library
@@ -82,14 +83,15 @@ class DumpCompiler(object):
         self._get_type_functions = get_type_functions
         self._error_quark_functions = error_quark_functions
 
-        self._compiler_cmd = os.environ.get('CC', 'gcc')
+        self._compiler_cmd = os.environ.get('CC', 'cc')
         self._linker_cmd = os.environ.get('CC', self._compiler_cmd)
         self._pkgconfig_cmd = os.environ.get('PKG_CONFIG', 'pkg-config')
         self._pkgconfig_msvc_flags = ''
         # Enable the --msvc-syntax pkg-config flag when
         # the Microsoft compiler is used
         # (This is the other way to check whether Visual C++ is used subsequently)
-        if 'cl' in self._compiler_cmd:
+        args = self._compiler_cmd.split()
+        if 'cl.exe' in args or 'cl' in args:
             self._pkgconfig_msvc_flags = '--msvc-syntax'
         self._uninst_srcdir = os.environ.get(
             'UNINSTALLED_INTROSPECTION_SRCDIR')
@@ -102,6 +104,7 @@ class DumpCompiler(object):
         # We have to use the current directory to work around Unix
         # sysadmins who mount /tmp noexec
         tmpdir = tempfile.mkdtemp('', 'tmp-introspect', dir=os.getcwd())
+        os.mkdir(os.path.join(tmpdir, '.libs'))
 
         tpl_args = {}
         if self._uninst_srcdir is not None:
@@ -158,7 +161,7 @@ class DumpCompiler(object):
             o_path = self._generate_tempfile(tmpdir, '.o')
 
         if os.name == 'nt':
-            ext = 'exe'
+            ext = '.exe'
         else:
             ext = ''
 
@@ -166,14 +169,14 @@ class DumpCompiler(object):
 
         try:
             self._compile(o_path, c_path)
-        except CompilerError, e:
+        except CompilerError as e:
             if not utils.have_debug_flag('save-temps'):
                 shutil.rmtree(tmpdir)
             raise SystemExit('compilation of temporary binary failed:' + str(e))
 
         try:
             self._link(bin_path, o_path)
-        except LinkerError, e:
+        except LinkerError as e:
             if not utils.have_debug_flag('save-temps'):
                 shutil.rmtree(tmpdir)
             raise SystemExit('linking of temporary binary failed: ' + str(e))
@@ -213,7 +216,10 @@ class DumpCompiler(object):
         else:
             args.append("-Wno-deprecated-declarations")
         pkgconfig_flags = self._run_pkgconfig('--cflags')
-        args.extend(pkgconfig_flags)
+        args.extend([utils.cflag_real_include_path(f) for f in pkgconfig_flags])
+        cppflags = os.environ.get('CPPFLAGS', '')
+        for cppflag in cppflags.split():
+            args.append(cppflag)
         cflags = os.environ.get('CFLAGS', '')
         for cflag in cflags.split():
             args.append(cflag)
@@ -222,7 +228,7 @@ class DumpCompiler(object):
         # The Microsoft compiler uses different option flags for
         # compilation result output
         if self._pkgconfig_msvc_flags:
-            args.extend(['-c', '-Fe'+output, '-Fo'+output])
+            args.extend(['-c', '-Fe' + output, '-Fo' + output])
         else:
             args.extend(['-c', '-o', output])
         for source in sources:
@@ -236,7 +242,7 @@ class DumpCompiler(object):
             sys.stdout.flush()
         try:
             subprocess.check_call(args)
-        except subprocess.CalledProcessError, e:
+        except subprocess.CalledProcessError as e:
             raise CompilerError(e)
 
     def _link(self, output, *sources):
@@ -253,15 +259,18 @@ class DumpCompiler(object):
         # We can use -o for the Microsoft compiler/linker,
         # but it is considered deprecated usage with that
         if self._pkgconfig_msvc_flags:
-            args.extend(['-Fe'+output])
+            args.extend(['-Fe' + output])
         else:
             args.extend(['-o', output])
         if libtool:
             if os.name == 'nt':
-                args.append('-export-all-symbols')
+                args.append('-Wl,--export-all-symbols')
             else:
                 args.append('-export-dynamic')
 
+        cppflags = os.environ.get('CPPFLAGS', '')
+        for cppflag in cppflags.split():
+            args.append(cppflag)
         cflags = os.environ.get('CFLAGS', '')
         for cflag in cflags.split():
             args.append(cflag)
@@ -279,83 +288,49 @@ class DumpCompiler(object):
                     "Could not find object file: %s" % (source, ))
         args.extend(list(sources))
 
+        cc = CCompiler()
+
         if not self._options.external_library:
-            self._add_link_internal_args(args, libtool)
+            cc.get_internal_link_flags(args,
+                                       libtool,
+                                       self._options.libraries,
+                                       self._options.library_paths,
+                                       self._pkgconfig_msvc_flags,
+                                       self._options.namespace_name,
+                                       self._options.namespace_version)
+            args.extend(self._run_pkgconfig('--libs'))
+
         else:
-            self._add_link_external_args(args)
+            args.extend(self._run_pkgconfig('--libs'))
+            cc.get_external_link_flags(args,
+                                       self._options.libraries,
+                                       self._pkgconfig_msvc_flags)
 
         if not self._options.quiet:
             print "g-ir-scanner: link: %s" % (
                 subprocess.list2cmdline(args), )
             sys.stdout.flush()
+        msys = os.environ.get('MSYSTEM', None)
+        if msys:
+            shell = os.environ.get('SHELL', 'sh.exe')
+            # Create a temporary script file that
+            # runs the command we want
+            tf, tf_name = tempfile.mkstemp()
+            f = os.fdopen(tf, 'wb')
+            shellcontents = ' '.join([x.replace('\\', '/') for x in args])
+            fcontents = '#!/bin/sh\nunset PWD\n{}\n'.format(shellcontents)
+            f.write(fcontents)
+            f.close()
+            shell = utils.which(shell)
+            args = [shell, tf_name.replace('\\', '/')]
         try:
             subprocess.check_call(args)
-        except subprocess.CalledProcessError, e:
+        except subprocess.CalledProcessError as e:
             raise LinkerError(e)
+        finally:
+            if msys:
+                os.remove(tf_name)
 
-    def _add_link_internal_args(self, args, libtool):
-        # An "internal" link is where the library to be introspected
-        # is being built in the current directory.
-
-        # Search the current directory first
-        # (This flag is not supported nor needed for Visual C++)
-        if self._pkgconfig_msvc_flags == '':
-            args.append('-L.')
-
-        # https://bugzilla.gnome.org/show_bug.cgi?id=625195
-        if not libtool:
-            # We don't have -Wl,-rpath for Visual C++, and that's
-            # going to cause a problem.  Instead, link to internal
-            # libraries by deducing the .lib file name using
-            # the namespace name and version
-            if self._pkgconfig_msvc_flags:
-                if self._options.namespace_version:
-                    args.append(str.lower(self._options.namespace_name) +
-                                '-' +
-                                self._options.namespace_version+'.lib')
-                else:
-                    args.append(str.lower(self._options.namespace_name)+'.lib')
-            else:
-                args.append('-Wl,-rpath=.')
-
-        for library in self._options.libraries:
-            # Visual C++: We have the needed .lib files now, and we need to link
-            # to .lib files, not the .dll as the --library option specifies the
-            # .dll(s) the .gir file refers to
-            if self._pkgconfig_msvc_flags == '':
-                if library.endswith(".la"): # explicitly specified libtool library
-                    args.append(library)
-                else:
-                    args.append('-l' + library)
-
-        for library_path in self._options.library_paths:
-            # Not used/needed on Visual C++, and -Wl,-rpath options
-            # will cause grief
-            if self._pkgconfig_msvc_flags == '':
-                args.append('-L' + library_path)
-                if os.path.isabs(library_path):
-                    if libtool:
-                        args.append('-rpath')
-                        args.append(library_path)
-                    else:
-                        args.append('-Wl,-rpath=' + library_path)
-
-        args.extend(self._run_pkgconfig('--libs'))
-
-    def _add_link_external_args(self, args):
-        # An "external" link is where the library to be introspected
-        # is installed on the system; this case is used for the scanning
-        # of GLib in gobject-introspection itself.
-
-        args.extend(self._run_pkgconfig('--libs'))
-        for library in self._options.libraries:
-            # The --library option on Windows pass in the .dll file(s) the
-            # .gir files refer to, so don't link to them on Visual C++
-            if self._pkgconfig_msvc_flags == '':
-                if library.endswith(".la"): # explicitly specified libtool library
-                    args.append(library)
-                else:
-                    args.append('-l' + library)
 
 def compile_introspection_binary(options, get_type_functions,
                                  error_quark_functions):

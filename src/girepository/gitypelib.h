@@ -29,23 +29,48 @@
 
 #include <glib.h>
 
+#include <giversionmacros.h>
+
 G_BEGIN_DECLS
 
+/**
+ * SECTION:gitypelib
+ * @title: gitypelib
+ * @short_description: TODO
+ *
+ * TODO
+ */
+
+/**
+ * GITypelib:
+ *
+ * TODO
+ */
 typedef struct _GITypelib GITypelib;
 
+GI_AVAILABLE_IN_ALL
 GITypelib *    g_typelib_new_from_memory       (guint8        *memory,
                                                gsize          len,
 					       GError       **error);
+
+GI_AVAILABLE_IN_ALL
 GITypelib *    g_typelib_new_from_const_memory (const guint8  *memory,
                                                gsize          len,
 					       GError       **error);
+
+GI_AVAILABLE_IN_ALL
 GITypelib *    g_typelib_new_from_mapped_file  (GMappedFile   *mfile,
 					       GError       **error);
+
+GI_AVAILABLE_IN_ALL
 void          g_typelib_free                  (GITypelib     *typelib);
 
+GI_AVAILABLE_IN_ALL
 gboolean      g_typelib_symbol                (GITypelib     *typelib,
                                                const gchar  *symbol_name,
                                                gpointer     *symbol);
+
+GI_AVAILABLE_IN_ALL
 const gchar * g_typelib_get_namespace         (GITypelib     *typelib);
 
 

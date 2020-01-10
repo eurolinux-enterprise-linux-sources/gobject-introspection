@@ -31,9 +31,13 @@ from . import utils
 
 
 class Position(object):
-    """Represents a position in the source file which we
+    """
+    Represents a position in the source file which we
     want to inform about.
     """
+
+    __slots__ = ('filename', 'line', 'column')
+
     def __init__(self, filename=None, line=None, column=None):
         self.filename = filename
         self.line = line
@@ -44,24 +48,22 @@ class Position(object):
                    (other.filename, other.line, other.column))
 
     def __repr__(self):
-        return '<Position %s:%d:%d>' % (
-            os.path.basename(self.filename),
-            self.line or -1,
-            self.column or -1)
+        return '<Position %s:%d:%d>' % (os.path.basename(self.filename), self.line or -1,
+                                        self.column or -1)
 
     def format(self, cwd):
-        filename = self.filename
-        if filename.startswith(cwd):
-            filename = filename[len(cwd):]
+        filename = os.path.realpath(self.filename)
+        cwd = os.path.realpath(cwd)
+        common_prefix = os.path.commonprefix((filename, cwd))
+        if common_prefix:
+            filename = os.path.relpath(filename, common_prefix)
+
         if self.column is not None:
             return '%s:%d:%d' % (filename, self.line, self.column)
         elif self.line is not None:
             return '%s:%d' % (filename, self.line, )
         else:
             return '%s:' % (filename, )
-
-    def offset(self, offset):
-        return Position(self.filename, self.line+offset, self.column)
 
 
 class MessageLogger(object):
@@ -70,11 +72,12 @@ class MessageLogger(object):
     def __init__(self, namespace, output=None):
         if output is None:
             output = sys.stderr
-        self._cwd = os.getcwd() + os.sep
+        self._cwd = os.getcwd()
         self._output = output
         self._namespace = namespace
-        self._enable_warnings = False
+        self._enable_warnings = []
         self._warning_count = 0
+        self._error_count = 0
 
     @classmethod
     def get(cls, *args, **kwargs):
@@ -82,23 +85,26 @@ class MessageLogger(object):
             cls._instance = cls(*args, **kwargs)
         return cls._instance
 
-    def enable_warnings(self, enable):
-        self._enable_warnings = enable
+    def enable_warnings(self, log_types):
+        self._enable_warnings = log_types
 
     def get_warning_count(self):
         return self._warning_count
 
+    def get_error_count(self):
+        return self._error_count
+
     def log(self, log_type, text, positions=None, prefix=None):
-        """Log a warning, using optional file positioning information.
-If the warning is related to a ast.Node type, see log_node()."""
+        """
+        Log a warning, using optional file positioning information.
+        If the warning is related to a ast.Node type, see log_node().
+        """
         utils.break_on_debug_flag('warning')
 
         self._warning_count += 1
 
-        if not self._enable_warnings and log_type != FATAL:
+        if not log_type in self._enable_warnings:
             return
-
-        # Always drop through on fatal
 
         if type(positions) == set:
             positions = list(positions)
@@ -116,31 +122,34 @@ If the warning is related to a ast.Node type, see log_node()."""
             error_type = "Warning"
         elif log_type == ERROR:
             error_type = "Error"
+            self._error_count += 1
         elif log_type == FATAL:
             error_type = "Fatal"
+
         if prefix:
-            text = (
-'''%s: %s: %s: %s: %s\n''' % (last_position, error_type, self._namespace.name,
-                            prefix, text))
+            text = ('%s: %s: %s: %s: %s\n' % (last_position, error_type,
+                                              self._namespace.name, prefix, text))
         else:
             if self._namespace:
-                text = (
-'''%s: %s: %s: %s\n''' % (last_position, error_type, self._namespace.name, text))
+                text = ('%s: %s: %s: %s\n' % (last_position, error_type,
+                                              self._namespace.name, text))
             else:
-                text = (
-'''%s: %s: %s\n''' % (last_position, error_type, text))
+                text = ('%s: %s: %s\n' % (last_position, error_type, text))
 
         self._output.write(text)
+
         if log_type == FATAL:
             utils.break_on_debug_flag('fatal')
             raise SystemExit(text)
 
     def log_node(self, log_type, node, text, context=None, positions=None):
-        """Log a warning, using information about file positions from
-the given node.  The optional context argument, if given, should be
-another ast.Node type which will also be displayed.  If no file position
-information is available from the node, the position data from the
-context will be used."""
+        """
+        Log a warning, using information about file positions from
+        the given node.  The optional context argument, if given, should be
+        another ast.Node type which will also be displayed.  If no file position
+        information is available from the node, the position data from the
+        context will be used.
+        """
         if positions:
             pass
         elif getattr(node, 'file_positions', None):
@@ -169,16 +178,25 @@ def log_node(log_type, node, text, context=None, positions=None):
     ml = MessageLogger.get()
     ml.log_node(log_type, node, text, context=context, positions=positions)
 
+
 def warn(text, positions=None, prefix=None):
     ml = MessageLogger.get()
     ml.log(WARNING, text, positions, prefix)
 
+
 def warn_node(node, text, context=None, positions=None):
     log_node(WARNING, node, text, context=context, positions=positions)
+
 
 def warn_symbol(symbol, text):
     ml = MessageLogger.get()
     ml.log_symbol(WARNING, symbol, text)
+
+
+def error(text, positions=None, prefix=None):
+    ml = MessageLogger.get()
+    ml.log(ERROR, text, positions, prefix)
+
 
 def fatal(text, positions=None, prefix=None):
     ml = MessageLogger.get()

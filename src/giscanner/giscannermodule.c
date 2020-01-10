@@ -28,7 +28,6 @@
 #ifdef G_OS_WIN32
 #define USE_WINDOWS
 #endif
-#include "grealpath.h"
 
 #ifdef _WIN32
 #include <fcntl.h>
@@ -194,6 +193,19 @@ symbol_get_const_string (PyGISourceSymbol *self,
 }
 
 static PyObject *
+symbol_get_const_boolean (PyGISourceSymbol *self,
+			  void             *context)
+{
+  if (!self->symbol->const_boolean_set)
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+
+  return PyBool_FromLong (self->symbol->const_boolean);
+}
+
+static PyObject *
 symbol_get_source_filename (PyGISourceSymbol *self,
                             void             *context)
 {
@@ -217,6 +229,8 @@ static const PyGetSetDef _PyGISourceSymbol_getsets[] = {
   /* gboolean const_double_set; */
   { "const_double", (getter)symbol_get_const_double, NULL, NULL},
   { "const_string", (getter)symbol_get_const_string, NULL, NULL},
+  /* gboolean const_boolean_set; */
+  { "const_boolean", (getter)symbol_get_const_boolean, NULL, NULL},
   { "source_filename", (getter)symbol_get_source_filename, NULL, NULL},
   { "line", (getter)symbol_get_line, NULL, NULL},
   { "private", (getter)symbol_get_private, NULL, NULL},
@@ -356,12 +370,13 @@ pygi_source_scanner_append_filename (PyGISourceScanner *self,
 				     PyObject          *args)
 {
   char *filename;
+  GFile *file;
 
   if (!PyArg_ParseTuple (args, "s:SourceScanner.append_filename", &filename))
     return NULL;
 
-  self->scanner->filenames = g_list_append (self->scanner->filenames,
-					    g_realpath (filename));
+  file = g_file_new_for_path (filename);
+  g_hash_table_add (self->scanner->files, file);
 
   Py_INCREF (Py_None);
   return Py_None;
@@ -511,18 +526,19 @@ pygi_source_scanner_lex_filename (PyGISourceScanner *self,
 				  PyObject          *args)
 {
   char *filename;
+  GFile *file;
 
   if (!PyArg_ParseTuple (args, "s:SourceScanner.lex_filename", &filename))
     return NULL;
 
-  self->scanner->current_filename = g_strdup (filename);
+  self->scanner->current_file = g_file_new_for_path (filename);
   if (!gi_source_scanner_lex_filename (self->scanner, filename))
     {
       g_print ("Something went wrong during lexing.\n");
       return NULL;
     }
-  self->scanner->filenames =
-    g_list_append (self->scanner->filenames, g_strdup (filename));
+  file = g_file_new_for_path (filename);
+  g_hash_table_add (self->scanner->files, file);
 
   Py_INCREF (Py_None);
   return Py_None;
@@ -559,6 +575,7 @@ pygi_source_scanner_get_symbols (PyGISourceScanner *self)
       PyList_SetItem (list, i++, item);
     }
 
+  g_slist_free (symbols);
   Py_INCREF (list);
   return list;
 }
@@ -582,6 +599,7 @@ pygi_source_scanner_get_comments (PyGISourceScanner *self)
       PyList_SetItem (list, i++, item);
     }
 
+  g_slist_free (comments);
   Py_INCREF (list);
   return list;
 }
@@ -695,7 +713,7 @@ pygi_collect_attributes (PyObject *self,
 	  goto out;
         }
 
-      if (!PyTuple_Size (tuple) == 2)
+      if (PyTuple_Size (tuple) != 2)
         {
           PyErr_SetString(PyExc_IndexError,
                           "attribute item must be a tuple of length 2");

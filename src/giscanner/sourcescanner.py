@@ -32,6 +32,10 @@ with LibtoolImporter(None, None):
     else:
         from giscanner._giscanner import SourceScanner as CSourceScanner
 
+HEADER_EXTS = ['.h', '.hpp', '.hxx']
+SOURCE_EXTS = ['.c', '.cpp', '.cc', '.cxx']
+ALL_EXTS = SOURCE_EXTS + HEADER_EXTS
+
 (CSYMBOL_TYPE_INVALID,
  CSYMBOL_TYPE_ELLIPSIS,
  CSYMBOL_TYPE_CONST,
@@ -89,8 +93,7 @@ def symbol_type_name(symbol_type):
         CSYMBOL_TYPE_UNION: 'union',
         CSYMBOL_TYPE_ENUM: 'enum',
         CSYMBOL_TYPE_TYPEDEF: 'typedef',
-        CSYMBOL_TYPE_MEMBER: 'member',
-        }.get(symbol_type)
+        CSYMBOL_TYPE_MEMBER: 'member'}.get(symbol_type)
 
 
 def ctype_name(ctype):
@@ -104,8 +107,7 @@ def ctype_name(ctype):
         CTYPE_ENUM: 'enum',
         CTYPE_POINTER: 'pointer',
         CTYPE_ARRAY: 'array',
-        CTYPE_FUNCTION: 'function',
-        }.get(ctype)
+        CTYPE_FUNCTION: 'function'}.get(ctype)
 
 
 class SourceType(object):
@@ -152,8 +154,8 @@ class SourceType(object):
 
 
 class SourceSymbol(object):
-    __members__ = ['const_int', 'const_double', 'const_string', 'ident',
-                   'type', 'base_type']
+    __members__ = ['const_int', 'const_double', 'const_string', 'const_boolean',
+                   'ident', 'type', 'base_type']
 
     def __init__(self, scanner, symbol):
         self._scanner = scanner
@@ -182,6 +184,10 @@ class SourceSymbol(object):
     @property
     def const_string(self):
         return self._symbol.const_string
+
+    @property
+    def const_boolean(self):
+        return self._symbol.const_boolean
 
     @property
     def ident(self):
@@ -225,7 +231,7 @@ class SourceScanner(object):
 
     def set_cpp_options(self, includes, defines, undefines, cflags=[]):
         self._cpp_options.extend(cflags)
-        for prefix, args in [('-I', includes),
+        for prefix, args in [('-I', [os.path.realpath(f) for f in includes]),
                              ('-D', defines),
                              ('-U', undefines)]:
             for arg in (args or []):
@@ -235,15 +241,14 @@ class SourceScanner(object):
 
     def parse_files(self, filenames):
         for filename in filenames:
-            filename = os.path.abspath(filename)
+            # self._scanner expects file names to be canonicalized and symlinks to be resolved
+            filename = os.path.realpath(filename)
             self._scanner.append_filename(filename)
             self._filenames.append(filename)
 
         headers = []
-        for filename in filenames:
-            if (filename.endswith('.c') or filename.endswith('.cpp') or
-                filename.endswith('.cc') or filename.endswith('.cxx')):
-                filename = os.path.abspath(filename)
+        for filename in self._filenames:
+            if os.path.splitext(filename)[1] in SOURCE_EXTS:
                 self._scanner.lex_filename(filename)
             else:
                 headers.append(filename)
@@ -252,7 +257,8 @@ class SourceScanner(object):
 
     def parse_macros(self, filenames):
         self._scanner.set_macro_scan(True)
-        self._scanner.parse_macros(filenames)
+        # self._scanner expects file names to be canonicalized and symlinks to be resolved
+        self._scanner.parse_macros([os.path.realpath(f) for f in filenames])
         self._scanner.set_macro_scan(False)
 
     def get_symbols(self):
@@ -263,7 +269,7 @@ class SourceScanner(object):
         return self._scanner.get_comments()
 
     def dump(self):
-        print '-'*30
+        print '-' * 30
         for symbol in self._scanner.get_symbols():
             print symbol.ident, symbol.base_type.name, symbol.type
 
@@ -275,19 +281,19 @@ class SourceScanner(object):
 
         defines = ['__GI_SCANNER__']
         undefs = []
-        cpp_exec = os.environ.get('CC', 'cc').split()
-        # The Microsoft compiler/preprocessor (cl) does not accept
-        # source input from stdin (the '-' flag), so we need
-        # some help from gcc from MinGW/Cygwin or so.
-        # Note that the generated dumper program is
-        # still built and linked by Visual C++.
-        if 'cl' in cpp_exec:
-            cpp_args = 'gcc'.split()
-        else:
-            cpp_args = cpp_exec
+        cpp_args = os.environ.get('CC', 'cc').split()  # support CC="ccache gcc"
+        if 'cl' in cpp_args:
+            # The Microsoft compiler/preprocessor (cl) does not accept
+            # source input from stdin (the '-' flag), so we need
+            # some help from gcc from MinGW/Cygwin or so.
+            # Note that the generated dumper program is
+            # still built and linked by Visual C++.
+            cpp_args = ['gcc']
+        cpp_args += os.environ.get('CPPFLAGS', '').split()
+        cpp_args += os.environ.get('CFLAGS', '').split()
         cpp_args += ['-E', '-C', '-I.', '-']
-
         cpp_args += self._cpp_options
+
         proc = subprocess.Popen(cpp_args,
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE)
@@ -299,12 +305,11 @@ class SourceScanner(object):
         for undef in undefs:
             proc.stdin.write('#undef %s\n' % (undef, ))
         for filename in filenames:
-            filename = os.path.abspath(filename)
             proc.stdin.write('#include <%s>\n' % (filename, ))
         proc.stdin.close()
 
-        tmp = tempfile.mktemp()
-        fp = open(tmp, 'w+')
+        tmp_fd, tmp_name = tempfile.mkstemp()
+        fp = os.fdopen(tmp_fd, 'w+b')
         while True:
             data = proc.stdout.read(4096)
             if data is None:
@@ -321,4 +326,4 @@ class SourceScanner(object):
 
         self._scanner.parse_file(fp.fileno())
         fp.close()
-        os.unlink(tmp)
+        os.unlink(tmp_name)

@@ -24,7 +24,9 @@ import platform
 import re
 import subprocess
 
-from .utils import get_libtool_command, extract_libtool_shlib
+from .utils import get_libtool_command, extract_libtool_shlib, which
+from .ccompiler import CCompiler
+
 
 # For .la files, the situation is easy.
 def _resolve_libtool(options, binary, libraries):
@@ -35,6 +37,7 @@ def _resolve_libtool(options, binary, libraries):
             shlibs.append(shlib)
 
     return shlibs
+
 
 # Assume ldd output is something vaguely like
 #
@@ -47,9 +50,14 @@ def _resolve_libtool(options, binary, libraries):
 # The negative lookbehind at the start is to avoid problems if someone
 # is crazy enough to name a library liblib<foo> when lib<foo> exists.
 #
+# Match absolute paths on OS X to conform to how libraries are usually
+# referenced on OS X systems.
 def _ldd_library_pattern(library_name):
-    return re.compile("(?<![A-Za-z0-9_-])(lib*%s[^A-Za-z0-9_-][^\s\(\)]*)"
-                      % re.escape(library_name))
+    pattern = "(?<![A-Za-z0-9_-])(lib*%s[^A-Za-z0-9_-][^\s\(\)]*)"
+    if platform.system() == 'Darwin':
+        pattern = "([^\s]*lib*%s[^A-Za-z0-9_-][^\s\(\)]*)"
+    return re.compile(pattern % re.escape(library_name))
+
 
 # This is a what we do for non-la files. We assume that we are on an
 # ELF-like system where ldd exists and the soname extracted with ldd is
@@ -68,7 +76,7 @@ def _resolve_non_libtool(options, binary, libraries):
     if not libraries:
         return []
 
-    if os.name == 'OpenBSD':
+    if platform.platform().startswith('OpenBSD'):
         # Hack for OpenBSD when using the ports' libtool which uses slightly
         # different directories to store the libraries in. So rewite binary.args[0]
         # by inserting '.libs/'.
@@ -82,10 +90,9 @@ def _resolve_non_libtool(options, binary, libraries):
             binary.args[0] = old_argdir
 
     if os.name == 'nt':
-        shlibs = []
+        cc = CCompiler()
+        shlibs = cc.resolve_windows_libs(libraries, options)
 
-        for library in libraries:
-            shlibs.append(library + '.dll')
     else:
         args = []
         libtool = get_libtool_command(options)
@@ -117,6 +124,7 @@ def _resolve_non_libtool(options, binary, libraries):
                 ", ".join(patterns.keys()))
 
     return shlibs
+
 
 # We want to resolve a set of library names (the <foo> of -l<foo>)
 # against a library to find the shared library name. The shared

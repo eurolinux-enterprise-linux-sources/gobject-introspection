@@ -31,11 +31,23 @@
 
 G_BEGIN_DECLS
 
+/**
+ * GI_IS_PROPERTY_INFO
+ * @info: an info structure
+ *
+ * Checks if @info is a #GIPropertyInfo.
+ */
 #define GI_IS_PROPERTY_INFO(info) \
     (g_base_info_get_type((GIBaseInfo*)info) ==  GI_INFO_TYPE_PROPERTY)
 
+
+GI_AVAILABLE_IN_ALL
 GParamFlags  g_property_info_get_flags (GIPropertyInfo *info);
+
+GI_AVAILABLE_IN_ALL
 GITypeInfo * g_property_info_get_type  (GIPropertyInfo *info);
+
+GI_AVAILABLE_IN_ALL
 GITransfer   g_property_info_get_ownership_transfer (GIPropertyInfo *info);
 
 G_END_DECLS

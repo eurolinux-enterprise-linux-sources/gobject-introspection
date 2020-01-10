@@ -32,11 +32,23 @@
 
 G_BEGIN_DECLS
 
+/**
+ * GI_IS_SIGNAL_INFO
+ * @info: an info structure
+ *
+ * Checks if @info is a #GISignalInfo.
+ */
 #define GI_IS_SIGNAL_INFO(info) \
     (g_base_info_get_type((GIBaseInfo*)info) ==  GI_INFO_TYPE_SIGNAL)
 
+
+GI_AVAILABLE_IN_ALL
 GSignalFlags  g_signal_info_get_flags         (GISignalInfo *info);
+
+GI_AVAILABLE_IN_ALL
 GIVFuncInfo * g_signal_info_get_class_closure (GISignalInfo *info);
+
+GI_AVAILABLE_IN_ALL
 gboolean      g_signal_info_true_stops_emit   (GISignalInfo *info);
 
 G_END_DECLS

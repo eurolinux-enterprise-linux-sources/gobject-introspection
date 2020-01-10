@@ -1,4 +1,6 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+#include "config.h"
+
 #include "annotation.h"
 
 char backslash_parsing_tester = '\\';
@@ -128,12 +130,12 @@ regress_annotation_object_class_init (RegressAnnotationObjectClass *klass)
   /**
    * RegressAnnotationObject::attribute-signal:
    * @regress_annotation: the regress_annotation object
-   * @arg1: (attribute some.regress_annotation.foo1 val1): a value
-   * @arg2: (attribute some.regress_annotation.foo2 val2): another value
+   * @arg1: (attributes some.annotation.foo1=val1): a value
+   * @arg2: (attributes some.annotation.foo2=val2): another value
    *
    * This signal tests a signal with attributes.
    *
-   * Returns: (attribute some.regress_annotation.foo3 val3): the return value
+   * Returns: (attributes some.annotation.foo3=val3): the return value
    */
   regress_annotation_object_signals[ATTRIBUTE_SIGNAL] =
     g_signal_new ("attribute-signal",
@@ -163,9 +165,7 @@ regress_annotation_object_class_init (RegressAnnotationObjectClass *klass)
                                                         NULL,
                                                         G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   /**
-   * RegressAnnotationObject:function-property:
-   *
-   * Type: RegressAnnotationCallback
+   * RegressAnnotationObject:function-property: (type RegressAnnotationCallback)
    */
   g_object_class_install_property (gobject_class,
                                    PROP_FUNCTION_PROPERTY,
@@ -174,14 +174,14 @@ regress_annotation_object_class_init (RegressAnnotationObjectClass *klass)
                                                          "This property is a function pointer",
                                                          G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 
-  /**
-   * RegressAnnotationObject:tab-property:
-   *
-   * This is a property regress_annotation intentionally indented with a mix
-   * of tabs and strings to test the tab handling capabilities of the scanner.
-   *
-   * Since: 1.2
-   */
+	  /**
+	   * RegressAnnotationObject:tab-property:
+	   *
+	   * This is a property annotation intentionally indented with a mix
+	   * of tabs and strings to test the tab handling capabilities of the scanner.
+	   *
+	   * Since: 1.2
+	   */
   g_object_class_install_property (gobject_class,
                                    PROP_TAB_PROPERTY,
                                    g_param_spec_string ("tab-property",
@@ -616,15 +616,13 @@ regress_annotation_object_watch (RegressAnnotationObject *object,
 }
 
 /**
- * regress_annotation_object_watch_full:
+ * regress_annotation_object_watch_full: (rename-to regress_annotation_object_watch)
  * @object: A #RegressAnnotationObject
  * @func: The callback
  * @user_data: The callback data
  * @destroy: Destroy notification
  *
- * Test overriding via the "Rename To" regress_annotation.
- *
- * Rename to: regress_annotation_object_watch
+ * Test overriding via the "Rename To" annotation.
  */
 void
 regress_annotation_object_watch_full (RegressAnnotationObject *object,
@@ -707,9 +705,7 @@ regress_annotation_string_array_length (guint n_properties, const gchar * const 
 }
 
 /**
- * regress_annotation_object_extra_annos:
- *
- * Attributes: (org.foobar testvalue)
+ * regress_annotation_object_extra_annos: (attributes org.foobar=testvalue)
  */
 void
 regress_annotation_object_extra_annos (RegressAnnotationObject *object)
@@ -721,7 +717,7 @@ regress_annotation_object_extra_annos (RegressAnnotationObject *object)
  * @callback: (destroy destroy) (closure data): Destroy notification
  *
  * Test messing up the heuristic of closure/destroy-notification
- * detection, and fixing it via regress_annotations.
+ * detection, and fixing it via annotations.
  */
 void
 regress_annotation_custom_destroy (RegressAnnotationCallback callback,
@@ -763,9 +759,9 @@ regress_annotation_ptr_array (GPtrArray *array)
 /**
  * regress_annotation_attribute_func:
  * @object: A #RegressAnnotationObject.
- * @data: (attribute some.regress_annotation value) (attribute another.regress_annotation blahvalue): Some data.
+ * @data: (attributes some.annotation=value another.annotation=blahvalue): Some data.
  *
- * Returns: (attribute some.other.regress_annotation value2) (attribute yet.another.regress_annotation another_value): The return value.
+ * Returns: (attributes some.other.annotation=value2 yet.another.annotation=another_value): The return value.
  */
 gint
 regress_annotation_attribute_func (RegressAnnotationObject *object,

@@ -5,7 +5,7 @@
 # cmph (static lib) projects
 # --------------------------
 ./build/win32/vs9/cmph.vcproj: $(top_srcdir)/build/win32/vs9/cmph.vcprojin
-	for F in `echo $(libcmph_la_SOURCES) | tr '/' '\\'`; do \
+	for F in `echo $(libcmph_la_SOURCES) | tr '/' '\\\\'`; do \
 		case $$F in \
 		*.c)	echo '   <File RelativePath="..\..\..\'$$F'" />' \
 			;; \
@@ -15,7 +15,7 @@
 	rm cmph.sourcefiles
 
 ./build/win32/vs10/cmph.vcxproj: $(top_srcdir)/build/win32/vs10/cmph.vcxprojin
-	for F in `echo $(libcmph_la_SOURCES) | tr '/' '\\'`; do \
+	for F in `echo $(libcmph_la_SOURCES) | tr '/' '\\\\'`; do \
 		case $$F in \
 		*.c)	echo '    <ClCompile Include="..\..\..\'$$F'" />' \
 			;; \
@@ -25,7 +25,7 @@
 	rm cmph.vs10.sourcefiles
 
 ./build/win32/vs10/cmph.vcxproj.filters: $(top_srcdir)/build/win32/vs10/cmph.vcxproj.filtersin
-	for F in `echo $(libcmph_la_SOURCES) | tr '/' '\\'`; do \
+	for F in `echo $(libcmph_la_SOURCES) | tr '/' '\\\\'`; do \
 		case $$F in \
 		*.c)	echo '    <ClCompile Include="..\..\..\'$$F'"><Filter>Sources</Filter></ClCompile>' \
 			;; \
@@ -38,7 +38,7 @@
 # girepository DLL projects
 # -------------------------
 ./build/win32/vs9/girepository.vcproj: $(top_srcdir)/build/win32/vs9/girepository.vcprojin ./build/win32/vs9/gir.vs9.install
-	for F in `echo $(libgirepository_1_0_la_SOURCES) $(libgirepository_gthash_la_SOURCES) | tr '/' '\\'`; do \
+	for F in `echo $(libgirepository_1_0_la_SOURCES) $(libgirepository_gthash_la_SOURCES) | tr '/' '\\\\'`; do \
 		case $$F in \
 		*.c)	echo '   <File RelativePath="..\..\..\'$$F'" />' \
 			;; \
@@ -48,7 +48,7 @@
 	rm girepository.sourcefiles
 
 ./build/win32/vs10/girepository.vcxproj: $(top_srcdir)/build/win32/vs10/girepository.vcxprojin ./build/win32/vs10/gir.vs10.install
-	for F in `echo $(libgirepository_1_0_la_SOURCES) $(libgirepository_gthash_la_SOURCES) | tr '/' '\\'`; do \
+	for F in `echo $(libgirepository_1_0_la_SOURCES) $(libgirepository_gthash_la_SOURCES) | tr '/' '\\\\'`; do \
 		case $$F in \
 		*.c)	echo '    <ClCompile Include="..\..\..\'$$F'" />' \
 			;; \
@@ -58,7 +58,7 @@
 	rm girepository.vs10.sourcefiles
 
 ./build/win32/vs10/girepository.vcxproj.filters: $(top_srcdir)/build/win32/vs10/girepository.vcxproj.filtersin
-	for F in `echo $(libgirepository_1_0_la_SOURCES) $(libgirepository_gthash_la_SOURCES) | tr '/' '\\'`; do \
+	for F in `echo $(libgirepository_1_0_la_SOURCES) $(libgirepository_gthash_la_SOURCES) | tr '/' '\\\\'`; do \
 		case $$F in \
 		*.c)	echo '    <ClCompile Include="..\..\..\'$$F'"><Filter>Sources</Filter></ClCompile>' \
 			;; \
@@ -76,7 +76,7 @@
 # here)
 # ------------------------------------
 ./build/win32/vs9/g-ir-compiler.vcproj: $(top_srcdir)/build/win32/vs9/g-ir-compiler.vcprojin
-	for F in `echo $(libgirepository_gthash_la_SOURCES) $(libgirepository_internals_la_SOURCES) | tr '/' '\\'`; do \
+	for F in `echo $(libgirepository_gthash_la_SOURCES) $(libgirepository_internals_la_SOURCES) | tr '/' '\\\\'`; do \
 		case $$F in \
 		*.c)	echo '   <File RelativePath="..\..\..\'$$F'" />' \
 			;; \
@@ -86,7 +86,7 @@
 	rm g-ir-compiler.sourcefiles
 
 ./build/win32/vs10/g-ir-compiler.vcxproj: $(top_srcdir)/build/win32/vs10/g-ir-compiler.vcxprojin
-	for F in `echo $(libgirepository_gthash_la_SOURCES) $(libgirepository_internals_la_SOURCES) | tr '/' '\\'`; do \
+	for F in `echo $(libgirepository_gthash_la_SOURCES) $(libgirepository_internals_la_SOURCES) | tr '/' '\\\\'`; do \
 		case $$F in \
 		*.c)	echo '    <ClCompile Include="..\..\..\'$$F'" />' \
 			;; \
@@ -96,7 +96,7 @@
 	rm g-ir-compiler.vs10.sourcefiles
 
 ./build/win32/vs10/g-ir-compiler.vcxproj.filters: $(top_srcdir)/build/win32/vs10/g-ir-compiler.vcxproj.filtersin
-	for F in `echo $(libgirepository_gthash_la_SOURCES) $(libgirepository_internals_la_SOURCES) | tr '/' '\\'`; do \
+	for F in `echo $(libgirepository_gthash_la_SOURCES) $(libgirepository_internals_la_SOURCES) | tr '/' '\\\\'`; do \
 		case $$F in \
 		*.c)	echo '    <ClCompile Include="..\..\..\'$$F'"><Filter>Sources</Filter></ClCompile>' \
 			;; \
@@ -110,51 +110,80 @@
 # and Python scripts to install
 #--------------------------------
 ./build/win32/vs9/gir.vs9.install:
-	echo 'mkdir $$(CopyDir)\include\gobject-introspection-$$(GIApiVersion)\girepository&#x0D;&#x0A;' >./build/win32/vs9/gir.vs9.install
+	echo 'mkdir $$(CopyDir)\include\gobject-introspection-$$(ApiVersion)\girepository&#x0D;&#x0A;' >./build/win32/vs9/gir.vs9.install
 	echo '' >>./build/win32/vs9/gir.vs9.install
-	for F in `echo $(girepo_HEADERS) | tr '/' '\\'`; do \
+	for F in `echo $(girepo_HEADERS) | tr '/' '\\\\'`; do \
 		case $$F in \
-		*.h) echo 'copy ..\..\..\'$$F' $$(CopyDir)\include\gobject-introspection-$$(GIApiVersion)\girepository&#x0D;&#x0A;' \
+		*.h) echo 'copy ..\..\..\'$$F' $$(CopyDir)\include\gobject-introspection-$$(ApiVersion)\girepository&#x0D;&#x0A;' \
 			;; \
 		esac; \
 	done >>./build/win32/vs9/gir.vs9.install
 	echo '' >>./build/win32/vs9/gir.vs9.install
 	echo 'mkdir $$(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;' >>./build/win32/vs9/gir.vs9.install
+	echo 'mkdir $$(CopyDir)\lib\gobject-introspection\giscanner\collections&#x0D;&#x0A;' >>./build/win32/vs9/gir.vs9.install
+	echo 'mkdir $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates&#x0D;&#x0A;' >>./build/win32/vs9/gir.vs9.install
+	echo 'mkdir $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;' >>./build/win32/vs9/gir.vs9.install
+	echo 'mkdir $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;' >>./build/win32/vs9/gir.vs9.install
+	echo 'mkdir $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;' >>./build/win32/vs9/gir.vs9.install
 	echo '' >>./build/win32/vs9/gir.vs9.install
-	for F in `echo $(pkgpyexec_PYTHON) | tr '/' '\\'`; do \
+	for F in `echo $(pkgpyexec_PYTHON) $(collections_PYTHON) $(nobase_dist_template_DATA) | tr '/' '\\\\'`; do \
 		case $$F in \
-		*.py|*.tmpl) echo 'copy ..\..\..\'$$F' $$(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;' \
+		giscanner\\doctemplates\\C\\*.tmpl) echo 'copy ..\..\..\'$$F' $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C&#x0D;&#x0A;' \
+			;; \
+		giscanner\\doctemplates\\Gjs\\*.tmpl) echo 'copy ..\..\..\'$$F' $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs&#x0D;&#x0A;' \
+			;; \
+		giscanner\\doctemplates\\Python\\*.tmpl) echo 'copy ..\..\..\'$$F' $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python&#x0D;&#x0A;' \
+			;; \
+		giscanner\\doctemplates\\*.tmpl) echo 'copy ..\..\..\'$$F' $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates&#x0D;&#x0A;' \
+			;; \
+		giscanner\\collections\\*.py) echo 'copy ..\..\..\'$$F' $$(CopyDir)\lib\gobject-introspection\giscanner\collections&#x0D;&#x0A;' \
+			;; \
+		giscanner\\*.py) echo 'copy ..\..\..\'$$F' $$(CopyDir)\lib\gobject-introspection\giscanner&#x0D;&#x0A;' \
 			;; \
 		esac; \
 	done >>./build/win32/vs9/gir.vs9.install
 
 ./build/win32/vs10/gir.vs10.install:
-	echo 'mkdir $$(CopyDir)\include\gobject-introspection-$$(GIApiVersion)\girepository' >./build/win32/vs10/gir.vs10.install
+	echo 'mkdir $$(CopyDir)\include\gobject-introspection-$$(ApiVersion)\girepository' >./build/win32/vs10/gir.vs10.install
 	echo '' >>./build/win32/vs10/gir.vs10.install
-	for F in `echo $(girepo_HEADERS) | tr '/' '\\'`; do \
+	for F in `echo $(girepo_HEADERS) | tr '/' '\\\\'`; do \
 		case $$F in \
-		*.h) echo 'copy ..\..\..\'$$F' $$(CopyDir)\include\gobject-introspection-$$(GIApiVersion)\girepository' && \
+		*.h) echo 'copy ..\..\..\'$$F' $$(CopyDir)\include\gobject-introspection-$$(ApiVersion)\girepository' && \
 			echo '' \
 			;; \
 		esac; \
 	done >>./build/win32/vs10/gir.vs10.install
 	echo '' >>./build/win32/vs10/gir.vs10.install
-	echo 'mkdir $$(CopyDir)\lib\gobject-introspection\giscanner' >>./build/win32/vs10/gir.vs10.install
+	echo 'mkdir $$(CopyDir)\lib\gobject-introspection\giscanner\collections' >>./build/win32/vs10/gir.vs10.install
+	echo 'mkdir $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates' >>./build/win32/vs10/gir.vs10.install
+	echo 'mkdir $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C' >>./build/win32/vs10/gir.vs10.install
+	echo 'mkdir $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs' >>./build/win32/vs10/gir.vs10.install
+	echo 'mkdir $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python' >>./build/win32/vs10/gir.vs10.install
 	echo '' >>./build/win32/vs10/gir.vs10.install
-	for F in `echo $(pkgpyexec_PYTHON) | tr '/' '\\'`; do \
+	for F in `echo $(pkgpyexec_PYTHON) $(collections_PYTHON) $(nobase_dist_template_DATA) | tr '/' '\\\\'`; do \
 		case $$F in \
-		*.py|*.tmpl) echo 'copy ..\..\..\'$$F' $$(CopyDir)\lib\gobject-introspection\giscanner' && \
+		giscanner\\doctemplates\\C\\*.tmpl) echo 'copy ..\..\..\'$$F' $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\C' \
+			;; \
+		giscanner\\doctemplates\\Gjs\\*.tmpl) echo 'copy ..\..\..\'$$F' $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Gjs' \
+			;; \
+		giscanner\\doctemplates\\Python\\*.tmpl) echo 'copy ..\..\..\'$$F' $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates\Python' \
+			;; \
+		giscanner\\doctemplates\\*.tmpl) echo 'copy ..\..\..\'$$F' $$(CopyDir)\lib\gobject-introspection\giscanner\doctemplates' \
+			;; \
+		giscanner\\collections\\*.py) echo 'copy ..\..\..\'$$F' $$(CopyDir)\lib\gobject-introspection\giscanner\collections' \
+			;; \
+		giscanner\\*.py) echo 'copy ..\..\..\'$$F' $$(CopyDir)\lib\gobject-introspection\giscanner' && \
 			echo '' \
 			;; \
 		esac; \
 	done >>./build/win32/vs10/gir.vs10.install
 
-./build/win32/vs9/gir.vsprops: ./build/win32/vs9/gir.vs9.install $(top_srcdir)/build/win32/vs9/gir.vspropsin
-	$(CPP) -P - <$(top_srcdir)/build/win32/vs9/gir.vspropsin >$@
+./build/win32/vs9/gi-install.vsprops: ./build/win32/vs9/gir.vs9.install $(top_srcdir)/build/win32/vs9/gi-install.vspropsin
+	$(CPP) -P - <$(top_srcdir)/build/win32/vs9/gi-install.vspropsin >$@
 	rm ./build/win32/vs9/gir.vs9.install
 
-./build/win32/vs10/gir.props: ./build/win32/vs10/gir.vs10.install $(top_srcdir)/build/win32/vs10/gir.propsin
-	$(CPP) -P - <$(top_srcdir)/build/win32/vs10/gir.propsin >$@
+./build/win32/vs10/gi-install.props: ./build/win32/vs10/gir.vs10.install $(top_srcdir)/build/win32/vs10/gi-install.propsin
+	$(CPP) -P - <$(top_srcdir)/build/win32/vs10/gi-install.propsin >$@
 	rm ./build/win32/vs10/gir.vs10.install
 
 GENERATED_MSVC_FILES =	\
@@ -170,7 +199,6 @@ GENERATED_MSVC_FILES =	\
 	config.h.win32
 
 EXTRA_DIST +=	\
-	./girepository/girepository.symbols	\
 	$(GENERATED_MSVC_FILES)
 
 CLEANFILES += $(GENERATED_MSVC_FILES)

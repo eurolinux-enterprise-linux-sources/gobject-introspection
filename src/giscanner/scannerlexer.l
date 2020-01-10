@@ -31,11 +31,18 @@
 %{
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
+#ifndef _WIN32
+#include <limits.h>
+#endif
 
 #include <glib.h>
 #include "sourcescanner.h"
 #include "scannerparser.h"
-#include "grealpath.h"
+
+#ifdef USE_WINDOWS
+#include <windows.h>
+#endif
 
 int lineno;
 char linebuf[2000];
@@ -48,9 +55,10 @@ extern int yylex (GISourceScanner *scanner);
 static int yywrap (void);
 static void parse_comment (GISourceScanner *scanner);
 static void parse_trigraph (GISourceScanner *scanner);
-static void process_linemarks (GISourceScanner *scanner);
+static void process_linemarks (GISourceScanner *scanner, gboolean has_line);
 static int check_identifier (GISourceScanner *scanner, const char *);
 static int parse_ignored_macro (void);
+static void print_error (GISourceScanner *scanner);
 %}
 
 %option nounput
@@ -71,6 +79,7 @@ stringtext				([^\\\"])|(\\.)
 						++lineno;
 					}
 "\\\n"					{ ++lineno; }
+
 [\t\f\v\r ]+				{ /* Ignore whitespace. */ }
 
 "/*"					{ parse_comment(scanner); }
@@ -79,9 +88,18 @@ stringtext				([^\\\"])|(\\.)
 
 "#define "[a-zA-Z_][a-zA-Z_0-9]*"("	{ yyless (yyleng - 1); return FUNCTION_MACRO; }
 "#define "[a-zA-Z_][a-zA-Z_0-9]*	{ return OBJECT_MACRO; }
+"#ifdef"[\t ]+"__GI_SCANNER__"[\t ]?.*"\n" { return IFDEF_GI_SCANNER; }
+"#ifndef"[\t ]+"__GI_SCANNER__"[\t ]?.*"\n" { return IFNDEF_GI_SCANNER; }
+"#ifndef ".*"\n"			{ return IFNDEF_COND; }
+"#ifdef ".*"\n"				{ return IFDEF_COND; }
+"#if ".*"\n"				{ return IF_COND; }
+"#elif ".*"\n"				{ return ELIF_COND; }
+"#else".*"\n"				{ return ELSE_COND; }
+"#endif".*"\n"				{ return ENDIF_COND; }
 "#pragma ".*"\n"			{ /* Ignore pragma. */ }
 
-"# "[0-9]+" ".*"\n"			{ process_linemarks(scanner); }
+"# "[0-9]+" ".*"\n"			{ process_linemarks(scanner, FALSE); }
+"#line "[0-9]+" ".*"\n"			{ process_linemarks(scanner, TRUE); }
 "#"			                { }
 "{"					{ return '{'; }
 "<%"					{ return '{'; }
@@ -134,21 +152,43 @@ stringtext				([^\\\"])|(\\.)
 ","					{ return ','; }
 "->"					{ return ARROW; }
 
+"__asm"[\t\f\v\r ]+"volatile"  	        { if (!parse_ignored_macro()) REJECT; }
+"__asm__"[\t\f\v\r ]+"volatile"	        { if (!parse_ignored_macro()) REJECT; }
+"__asm__"[\t\f\v\r ]+"__volatile__"	{ if (!parse_ignored_macro()) REJECT; }
 "__asm" 	        	        { if (!parse_ignored_macro()) REJECT; }
 "__asm__" 	        	        { if (!parse_ignored_macro()) REJECT; }
 "__attribute__" 		        { if (!parse_ignored_macro()) REJECT; }
 "__attribute" 		                { if (!parse_ignored_macro()) REJECT; }
 "__const"                               { return CONST; }
 "__extension__"                         { return EXTENSION; }
+"__inline__"                            { return INLINE; }
 "__inline"				{ return INLINE; }
 "__nonnull" 			        { if (!parse_ignored_macro()) REJECT; }
+"_Noreturn" 			        { /* Ignore */ }
 "__signed__"				{ return SIGNED; }
 "__restrict"				{ return RESTRICT; }
+"__restrict__"				{ return RESTRICT; }
 "__typeof"				{ if (!parse_ignored_macro()) REJECT; }
+"__volatile"	        	        { return VOLATILE; }
+"__volatile__"	        	        { return VOLATILE; }
 "_Bool"					{ return BOOL; }
+"typedef char __static_assert_t".*"\n"	{ /* Ignore */ }
+"__cdecl" 	        	        { /* Ignore */ }
+"__declspec(deprecated(".*"))"		{ /* Ignore */ }
+"__declspec"[\t ]*"("[a-z\t ]+")"	{ /* Ignore */ }
+"__stdcall" 			        { /* ignore */ }
+"__w64"					{ /* ignore */ }
+"__int64"				{ return INT; }
+
 
 "G_GINT64_CONSTANT"			{ return INTL_CONST; }
 "G_GUINT64_CONSTANT"			{ return INTUL_CONST; }
+
+"TRUE"					{ return BOOLEAN; }
+"FALSE"					{ return BOOLEAN; }
+"true"					{ return BOOLEAN; }
+"false"					{ return BOOLEAN; }
+
 [a-zA-Z_][a-zA-Z_0-9]*			{ if (scanner->macro_scan) return check_identifier(scanner, yytext); else REJECT; }
 
 "asm"           		        { if (!parse_ignored_macro()) REJECT; }
@@ -170,6 +210,10 @@ stringtext				([^\\\"])|(\\.)
 "if"					{ return IF; }
 "inline"				{ return INLINE; }
 "int"					{ return INT; }
+"__uint128_t"				{ return INT; }
+"__int128_t"				{ return INT; }
+"__uint128"				{ return INT; }
+"__int128"				{ return INT; }
 "long"					{ return LONG; }
 "register"				{ return REGISTER; }
 "restrict"				{ return RESTRICT; }
@@ -202,7 +246,7 @@ stringtext				([^\\\"])|(\\.)
 "\""{stringtext}*"\""			{ return STRING; }
 "L\""{stringtext}*"\""			{ return STRING; }
 
-.					{ if (yytext[0]) fprintf(stderr, "%s:%d: unexpected character `%c'\n", scanner->current_filename, lineno, yytext[0]); }
+.					{ print_error(scanner); }
 
 %%
 
@@ -212,54 +256,70 @@ yywrap (void)
   return 1;
 }
 
-
 static void
 parse_comment (GISourceScanner *scanner)
 {
-  GString *string = NULL;
   int c1, c2;
+  GString *string = NULL;
   GISourceComment *comment;
   int comment_lineno;
   int skip = FALSE;
 
-  if (!g_list_find_custom (scanner->filenames,
-                           scanner->current_filename,
-                           (GCompareFunc)g_strcmp0)) {
-      skip = TRUE;
-  } else {
-      string = g_string_new ("/*");
-  }
-
   c1 = input();
   c2 = input();
 
-  comment_lineno = lineno;
-
-  while (c2 != EOF && !(c1 == '*' && c2 == '/'))
-    {
-      if (!skip)
-        g_string_append_c (string, c1);
-
-      if (c1 == '\n')
-        lineno++;
-
-      c1 = c2;
-      c2 = input();
+  if (c2 != EOF && (c1 == '*' && c2 != '*' && c2 != '/')) {
+    /*
+     * Store GTK-Doc comment blocks,
+     * starts with one '/' followed by exactly two '*' and not followed by a '/'
+     */
+    if (!g_hash_table_contains (scanner->files, scanner->current_file)) {
+        skip = TRUE;
+    } else {
+        string = g_string_new (yytext);
     }
 
-  if (skip) {
-      return;
+    comment_lineno = lineno;
+
+    while (c2 != EOF && !(c1 == '*' && c2 == '/'))
+      {
+        if (!skip)
+          g_string_append_c (string, c1);
+
+        if (c1 == '\n')
+          lineno++;
+
+        c1 = c2;
+        c2 = input();
+      }
+
+    if (skip) {
+        return;
+    }
+
+    g_string_append (string, "*/");
+
+    comment = g_slice_new (GISourceComment);
+    comment->comment = g_string_free (string, FALSE);
+    comment->line = comment_lineno;
+    comment->filename = g_file_get_parse_name (scanner->current_file);
+
+    gi_source_scanner_take_comment (scanner, comment);
+  } else {
+    /*
+     * Ignore all other comment blocks
+     */
+    while (c2 != EOF && !(c1 == '*' && c2 == '/'))
+      {
+        if (c1 == '\n')
+          lineno++;
+
+        c1 = c2;
+        c2 = input();
+      }
+
+    return;
   }
-
-  g_string_append (string, "*/");
-
-  comment = g_slice_new (GISourceComment);
-  comment->comment = g_string_free (string, FALSE);
-  comment->line = comment_lineno;
-  comment->filename = g_strdup(scanner->current_filename);
-
-  scanner->comments = g_slist_prepend (scanner->comments,
-                                       comment);
 }
 
 static int
@@ -280,29 +340,88 @@ check_identifier (GISourceScanner *scanner,
 	return IDENTIFIER;
 }
 
+/* taken from glib/gfileutils.c */
+#if defined(MAXPATHLEN)
+#define G_PATH_LENGTH MAXPATHLEN
+#elif defined(PATH_MAX)
+#define G_PATH_LENGTH PATH_MAX
+#elif defined(_PC_PATH_MAX)
+#define G_PATH_LENGTH sysconf(_PC_PATH_MAX)
+#else
+#define G_PATH_LENGTH 2048
+#endif
+
+static inline char *
+_realpath (const char *path)
+{
+#ifndef _WIN32
+  char buffer[G_PATH_LENGTH];
+
+  return realpath (path, buffer) ? g_strdup (buffer) : NULL;
+#else
+  /* We don't want to include <windows.h> as it clashes horribly
+   * with token names from scannerparser.h. So just declare
+   * GetFullPathNameA() here unless we already defined it, like
+   * in giscanner.c.
+   */
+#ifndef USE_WINDOWS
+  extern __stdcall GetFullPathNameA(const char*, int, char*, char**);
+#endif
+  char *buffer;
+  char dummy;
+  int rc, len;
+
+  rc = GetFullPathNameA (path, 1, &dummy, NULL);
+  if (rc == 0)
+    {
+      /* Weird failure, so just return the input path as such */
+      return g_strdup (path);
+    }
+
+  len = rc + 1;
+  buffer = g_malloc (len);
+
+  rc = GetFullPathNameA (path, len, buffer, NULL);
+  if (rc == 0 || rc > len)
+    {
+      /* Weird failure again */
+      g_free (buffer);
+      return g_strdup (path);
+    }
+  return buffer;
+#endif
+}
+
 /*
  * # linenum "filename" flags
  *  See http://gcc.gnu.org/onlinedocs/cpp/Preprocessor-Output.html
  **/
 
 static void
-process_linemarks (GISourceScanner *scanner)
+process_linemarks (GISourceScanner *scanner, gboolean has_line)
 {
-        char filename[1025];
-        char *compress;
-        char *real;
+	char escaped_filename[1025];
+	char *filename;
+	char *real;
 
-        sscanf(yytext, "# %d \"%1024[^\"]\"", &lineno, filename);
+	if (has_line)
+		sscanf(yytext, "#line %d \"%1024[^\"]\"", &lineno, escaped_filename);
+	else
+		sscanf(yytext, "# %d \"%1024[^\"]\"", &lineno, escaped_filename);
 
-	compress = g_strcompress (filename);
-        real = g_realpath (filename);
-        if (real) {
-                g_free (scanner->current_filename);
-                scanner->current_filename = real;
-        } else {
-                g_free (real);
-        }
-        g_free (compress);
+	filename = g_strcompress (escaped_filename);
+
+        real = _realpath (filename);
+        if (real)
+          {
+            g_free (filename);
+            filename = real;
+          }
+
+        if (scanner->current_file)
+          g_object_unref (scanner->current_file);
+	scanner->current_file = g_file_new_for_path (filename);
+	g_free (filename);
 }
 
 /*
@@ -371,4 +490,14 @@ parse_trigraph (GISourceScanner *scanner)
 			scanner->flags = TRUE;
 	}
 	g_strfreev (items);
+}
+
+static void
+print_error (GISourceScanner *scanner)
+{
+  if (yytext[0]) {
+    char *filename = g_file_get_parse_name (scanner->current_file);
+    fprintf(stderr, "%s:%d: unexpected character `%c'\n", filename, lineno, yytext[0]);
+    g_free (filename);
+  }
 }

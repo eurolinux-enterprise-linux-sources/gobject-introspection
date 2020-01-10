@@ -20,6 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include "config.h"
+
 #include <string.h>
 
 #include <glib.h>
@@ -30,8 +32,8 @@
 
 /**
  * SECTION:giregisteredtypeinfo
- * @Short_description: Struct representing a struct with a GType
- * @Title: GIRegisteredTypeInfo
+ * @title: GIRegisteredTypeInfo
+ * @short_description: Struct representing a struct with a GType
  *
  * GIRegisteredTypeInfo represents an entity with a GType associated. Could
  * be either a #GIEnumInfo, #GIInterfaceInfo, #GIObjectInfo, #GIStructInfo or a

@@ -2,6 +2,8 @@
  *vim: tabstop=4 shiftwidth=4 expandtab
  */
 
+#include "config.h"
+
 #include "gimarshallingtests.h"
 
 #include <string.h>
@@ -2014,6 +2016,7 @@ gi_marshalling_tests_garray_utf8_container_inout (GArray **array_)
   g_array_append_val (result, val3);
   g_array_append_val (result, val4);
 
+  g_array_unref (*array_);
   *array_ = result;
 }
 
@@ -2044,6 +2047,7 @@ gi_marshalling_tests_garray_utf8_full_inout (GArray **array_)
   val = g_strdup ("1");
   g_array_append_val (result, val);
 
+  g_array_unref (*array_);
   *array_ = result;
 }
 
@@ -2231,6 +2235,7 @@ gi_marshalling_tests_gptrarray_utf8_container_inout (GPtrArray **parray_)
   g_ptr_array_add (result, (gpointer) val3);
   g_ptr_array_add (result, (gpointer) val4);
 
+  g_ptr_array_unref (*parray_);
   *parray_ = result;
 }
 
@@ -2261,6 +2266,7 @@ gi_marshalling_tests_gptrarray_utf8_full_inout (GPtrArray **parray_)
   val = g_strdup ("1");
   g_ptr_array_add (result, (gpointer) val);
 
+  g_ptr_array_unref (*parray_);
   *parray_ = result;
 }
 
@@ -2607,6 +2613,7 @@ gi_marshalling_tests_glist_utf8_container_inout (GList **list)
   result = g_list_prepend (result, "-1");
   result = g_list_prepend (result, "-2");
 
+  g_list_free (*list);
   *list = result;
 }
 
@@ -2629,6 +2636,7 @@ gi_marshalling_tests_glist_utf8_full_inout (GList **list)
   result = g_list_prepend (result, g_strdup ("-1"));
   result = g_list_prepend (result, g_strdup ("-2"));
 
+  g_list_free_full (*list, g_free);
   *list = result;
 }
 
@@ -2834,6 +2842,7 @@ gi_marshalling_tests_gslist_utf8_container_inout (GSList **list)
   result = g_slist_prepend (result, "-1");
   result = g_slist_prepend (result, "-2");
 
+  g_slist_free (*list);
   *list = result;
 }
 
@@ -2856,6 +2865,7 @@ gi_marshalling_tests_gslist_utf8_full_inout (GSList **list)
   result = g_slist_prepend (result, g_strdup ("-1"));
   result = g_slist_prepend (result, g_strdup ("-2"));
 
+  g_slist_free_full (*list, g_free);
   *list = result;
 }
 
@@ -3060,6 +3070,7 @@ gi_marshalling_tests_ghashtable_utf8_container_inout (GHashTable **hash_table)
   g_hash_table_insert (result, "0", "0");
   g_hash_table_insert (result, "1", "1");
 
+  g_hash_table_unref (*hash_table);
   *hash_table = result;
 }
 
@@ -3082,6 +3093,7 @@ gi_marshalling_tests_ghashtable_utf8_full_inout (GHashTable **hash_table)
   g_hash_table_insert (result, g_strdup ("0"), g_strdup ("0"));
   g_hash_table_insert (result, g_strdup ("1"), g_strdup ("1"));
 
+  g_hash_table_unref (*hash_table);
   *hash_table = result;
 }
 
@@ -3135,6 +3147,20 @@ void
 gi_marshalling_tests_gvalue_in_with_type (GValue *value, GType type)
 {
   g_assert (g_type_is_a (G_VALUE_TYPE (value), type));
+}
+
+/**
+ * gi_marshalling_tests_gvalue_in_with_modification:
+ * @value: (transfer none):
+ *
+ * Expects a GValue passed by reference which is then modified by
+ * this function.
+ */
+void
+gi_marshalling_tests_gvalue_in_with_modification (GValue *value)
+{
+  g_assert_cmpint (g_value_get_int (value), ==, 42);
+  g_value_set_int (value, 24);
 }
 
 /**
@@ -3791,6 +3817,7 @@ gi_marshalling_tests_boxed_struct_inout (GIMarshallingTestsBoxedStruct **struct_
 {
   g_assert_cmpint ((*struct_)->long_, ==, 42);
 
+  g_boxed_free (gi_marshalling_tests_boxed_struct_get_type(), *struct_);
   (*struct_) = g_slice_new0 (GIMarshallingTestsBoxedStruct);
   (*struct_)->long_ = 0;
 }
@@ -3968,6 +3995,19 @@ gi_marshalling_tests_object_new (gint int_)
   return g_object_new (GI_MARSHALLING_TESTS_TYPE_OBJECT, "int", int_, NULL);
 }
 
+GIMarshallingTestsObject *
+gi_marshalling_tests_object_new_fail (gint int_, GError **error)
+{
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+  g_set_error_literal (error,
+                       g_quark_from_static_string (GI_MARSHALLING_TESTS_CONSTANT_GERROR_DOMAIN),
+                       GI_MARSHALLING_TESTS_CONSTANT_GERROR_CODE,
+                       GI_MARSHALLING_TESTS_CONSTANT_GERROR_MESSAGE);
+
+  return NULL;
+}
+
 /**
  * gi_marshalling_tests_object_method_array_in:
  * @ints: (array length=length):
@@ -4100,11 +4140,9 @@ static void
 }
 
 /**
- * gi_marshalling_tests_object_vfunc_with_callback:
+ * gi_marshalling_tests_object_vfunc_with_callback: (virtual vfunc_with_callback)
  * @callback: (scope call) (closure callback_data):
  * @callback_data: (allow-none):
- *
- * Virtual: vfunc_with_callback
  */
 void
 gi_marshalling_tests_object_vfunc_with_callback (GIMarshallingTestsObject *
@@ -4221,11 +4259,12 @@ gi_marshalling_tests_object_full_inout (GIMarshallingTestsObject **object)
 {
   g_assert_cmpint ((*object)->int_, ==, 42);
 
+  g_object_unref (*object);
   *object = g_object_new (GI_MARSHALLING_TESTS_TYPE_OBJECT, NULL);
 }
 
 /**
- * gi_marshalling_tests_object_test_int8_in:
+ * gi_marshalling_tests_object_int8_in:
  * @in: (in):
  */
 void
@@ -4235,7 +4274,7 @@ gi_marshalling_tests_object_int8_in (GIMarshallingTestsObject *object, gint8 in)
 }
 
 /**
- * gi_marshalling_tests_object_test_int8_out:
+ * gi_marshalling_tests_object_int8_out:
  * @out: (out):
  */
 void
@@ -4337,6 +4376,26 @@ glong
     GI_MARSHALLING_TESTS_OBJECT_GET_CLASS (self)->vfunc_return_value_and_multiple_out_parameters (self, a, b);
   g_assert_cmpint (local, ==, 0x12345678);
   return return_value;
+}
+
+/**
+ * gi_marshalling_tests_callback_owned_boxed:
+ * @callback: (scope call) (closure callback_data):
+ * @callback_data: (allow-none):
+ */
+glong
+gi_marshalling_tests_callback_owned_boxed (GIMarshallingTestsCallbackOwnedBoxed callback,
+                                           void *callback_data)
+{
+  static GIMarshallingTestsBoxedStruct *box = NULL;
+  glong ret;
+
+  if (!box)
+    box = gi_marshalling_tests_boxed_struct_new ();
+  box->long_++;
+  callback (box, callback_data);
+  ret = box->long_;
+  return ret;
 }
 
 gboolean
@@ -4596,6 +4655,7 @@ gi_marshalling_tests_interface_get_type (void)
   static GType type = 0;
   if (type == 0)
     {
+      /* Not adding prerequisite here for test purposes */
       type = g_type_register_static_simple (G_TYPE_INTERFACE,
                                             "GIMarshallingTestsInterface",
                                             sizeof
@@ -4626,6 +4686,42 @@ gi_marshalling_tests_test_interface_test_int8_in (GIMarshallingTestsInterface *t
   gi_marshalling_tests_interface_test_int8_in (test_iface, in);
 }
 
+
+static void test_interface_init (GIMarshallingTestsInterfaceIface *iface);
+
+G_DEFINE_TYPE_WITH_CODE (GIMarshallingTestsInterfaceImpl, gi_marshalling_tests_interface_impl, G_TYPE_OBJECT,
+                         G_IMPLEMENT_INTERFACE(GI_MARSHALLING_TESTS_TYPE_INTERFACE, test_interface_init))
+
+static void
+gi_marshalling_tests_interface_impl_test_int8_in (GIMarshallingTestsInterface *self, gint8 in)
+{
+}
+
+static void test_interface_init (GIMarshallingTestsInterfaceIface *iface)
+{
+  iface->test_int8_in = gi_marshalling_tests_interface_impl_test_int8_in;
+}
+
+static void
+gi_marshalling_tests_interface_impl_init (GIMarshallingTestsInterfaceImpl *object)
+{
+}
+
+static void
+gi_marshalling_tests_interface_impl_class_init (GIMarshallingTestsInterfaceImplClass *klass)
+{
+}
+
+/**
+ * gi_marshalling_tests_interface_impl_get_as_interface:
+ *
+ * Returns: (transfer none):
+ */
+GIMarshallingTestsInterface *
+gi_marshalling_tests_interface_impl_get_as_interface (GIMarshallingTestsInterfaceImpl *self)
+{
+  return (GIMarshallingTestsInterface *) self;
+}
 
 static void
 gi_marshalling_tests_interface2_class_init (void *g_iface)
@@ -4719,6 +4815,83 @@ gi_marshalling_tests_int_return_out (gint *int_)
 {
   *int_ = 7;
   return 6;
+}
+
+/**
+* gi_marshalling_tests_int_two_in_utf8_two_in_with_allow_none:
+* @a: (in): Must be 1
+* @b: (in): Must be 2
+* @c: (in) (allow-none): Must be "3" or NULL
+* @d: (in) (allow-none): Must be "4" or NULL
+*/
+void
+gi_marshalling_tests_int_two_in_utf8_two_in_with_allow_none (gint a, gint b, const gchar *c, const gchar *d)
+{
+    g_assert_cmpint (a, ==, 1);
+    g_assert_cmpint (b, ==, 2);
+    if (c != NULL)
+        g_assert_cmpstr (c, ==, "3");
+    if (d != NULL)
+        g_assert_cmpstr (d, ==, "4");
+}
+
+/**
+* gi_marshalling_tests_int_one_in_utf8_two_in_one_allows_none:
+* @a: (in): Must be 1
+* @b: (in) (allow-none): Must be "2" or NULL
+* @c: (in): Must be "3"
+*/
+void
+gi_marshalling_tests_int_one_in_utf8_two_in_one_allows_none (gint a, const gchar *b, const gchar *c)
+{
+    g_assert_cmpint (a, ==, 1);
+    if (b != NULL)
+        g_assert_cmpstr (b, ==, "2");
+    g_assert_cmpstr (c, ==, "3");
+}
+
+/**
+ * gi_marshalling_tests_array_in_utf8_two_in:
+ * @ints: (array length=length):
+ * @length:
+ * @a: (in) (allow-none): Must be "1" or NULL
+ * @b: (in) (allow-none): Must be "2" or NULL
+ */
+void
+gi_marshalling_tests_array_in_utf8_two_in (const gint *ints, gint length, const gchar *a, const gchar *b)
+{
+  g_assert_cmpint (length, ==, 4);
+  g_assert_cmpint (ints[0], ==, -1);
+  g_assert_cmpint (ints[1], ==, 0);
+  g_assert_cmpint (ints[2], ==, 1);
+  g_assert_cmpint (ints[3], ==, 2);
+
+  if (a != NULL)
+      g_assert_cmpstr (a, ==, "1");
+  if (b != NULL)
+      g_assert_cmpstr (b, ==, "2");
+}
+
+/**
+ * gi_marshalling_tests_array_in_utf8_two_in_out_of_order:
+ * @length:
+ * @a: (in) (allow-none): Must be "1" or NULL
+ * @ints: (array length=length):
+ * @b: (in) (allow-none): Must be "2" or NULL
+ */
+void
+gi_marshalling_tests_array_in_utf8_two_in_out_of_order (gint length, const gchar *a, const gint *ints, const gchar *b)
+{
+  g_assert_cmpint (length, ==, 4);
+  g_assert_cmpint (ints[0], ==, -1);
+  g_assert_cmpint (ints[1], ==, 0);
+  g_assert_cmpint (ints[2], ==, 1);
+  g_assert_cmpint (ints[3], ==, 2);
+
+  if (a != NULL)
+      g_assert_cmpstr (a, ==, "1");
+  if (b != NULL)
+      g_assert_cmpstr (b, ==, "2");
 }
 
 /* GError */
@@ -4920,7 +5093,7 @@ void
 gi_marshalling_tests_param_spec_in_bool (const GParamSpec *param)
 {
   g_assert (G_IS_PARAM_SPEC (param));
-  g_assert_cmpint (G_PARAM_SPEC_TYPE (param), ==, G_TYPE_BOOLEAN);
+  g_assert_cmpint (G_PARAM_SPEC_VALUE_TYPE (param), ==, G_TYPE_BOOLEAN);
   g_assert_cmpstr (g_param_spec_get_name ((GParamSpec *) param), ==, "mybool");
 }
 
@@ -5221,10 +5394,7 @@ static void gi_marshalling_tests_properties_object_class_init (GIMarshallingTest
                                                        (), G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT));
 
     /**
-     * GIMarshallingTestsPropertiesObject:some-boxed-glist:
-     *
-     * Type: GLib.List(gint)
-     * Transfer: none
+     * GIMarshallingTestsPropertiesObject:some-boxed-glist: (type GLib.List(gint)) (transfer none):
      */
   g_object_class_install_property (object_class, SOME_BOXED_GLIST_PROPERTY,
                                    g_param_spec_boxed ("some-boxed-glist",

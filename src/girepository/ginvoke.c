@@ -19,6 +19,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include "config.h"
+
 #include <stdlib.h>
 
 #include <glib.h>
@@ -26,8 +28,14 @@
 
 #include <girepository.h>
 #include "girffi.h"
-#include "config.h"
 
+/**
+ * value_to_ffi_type:
+ * @gvalue: TODO
+ * @value: TODO
+ *
+ * TODO
+ */
 static ffi_type *
 value_to_ffi_type (const GValue *gvalue, gpointer *value)
 {
@@ -89,7 +97,14 @@ value_to_ffi_type (const GValue *gvalue, gpointer *value)
   return rettype;
 }
 
-/* See comment aboe set_gargument_from_ffi_return_value() */
+/**
+ * g_value_to_ffi_return_type:
+ * @gvalue: TODO
+ * @ffi_value: TODO
+ * @value: TODO
+ *
+ * TODO
+ */
 static ffi_type *
 g_value_to_ffi_return_type (const GValue *gvalue,
 			    const GIArgument *ffi_value,
@@ -153,6 +168,13 @@ g_value_to_ffi_return_type (const GValue *gvalue,
   return rettype;
 }
 
+/**
+ * g_value_from_ffi_value:
+ * @gvalue: TODO
+ * @value: TODO
+ *
+ * TODO
+ */
 static void
 g_value_from_ffi_value (GValue           *gvalue,
                         const GIArgument *value)
@@ -210,6 +232,17 @@ g_value_from_ffi_value (GValue           *gvalue,
 
 }
 
+/**
+ * gi_cclosure_marshal_generic:
+ * @closure: TODO
+ * @return_gvalue: TODO
+ * @n_param_values: TODO
+ * @param_values: TODO
+ * @invocation_hint: TODO
+ * @marshal_data: TODO
+ *
+ * TODO
+ */
 void
 gi_cclosure_marshal_generic (GClosure *closure,
                              GValue *return_gvalue,

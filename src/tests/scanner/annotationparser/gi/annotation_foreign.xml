@@ -1,22 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<tests>
+<tests xmlns="http://schemas.gnome.org/gobject-introspection/2013/test">
 
 <test>
-  <commentblock>/**
+  <input>/**
  * FooForeignStruct: (foreign)
  *
- */</commentblock>
-  <docblock>
-    <identifier>
-      <name>FooForeignStruct</name>
-      <annotations>
-        <annotation>
-          <name>foreign</name>
-        </annotation>
-      </annotations>
-    </identifier>
-  </docblock>
+ */</input>
+  <parser>
+    <docblock>
+      <identifier>
+        <name>FooForeignStruct</name>
+        <annotations>
+          <annotation>
+            <name>foreign</name>
+          </annotation>
+        </annotations>
+      </identifier>
+    </docblock>
+  </parser>
+  <output>/**
+ * FooForeignStruct: (foreign)
+ */</output>
 </test>
 
 </tests>

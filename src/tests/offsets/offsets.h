@@ -5,6 +5,8 @@
 #include <glib-object.h>
 #include <time.h>
 
+#include "gitestmacros.h"
+
 /* Test we get the alignment right for various basic types; we put
  * a char in front of of each field to make it more likely that we'll
  * stress out the alignment code.
@@ -119,8 +121,7 @@ struct _OffsetsArray
   gpointer some_ptrs[5];
 };
 
-/** Test object offsets
- */
+/* Test object offsets */
 
 typedef struct _OffsetsObj OffsetsObj;
 typedef struct _OffsetsObjClass OffsetsObjClass;

@@ -20,6 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include "config.h"
+
 #include <glib.h>
 
 #include <girepository.h>
@@ -28,8 +30,8 @@
 
 /**
  * SECTION:giunioninfo
- * @Short_description: Struct representing a union.
- * @Title: GIUnionInfo
+ * @title: GIUnionInfo
+ * @short_description: Struct representing a union.
  *
  * GIUnionInfo represents a union type.
  *
@@ -147,7 +149,7 @@ g_union_info_is_discriminated (GIUnionInfo *info)
 }
 
 /**
- * g_union_info_get_discrimintor_offset:
+ * g_union_info_get_discriminator_offset:
  * @info: a #GIUnionInfo
  *
  * Returns offset of the discriminator field in the structure.

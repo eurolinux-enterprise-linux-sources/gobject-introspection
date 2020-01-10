@@ -25,6 +25,7 @@
 
 #include <glib.h>
 #include <stdio.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 
@@ -105,15 +106,16 @@ struct _GISourceComment
 
 struct _GISourceScanner
 {
-  char *current_filename;
+  GFile *current_file;
   gboolean macro_scan;
   gboolean private; /* set by gtk-doc comment <private>/<public> */
   gboolean flags; /* set by gtk-doc comment <flags> */
   GSList *symbols;
-  GList *filenames;
+  GHashTable *files;
   GSList *comments; /* _GIComment */
   GHashTable *typedef_table;
-  GHashTable *struct_or_union_or_enum_table;
+  gboolean skipping;
+  GQueue conditionals;
 };
 
 struct _GISourceSymbol
@@ -129,6 +131,8 @@ struct _GISourceSymbol
   char *const_string;
   gboolean const_double_set;
   double const_double;
+  gboolean const_boolean_set;
+  int const_boolean;
   char *source_filename;
   int line;
 };
@@ -158,7 +162,7 @@ GSList *            gi_source_scanner_get_symbols      (GISourceScanner  *scanne
 GSList *            gi_source_scanner_get_comments     (GISourceScanner  *scanner);
 void                gi_source_scanner_free             (GISourceScanner  *scanner);
 
-GISourceSymbol *    gi_source_symbol_new               (GISourceSymbolType  type, const gchar *filename, int line);
+GISourceSymbol *    gi_source_symbol_new               (GISourceSymbolType  type, GFile *file, int line);
 gboolean            gi_source_symbol_get_const_boolean (GISourceSymbol     *symbol);
 GISourceSymbol *    gi_source_symbol_ref               (GISourceSymbol     *symbol);
 void                gi_source_symbol_unref             (GISourceSymbol     *symbol);
@@ -167,6 +171,8 @@ GISourceSymbol *    gi_source_symbol_copy              (GISourceSymbol     *symb
 /* Private */
 void                gi_source_scanner_add_symbol       (GISourceScanner  *scanner,
 							GISourceSymbol   *symbol);
+void                gi_source_scanner_take_comment     (GISourceScanner *scanner,
+                                                        GISourceComment *comment);
 gboolean            gi_source_scanner_is_typedef       (GISourceScanner  *scanner,
 							const char       *name);
 void                gi_source_symbol_merge_type        (GISourceSymbol   *symbol,
